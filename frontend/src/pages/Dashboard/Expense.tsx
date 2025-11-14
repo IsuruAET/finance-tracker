@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import type { Transaction } from "../../types/dashboard";
 import type { DeleteAlertState } from "../../components/DeleteAlert";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -16,8 +15,6 @@ import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
 
 const Expense = () => {
-  useUserAuth();
-
   const [expenseData, setExpenseData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({

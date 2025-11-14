@@ -12,6 +12,8 @@ interface UserContextType {
   user: User | null;
   updateUser: (userData: User) => void;
   clearUser: () => void;
+  isLoading: boolean;
+  setIsLoading: (loading: boolean) => void;
 }
 
 export const UserContext = createContext<UserContextType | undefined>(

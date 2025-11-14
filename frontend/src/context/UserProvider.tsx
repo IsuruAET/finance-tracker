@@ -13,6 +13,7 @@ interface UserProviderProps {
 
 const UserProvider = ({ children }: UserProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   const updateUser = (userData: User) => {
     setUser(userData);
@@ -23,7 +24,9 @@ const UserProvider = ({ children }: UserProviderProps) => {
   };
 
   return (
-    <UserContext.Provider value={{ user, updateUser, clearUser }}>
+    <UserContext.Provider
+      value={{ user, updateUser, clearUser, isLoading, setIsLoading }}
+    >
       {children}
     </UserContext.Provider>
   );

@@ -1,38 +1,32 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useUserContext } from "../context/UserContext";
 import { useNavigate } from "react-router-dom";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 
 export const useUserAuth = () => {
-  const { user, updateUser, clearUser } = useUserContext();
+  const { user, updateUser, clearUser, setIsLoading } = useUserContext();
   const navigate = useNavigate();
+  const hasFetched = useRef(false);
 
   useEffect(() => {
-    if (user) return;
-
-    let isMounted = true;
-
-    const fetchUserInfo = async () => {
-      try {
-        const response = await axiosInstance.get(API_PATHS.AUTH.GET_USER_INFO);
-
-        if (isMounted && response.data) {
-          updateUser(response.data);
-        }
-      } catch (error) {
-        console.error("Failed to fetch user info:", error);
-        if (isMounted) {
+    const token = localStorage.getItem("token");
+    if (token && !user && !hasFetched.current) {
+      hasFetched.current = true;
+      setIsLoading(true);
+      axiosInstance
+        .get(API_PATHS.AUTH.GET_USER_INFO)
+        .then((res) => {
+          updateUser(res.data);
+          setIsLoading(false);
+        })
+        .catch(() => {
           clearUser();
+          setIsLoading(false);
           navigate("/login");
-        }
-      }
-    };
-
-    fetchUserInfo();
-
-    return () => {
-      isMounted = false;
-    };
-  }, [updateUser, clearUser, navigate, user]);
+        });
+    } else {
+      setIsLoading(false);
+    }
+  }, [clearUser, navigate, updateUser, user, setIsLoading]);
 };

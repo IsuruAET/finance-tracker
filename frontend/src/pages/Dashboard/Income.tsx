@@ -12,13 +12,10 @@ import IncomeList from "../../components/Income/IncomeList";
 import DeleteAlert, {
   type DeleteAlertState,
 } from "../../components/DeleteAlert";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import type { Transaction } from "../../types/dashboard";
 import axios from "axios";
 
 const Income = () => {
-  useUserAuth();
-
   const [incomeData, setIncomeData] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({

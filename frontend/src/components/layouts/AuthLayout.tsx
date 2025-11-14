@@ -1,5 +1,5 @@
 import { LuTrendingUpDown } from "react-icons/lu";
-import LOGIN_CARD from "../../assets/images/LoginCard.png";
+import loginCard from "../../assets/images/login-card.svg";
 
 const AuthLayout = ({ children }: { children: React.ReactNode }) => {
   return (
@@ -24,7 +24,7 @@ const AuthLayout = ({ children }: { children: React.ReactNode }) => {
         </div>
 
         <img
-          src={LOGIN_CARD}
+          src={loginCard}
           className="w-64 lg:w-[90%] absolute bottom-10 shadow-lg shadow-blue-400/15"
         />
       </div>

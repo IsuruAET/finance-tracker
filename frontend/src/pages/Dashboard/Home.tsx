@@ -1,6 +1,5 @@
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
-import { useUserAuth } from "../../hooks/useUserAuth";
 import { useCallback, useEffect, useState } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -18,8 +17,6 @@ import type { DashboardDataResponse } from "../../types/dashboard";
 import RecentIncome from "../../components/Dashboard/RecentIncome";
 
 const Home = () => {
-  useUserAuth();
-
   const navigate = useNavigate();
 
   const [dashboardData, setDashboardData] =
