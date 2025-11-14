@@ -2,6 +2,7 @@ import { Response } from "express";
 import Income from "../models/Income";
 import { AuthenticatedRequest } from "../types/express";
 import ExcelJS from "exceljs";
+import { validateAndCreateDateFilter } from "../utils/dateFilter";
 
 // Add Income Source
 export const addIncome = async (
@@ -46,7 +47,24 @@ export const getAllIncomes = async (
   const userId = req.user?._id;
 
   try {
-    const income = await Income.find({ userId }).sort({ date: -1 });
+    // Validate date filter query parameters
+    const { startDate, endDate } = req.query;
+    const dateFilterResult = validateAndCreateDateFilter(
+      startDate as string,
+      endDate as string
+    );
+
+    if (!dateFilterResult.isValid) {
+      return res.status(400).json({ message: dateFilterResult.error });
+    }
+
+    // Build query with date filter if provided
+    const query: any = { userId };
+    if (dateFilterResult.dateFilter) {
+      query.date = dateFilterResult.dateFilter;
+    }
+
+    const income = await Income.find(query).sort({ date: -1 });
 
     return res.status(200).json(income);
   } catch (error: unknown) {
@@ -85,7 +103,25 @@ export const downloadIncomeExcel = async (
   const userId = req.user?._id;
 
   try {
-    const income = await Income.find({ userId }).sort({ date: -1 });
+    // Validate date filter query parameters
+    const { startDate, endDate } = req.query;
+    const dateFilterResult = validateAndCreateDateFilter(
+      startDate as string,
+      endDate as string
+    );
+
+    if (!dateFilterResult.isValid) {
+      res.status(400).json({ message: dateFilterResult.error });
+      return;
+    }
+
+    // Build query with date filter if provided
+    const query: any = { userId };
+    if (dateFilterResult.dateFilter) {
+      query.date = dateFilterResult.dateFilter;
+    }
+
+    const income = await Income.find(query).sort({ date: -1 });
 
     // Create workbook and worksheet
     const workbook = new ExcelJS.Workbook();
