@@ -29,7 +29,7 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
   // Type the props manually
   interface CustomTooltipProps {
     active?: boolean;
-    payload?: {
+    payload?: readonly {
       payload: LineData;
       name?: string;
       value?: number;

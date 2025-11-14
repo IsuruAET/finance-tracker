@@ -35,7 +35,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   // Type the props manually
   interface CustomTooltipProps {
     active?: boolean;
-    payload?: {
+    payload?: readonly {
       payload: BarData;
       name?: string;
       value?: number;
