@@ -31,7 +31,7 @@ export const prepareExpenseBarChartData = (data: Transaction[] = []) => {
   return data.map((item) => ({
     title: item.category ?? "Unknown",
     yAxisValue: item.amount,
-    xAxisValue: "Last 30 Days",
+    xAxisValue: item.category ?? "Unknown",
   }));
 };
 
