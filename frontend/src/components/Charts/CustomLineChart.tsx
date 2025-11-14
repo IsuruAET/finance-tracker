@@ -7,6 +7,7 @@ import {
   Area,
   AreaChart,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 
 // Define data type
 export interface ChartDataItem {
@@ -27,8 +28,7 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
   }
 
   // Type the props manually
-  interface CustomTooltipProps {
-    active?: boolean;
+  interface CustomTooltipProps extends TooltipProps<number, string> {
     payload?: readonly {
       payload: LineData;
       name?: string;
@@ -74,7 +74,11 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
           />
           <YAxis tick={{ fontSize: 12, fill: "#555" }} stroke="none" />
 
-          <Tooltip content={CustomTooltip} />
+          <Tooltip
+            content={(props: TooltipProps<number, string>) => (
+              <CustomTooltip {...props} />
+            )}
+          />
 
           <Area
             type="monotone"

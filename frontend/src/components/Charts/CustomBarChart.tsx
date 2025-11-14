@@ -8,6 +8,7 @@ import {
   ResponsiveContainer,
   Cell,
 } from "recharts";
+import type { TooltipProps } from "recharts";
 
 // Define data type
 export interface ChartDataItem {
@@ -33,8 +34,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   }
 
   // Type the props manually
-  interface CustomTooltipProps {
-    active?: boolean;
+  interface CustomTooltipProps extends TooltipProps<number, string> {
     payload?: readonly {
       payload: BarData;
       name?: string;
@@ -73,7 +73,11 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
           />
           <YAxis tick={{ fontSize: 12, fill: "#555" }} stroke="none" />
 
-          <Tooltip content={CustomTooltip} />
+          <Tooltip
+            content={(props: TooltipProps<number, string>) => (
+              <CustomTooltip {...props} />
+            )}
+          />
 
           <Bar
             dataKey="yAxisValue"
