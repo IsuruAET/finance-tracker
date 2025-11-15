@@ -27,7 +27,7 @@ const DateRangePicker = () => {
         const today = DateTime.now();
         return {
           startDate: today.startOf("day").toJSDate(),
-          endDate: today.endOf("day").toJSDate(),
+          endDate: today.startOf("day").toJSDate(),
           label: "Today",
         };
       },
@@ -38,7 +38,7 @@ const DateRangePicker = () => {
         const lastDay = DateTime.now().minus({ days: 1 });
         return {
           startDate: lastDay.startOf("day").toJSDate(),
-          endDate: lastDay.endOf("day").toJSDate(),
+          endDate: lastDay.startOf("day").toJSDate(),
           label: "Last Day",
         };
       },
@@ -49,7 +49,7 @@ const DateRangePicker = () => {
         const now = DateTime.now();
         return {
           startDate: now.startOf("week").toJSDate(),
-          endDate: now.endOf("week").toJSDate(),
+          endDate: now.endOf("week").startOf("day").toJSDate(),
           label: "This Week",
         };
       },
@@ -60,7 +60,7 @@ const DateRangePicker = () => {
         const lastWeek = DateTime.now().minus({ weeks: 1 });
         return {
           startDate: lastWeek.startOf("week").toJSDate(),
-          endDate: lastWeek.endOf("week").toJSDate(),
+          endDate: lastWeek.endOf("week").startOf("day").toJSDate(),
           label: "Last Week",
         };
       },
@@ -71,7 +71,7 @@ const DateRangePicker = () => {
         const now = DateTime.now();
         return {
           startDate: now.startOf("month").toJSDate(),
-          endDate: now.endOf("month").toJSDate(),
+          endDate: now.endOf("month").startOf("day").toJSDate(),
           label: "This Month",
         };
       },
@@ -83,7 +83,7 @@ const DateRangePicker = () => {
         const lastMonth = now.minus({ months: 1 });
         return {
           startDate: lastMonth.startOf("month").toJSDate(),
-          endDate: lastMonth.endOf("month").toJSDate(),
+          endDate: lastMonth.endOf("month").startOf("day").toJSDate(),
           label: "Last Month",
         };
       },
@@ -94,7 +94,7 @@ const DateRangePicker = () => {
         const now = DateTime.now();
         return {
           startDate: now.startOf("year").toJSDate(),
-          endDate: now.endOf("year").toJSDate(),
+          endDate: now.endOf("year").startOf("day").toJSDate(),
           label: "This Year",
         };
       },
@@ -106,7 +106,7 @@ const DateRangePicker = () => {
         const lastYear = now.minus({ years: 1 });
         return {
           startDate: lastYear.startOf("year").toJSDate(),
-          endDate: lastYear.endOf("year").toJSDate(),
+          endDate: lastYear.endOf("year").startOf("day").toJSDate(),
           label: "Last Year",
         };
       },
@@ -171,7 +171,7 @@ const DateRangePicker = () => {
         startDate: DateTime.fromJSDate(selectedStartDate)
           .startOf("day")
           .toJSDate(),
-        endDate: DateTime.fromJSDate(selectedEndDate).endOf("day").toJSDate(),
+        endDate: DateTime.fromJSDate(selectedEndDate).startOf("day").toJSDate(),
         label: "Custom Range",
       });
       setIsOpen(false);
@@ -194,8 +194,8 @@ const DateRangePicker = () => {
     const start = month.startOf("month");
     const end = month.endOf("month");
     // Luxon weekday: 1=Monday, 2=Tuesday, ..., 7=Sunday
-    // Calendar grid: 0=Sunday, 1=Monday, 2=Tuesday, ..., 6=Saturday
-    const startDay = start.weekday % 7; // Convert to 0-based where 0=Sunday
+    // Calendar grid: 0=Monday, 1=Tuesday, ..., 6=Sunday
+    const startDay = (start.weekday - 1) % 7; // Convert to 0-based where 0=Monday
     const daysInMonth = end.day;
     const days: (Date | null)[] = [];
 
@@ -287,7 +287,7 @@ const DateRangePicker = () => {
 
   const days1 = generateCalendarDays(currentMonth);
   const days2 = generateCalendarDays(currentMonth.plus({ months: 1 }));
-  const weekDays = ["S", "M", "T", "W", "T", "F", "S"];
+  const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
 
   return (
     <div className="relative" ref={containerRef}>

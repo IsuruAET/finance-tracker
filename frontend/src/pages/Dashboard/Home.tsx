@@ -7,7 +7,7 @@ import { useDateRange } from "../../context/DateRangeContext";
 
 import { LuHandCoins, LuWalletMinimal } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
-import { addThousandsSeparator } from "../../utils/helper";
+import { addThousandsSeparator, formatLocalDate } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
 import RecentTransactions from "../../components/Dashboard/RecentTransactions";
 import FinanceOverview from "../../components/Dashboard/FinanceOverview";
@@ -30,9 +30,8 @@ const Home = () => {
     loadingRef.current = true;
 
     try {
-      // Format dates as YYYY-MM-DD for API
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get(
         API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
