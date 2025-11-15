@@ -11,8 +11,8 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
   const [openSideMenu, setOpenSideMenu] = useState(false);
 
   return (
-    <div className="flex items-center justify-between gap-3 sm:gap-5 bg-white border border-b border-gray-200/50 backdrop-blur-[2px] py-4 px-4 sm:px-7 sticky top-0 z-30">
-      <div className="flex items-center gap-3 sm:gap-5 min-w-0">
+    <div className="flex items-center justify-between gap-2 sm:gap-5 bg-white border border-b border-gray-200/50 backdrop-blur-[2px] py-4 px-2 sm:px-7 sticky top-0 z-30">
+      <div className="flex items-center gap-2 sm:gap-5 min-w-0 shrink">
         <button
           className="block lg:hidden text-black shrink-0"
           onClick={() => {
@@ -26,7 +26,7 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
           )}
         </button>
 
-        <h2 className="text-base sm:text-lg font-medium text-black wrap-break-word">
+        <h2 className="text-[clamp(0.625rem,3.5vw,1.125rem)] sm:text-lg font-medium text-black whitespace-nowrap min-w-0 shrink">
           Finance Tracker
         </h2>
       </div>

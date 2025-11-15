@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import IncomeOverview from "../../components/Income/IncomeOverview";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import { useDateRange } from "../../context/DateRangeContext";
 import Modal from "../../components/Modal";
 import AddIncomeForm, {
   type IncomeData,
@@ -16,8 +17,9 @@ import type { Transaction } from "../../types/dashboard";
 import axios from "axios";
 
 const Income = () => {
+  const { dateRange } = useDateRange();
   const [incomeData, setIncomeData] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     show: false,
     data: null,
@@ -26,13 +28,23 @@ const Income = () => {
 
   // Get All Income Details
   const fetchIncomeDetails = useCallback(async () => {
-    if (loading) return;
+    if (loadingRef.current) return;
 
-    setLoading(true);
+    loadingRef.current = true;
 
     try {
+      // Format dates as YYYY-MM-DD for API
+      const startDate = dateRange.startDate.toISOString().split("T")[0];
+      const endDate = dateRange.endDate.toISOString().split("T")[0];
+
       const response = await axiosInstance.get<Transaction[]>(
-        `${API_PATHS.INCOME.GET_ALL_INCOME}`
+        `${API_PATHS.INCOME.GET_ALL_INCOME}`,
+        {
+          params: {
+            startDate,
+            endDate,
+          },
+        }
       );
 
       if (response.data) {
@@ -41,10 +53,9 @@ const Income = () => {
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
     } finally {
-      setLoading(false);
+      loadingRef.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dateRange]);
 
   // Handle Add Income
   const handleAddIncome = async (income: IncomeData) => {
@@ -113,9 +124,19 @@ const Income = () => {
   // handle download income details
   const handleDownloadIncomeDetails = async () => {
     try {
+      // Format dates as YYYY-MM-DD for API
+      const startDate = dateRange.startDate.toISOString().split("T")[0];
+      const endDate = dateRange.endDate.toISOString().split("T")[0];
+
       const response = await axiosInstance.get(
         API_PATHS.INCOME.DOWNLOAD_INCOME,
-        { responseType: "blob" }
+        {
+          responseType: "blob",
+          params: {
+            startDate,
+            endDate,
+          },
+        }
       );
 
       // Create a URL for the blob

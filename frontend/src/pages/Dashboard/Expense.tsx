@@ -1,8 +1,9 @@
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import type { Transaction } from "../../types/dashboard";
 import type { DeleteAlertState } from "../../components/DeleteAlert";
 import { API_PATHS } from "../../utils/apiPaths";
+import { useDateRange } from "../../context/DateRangeContext";
 import toast from "react-hot-toast";
 import axiosInstance from "../../utils/axiosInstance";
 import axios from "axios";
@@ -15,8 +16,9 @@ import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
 
 const Expense = () => {
+  const { dateRange } = useDateRange();
   const [expenseData, setExpenseData] = useState<Transaction[]>([]);
-  const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     show: false,
     data: null,
@@ -25,13 +27,23 @@ const Expense = () => {
 
   // Get All Expense Details
   const fetchExpenseDetails = useCallback(async () => {
-    if (loading) return;
+    if (loadingRef.current) return;
 
-    setLoading(true);
+    loadingRef.current = true;
 
     try {
+      // Format dates as YYYY-MM-DD for API
+      const startDate = dateRange.startDate.toISOString().split("T")[0];
+      const endDate = dateRange.endDate.toISOString().split("T")[0];
+
       const response = await axiosInstance.get<Transaction[]>(
-        `${API_PATHS.EXPENSE.GET_ALL_EXPENSES}`
+        `${API_PATHS.EXPENSE.GET_ALL_EXPENSES}`,
+        {
+          params: {
+            startDate,
+            endDate,
+          },
+        }
       );
 
       if (response.data) {
@@ -40,10 +52,9 @@ const Expense = () => {
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
     } finally {
-      setLoading(false);
+      loadingRef.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dateRange]);
 
   // Handle Add Expense
   const handleAddExpense = async (expense: ExpenseData) => {
@@ -112,9 +123,19 @@ const Expense = () => {
   // handle download expense details
   const handleDownloadExpenseDetails = async () => {
     try {
+      // Format dates as YYYY-MM-DD for API
+      const startDate = dateRange.startDate.toISOString().split("T")[0];
+      const endDate = dateRange.endDate.toISOString().split("T")[0];
+
       const response = await axiosInstance.get(
         API_PATHS.EXPENSE.DOWNLOAD_EXPENSE,
-        { responseType: "blob" }
+        {
+          responseType: "blob",
+          params: {
+            startDate,
+            endDate,
+          },
+        }
       );
 
       // Create a URL for the blob

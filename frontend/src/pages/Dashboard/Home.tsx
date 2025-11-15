@@ -1,8 +1,9 @@
 import { useNavigate } from "react-router-dom";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, useRef } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import { useDateRange } from "../../context/DateRangeContext";
 
 import { LuHandCoins, LuWalletMinimal } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
@@ -18,18 +19,29 @@ import RecentIncome from "../../components/Dashboard/RecentIncome";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { dateRange } = useDateRange();
 
   const [dashboardData, setDashboardData] =
     useState<DashboardDataResponse | null>(null);
-  const [loading, setLoading] = useState(false);
+  const loadingRef = useRef(false);
 
   const fetchDashboardData = useCallback(async () => {
-    if (loading) return;
-    setLoading(true);
+    if (loadingRef.current) return;
+    loadingRef.current = true;
 
     try {
+      // Format dates as YYYY-MM-DD for API
+      const startDate = dateRange.startDate.toISOString().split("T")[0];
+      const endDate = dateRange.endDate.toISOString().split("T")[0];
+
       const response = await axiosInstance.get(
-        API_PATHS.DASHBOARD.GET_DASHBOARD_DATA
+        API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
+        {
+          params: {
+            startDate,
+            endDate,
+          },
+        }
       );
       if (response.data) {
         setDashboardData(response.data);
@@ -37,10 +49,9 @@ const Home = () => {
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
     } finally {
-      setLoading(false);
+      loadingRef.current = false;
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [dateRange]);
 
   useEffect(() => {
     fetchDashboardData();

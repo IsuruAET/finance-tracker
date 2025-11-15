@@ -308,7 +308,7 @@ const DateRangePicker = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 sm:right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto">
+        <div className="absolute top-full right-0 sm:right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto max-h-[85vh] overflow-y-auto">
           {!showCustomPicker ? (
             // Predefined Ranges
             <div className="p-4">
@@ -341,7 +341,7 @@ const DateRangePicker = () => {
             </div>
           ) : (
             // Custom Date Picker
-            <div className="p-4">
+            <div className="p-4 pb-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-semibold text-gray-700">
                   Select Date Range
