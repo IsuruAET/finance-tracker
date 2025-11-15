@@ -3,7 +3,6 @@ import { Routes, Route, Navigate } from "react-router-dom";
 import { useUserAuth } from "../hooks/useUserAuth";
 import PublicRoute from "./PublicRoute";
 import ProtectedRoute from "./ProtectedRoute";
-import { useUserContext } from "../context/UserContext";
 import LoadingSpinner from "../components/LoadingSpinner";
 
 // Lazy load components to trigger Suspense
@@ -16,11 +15,6 @@ const NotFound = lazy(() => import("../pages/NotFound"));
 
 const AppRoutes = () => {
   useUserAuth();
-  const { isLoading } = useUserContext();
-
-  if (isLoading) {
-    return <LoadingSpinner />;
-  }
 
   return (
     <Suspense fallback={<LoadingSpinner />}>

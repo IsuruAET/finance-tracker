@@ -11,7 +11,25 @@ export const useUserAuth = () => {
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token && !user && !hasFetched.current) {
+
+    // If no token, user can't be authenticated
+    if (!token) {
+      if (user) {
+        clearUser();
+      }
+      hasFetched.current = false; // Reset for future checks
+      setIsLoading(false);
+      return;
+    }
+
+    // If user already exists, no need to fetch
+    if (user) {
+      setIsLoading(false);
+      return;
+    }
+
+    // If token exists but no user, fetch user data
+    if (!hasFetched.current) {
       hasFetched.current = true;
       setIsLoading(true);
       axiosInstance
@@ -21,12 +39,12 @@ export const useUserAuth = () => {
           setIsLoading(false);
         })
         .catch(() => {
+          localStorage.removeItem("token");
           clearUser();
+          hasFetched.current = false; // Reset on error
           setIsLoading(false);
           navigate("/login");
         });
-    } else {
-      setIsLoading(false);
     }
   }, [clearUser, navigate, updateUser, user, setIsLoading]);
 };
