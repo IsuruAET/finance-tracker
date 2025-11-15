@@ -7,20 +7,20 @@ import { DateRangeProvider } from "./context/DateRangeProvider";
 function App() {
   return (
     <UserProvider>
-      <DateRangeProvider>
-        <Router>
+      <Router>
+        <DateRangeProvider>
           <AppRoutes />
-        </Router>
 
-        <Toaster
-          toastOptions={{
-            className: "",
-            style: {
-              fontSize: "13px",
-            },
-          }}
-        />
-      </DateRangeProvider>
+          <Toaster
+            toastOptions={{
+              className: "",
+              style: {
+                fontSize: "13px",
+              },
+            }}
+          />
+        </DateRangeProvider>
+      </Router>
     </UserProvider>
   );
 }
