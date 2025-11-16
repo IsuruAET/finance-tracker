@@ -14,13 +14,22 @@ dotenv.config();
 const app: Application = express();
 
 // Middleware to handle CORS
-app.use(
-  cors({
-    origin: process.env.CLIENT_URL || "*",
-    methods: ["GET", "POST", "PUT", "DELETE"],
-    allowedHeaders: ["Content-Type", "Authorization"],
-  })
-);
+const allowedOrigins = [
+  process.env.CLIENT_URL,
+  "https://finance-tracker-frontend-kappa.vercel.app",
+].filter(Boolean) as string[];
+
+const corsOptions: cors.CorsOptions = {
+  origin: allowedOrigins.length > 0 ? allowedOrigins : "*",
+  methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"],
+  credentials: true,
+  preflightContinue: false,
+  optionsSuccessStatus: 204,
+};
+
+app.use(cors(corsOptions));
+// Preflight will be handled by the global CORS middleware above
 
 app.use(express.json());
 
