@@ -15,6 +15,7 @@ import DeleteAlert, {
 } from "../../components/DeleteAlert";
 import type { Transaction } from "../../types/dashboard";
 import axios from "axios";
+import DateRangePicker from "../../components/DateRangePicker";
 
 const Income = () => {
   const { dateRange } = useDateRange();
@@ -175,6 +176,9 @@ const Income = () => {
   return (
     <DashboardLayout activeMenu="Income">
       <div className="my-5 mx-auto">
+        <div className="mb-4 flex justify-start">
+          <DateRangePicker />
+        </div>
         <div className="grid grid-cols-1 gap-6">
           <div>
             <IncomeOverview

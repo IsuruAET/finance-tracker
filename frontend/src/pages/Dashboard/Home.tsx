@@ -3,11 +3,10 @@ import DashboardLayout from "../../components/layouts/DashboardLayout";
 import { useCallback, useEffect, useState, useRef } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import { useDateRange } from "../../context/DateRangeContext";
 
 import { LuHandCoins, LuWalletMinimal } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
-import { addThousandsSeparator, formatLocalDate } from "../../utils/helper";
+import { addThousandsSeparator } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
 import RecentTransactions from "../../components/Dashboard/RecentTransactions";
 import FinanceOverview from "../../components/Dashboard/FinanceOverview";
@@ -19,7 +18,6 @@ import RecentIncome from "../../components/Dashboard/RecentIncome";
 
 const Home = () => {
   const navigate = useNavigate();
-  const { dateRange } = useDateRange();
 
   const [dashboardData, setDashboardData] =
     useState<DashboardDataResponse | null>(null);
@@ -30,17 +28,8 @@ const Home = () => {
     loadingRef.current = true;
 
     try {
-      const startDate = formatLocalDate(dateRange.startDate);
-      const endDate = formatLocalDate(dateRange.endDate);
-
       const response = await axiosInstance.get(
-        API_PATHS.DASHBOARD.GET_DASHBOARD_DATA,
-        {
-          params: {
-            startDate,
-            endDate,
-          },
-        }
+        API_PATHS.DASHBOARD.GET_DASHBOARD_DATA
       );
       if (response.data) {
         setDashboardData(response.data);
@@ -50,7 +39,7 @@ const Home = () => {
     } finally {
       loadingRef.current = false;
     }
-  }, [dateRange]);
+  }, []);
 
   useEffect(() => {
     fetchDashboardData();

@@ -5,9 +5,10 @@ import { useUserContext } from "../../context/UserContext";
 
 interface SideMenuProps {
   activeMenu: string;
+  onClose?: () => void;
 }
 
-const SideMenu = ({ activeMenu }: SideMenuProps) => {
+const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
   const { user, clearUser } = useUserContext();
   const navigate = useNavigate();
 
@@ -17,6 +18,7 @@ const SideMenu = ({ activeMenu }: SideMenuProps) => {
       return;
     }
     navigate(route);
+    onClose?.();
   };
 
   const handleLogout = () => {
@@ -26,7 +28,7 @@ const SideMenu = ({ activeMenu }: SideMenuProps) => {
   };
 
   return (
-    <div className="w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 p-5 sticky top-[61px] z-20">
+    <div className="w-64 h-full bg-white border-r border-gray-200/50 p-5">
       <div className="flex flex-col items-center justify-center gap-3 mt-3 mb-7">
         {user?.profileImageUrl ? (
           <img

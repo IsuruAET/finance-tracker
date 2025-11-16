@@ -4,7 +4,6 @@ import Expense from "../models/Expense";
 import Wallet from "../models/Wallet";
 import { AuthenticatedRequest } from "../types/express";
 import { Types } from "mongoose";
-import { validateAndCreateDateFilter } from "../utils/dateFilter";
 
 // Dashboard Data
 export const getDashboardData = async (
@@ -17,27 +16,12 @@ export const getDashboardData = async (
       return res.status(400).json({ message: "User not found in request" });
     }
 
-    // Validate date filter query parameters
-    const { startDate, endDate } = req.query;
-    const dateFilterResult = validateAndCreateDateFilter(
-      startDate as string,
-      endDate as string
-    );
-
-    if (!dateFilterResult.isValid) {
-      return res.status(400).json({ message: dateFilterResult.error });
-    }
-
     const userObjectId = new Types.ObjectId(String(userId));
 
     // Build match conditions
     const baseMatch = { userId: userObjectId };
-    const incomeMatch = dateFilterResult.dateFilter
-      ? { ...baseMatch, date: dateFilterResult.dateFilter }
-      : baseMatch;
-    const expenseMatch = dateFilterResult.dateFilter
-      ? { ...baseMatch, date: dateFilterResult.dateFilter }
-      : baseMatch;
+    const incomeMatch = baseMatch;
+    const expenseMatch = baseMatch;
 
     // Fetch total income & expenses
     const totalIncome = await Income.aggregate([
@@ -56,10 +40,10 @@ export const getDashboardData = async (
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-    // Get income transactions (filtered by date range if provided, otherwise last 60 days)
-    const incomeDateFilter = dateFilterResult.dateFilter
-      ? dateFilterResult.dateFilter
-      : { $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000) };
+    // Get income transactions for last 60 days
+    const incomeDateFilter = {
+      $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
+    };
 
     const last60DaysIncomeTransactions = await Income.find({
       userId: userObjectId,
@@ -72,10 +56,10 @@ export const getDashboardData = async (
       0
     );
 
-    // Get expense transactions (filtered by date range if provided, otherwise last 30 days)
-    const expenseDateFilter = dateFilterResult.dateFilter
-      ? dateFilterResult.dateFilter
-      : { $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) };
+    // Get expense transactions for last 30 days
+    const expenseDateFilter = {
+      $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
+    };
 
     const last30DaysExpenseTransactions = await Expense.find({
       userId: userObjectId,
@@ -88,9 +72,9 @@ export const getDashboardData = async (
       0
     );
 
-    // Fetch last 5 transactions (income + expenses) - apply date filter if provided
-    const incomeQuery = Income.find(incomeMatch).sort({ date: -1 }).limit(5);
-    const expenseQuery = Expense.find(expenseMatch).sort({ date: -1 }).limit(5);
+    // Fetch last 5 transactions (income + expenses)
+    const incomeQuery = Income.find(baseMatch).sort({ date: -1 }).limit(5);
+    const expenseQuery = Expense.find(baseMatch).sort({ date: -1 }).limit(5);
 
     const lastTransactions = [
       ...(await incomeQuery).map((txn) => ({

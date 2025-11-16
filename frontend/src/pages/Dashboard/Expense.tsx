@@ -14,6 +14,7 @@ import AddExpenseForm, {
 } from "../../components/Expense/AddExpenseForm";
 import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
+import DateRangePicker from "../../components/DateRangePicker";
 
 const Expense = () => {
   const { dateRange } = useDateRange();
@@ -174,6 +175,9 @@ const Expense = () => {
   return (
     <DashboardLayout activeMenu="Expense">
       <div className="my-5 mx-auto">
+        <div className="mb-4 flex justify-start">
+          <DateRangePicker />
+        </div>
         <div className="grid grid-cols-1 gap-6">
           <div>
             <ExpenseOverview
