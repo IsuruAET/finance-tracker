@@ -198,9 +198,7 @@ const Wallet = () => {
           {/* Cash/Savings Wallets Section */}
           <div className="card">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Cash in Hand
-              </h3>
+              <h5 className="text-lg">Cash in Hand</h5>
               <p className="text-gray-600">
                 Balance: {addThousandsSeparator(cashBalance)}
               </p>
@@ -219,9 +217,7 @@ const Wallet = () => {
           {/* Card Wallets Section */}
           <div className="card">
             <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Card Wallets
-              </h3>
+              <h5 className="text-lg">Card Wallets</h5>
               <p className="text-gray-600">
                 Balance: {addThousandsSeparator(cardBalance)}
               </p>
