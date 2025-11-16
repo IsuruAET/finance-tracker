@@ -16,6 +16,7 @@ import DeleteAlert, {
 import type { Transaction } from "../../types/dashboard";
 import axios from "axios";
 import DateRangePicker from "../../components/DateRangePicker";
+import { MdFilterList } from "react-icons/md";
 
 const Income = () => {
   const { dateRange } = useDateRange();
@@ -176,7 +177,8 @@ const Income = () => {
   return (
     <DashboardLayout activeMenu="Income">
       <div className="my-5 mx-auto">
-        <div className="mb-4 flex justify-start">
+        <div className="mb-4 flex items-center justify-start gap-3">
+          <MdFilterList className="text-gray-600 text-xl ml-2" />
           <DateRangePicker />
         </div>
         <div className="grid grid-cols-1 gap-6">

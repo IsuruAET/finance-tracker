@@ -15,6 +15,7 @@ import TransferList, {
   type Transfer as TransferType,
 } from "../../components/Wallet/TransferList";
 import axios from "axios";
+import InfoCard from "../../components/Cards/InfoCard";
 
 interface Wallet {
   _id: string;
@@ -127,49 +128,38 @@ const Wallet = () => {
     0
   );
 
+  const renderWalletIcon = (wallet: Wallet) => {
+    const icon = wallet.icon || "💳";
+    const isUrl = icon.startsWith("http://") || icon.startsWith("https://");
+
+    if (isUrl) {
+      return <img src={icon} alt={wallet.name} className="w-6 h-6" />;
+    }
+    return <span className="text-2xl leading-none">{icon}</span>;
+  };
+
   const renderWalletCard = (wallet: Wallet) => {
     // Hide delete button if there's only one wallet
     const canDelete = wallets.length > 1;
-
-    const renderIcon = () => {
-      const icon = wallet.icon || "💳";
-      const isUrl = icon.startsWith("http://") || icon.startsWith("https://");
-      return (
-        <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 bg-gray-100 rounded-full">
-          {isUrl ? (
-            <img src={icon} alt={wallet.name} className="w-6 h-6" />
-          ) : (
-            <span className="text-2xl leading-none">{icon}</span>
-          )}
-        </div>
-      );
-    };
+    const color = wallet.type === "cash" ? "bg-green-50" : "bg-blue-50";
 
     return (
-      <div key={wallet._id} className="card relative group">
-        <div className="flex items-center justify-between mb-4">
-          <div className="flex items-center gap-3">
-            {renderIcon()}
-            <div>
-              <h3 className="font-semibold text-gray-800">{wallet.name}</h3>
-              <p className="text-xs text-gray-500 capitalize">{wallet.type}</p>
-            </div>
-          </div>
-          {canDelete && (
-            <button
-              onClick={() => handleDeleteWalletClick(wallet._id)}
-              className="text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer p-1 rounded"
-              title="Delete wallet"
-            >
-              <LuTrash2 className="h-5 w-5" />
-            </button>
-          )}
-        </div>
-        <div className="mt-4">
-          <p className="text-2xl font-bold text-gray-800">
-            {addThousandsSeparator(wallet.balance)}
-          </p>
-        </div>
+      <div key={wallet._id} className="relative group">
+        <InfoCard
+          icon={renderWalletIcon(wallet)}
+          label={wallet.name}
+          value={addThousandsSeparator(wallet.balance)}
+          color={color}
+        />
+        {canDelete && (
+          <button
+            onClick={() => handleDeleteWalletClick(wallet._id)}
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer p-1 rounded bg-white shadow-sm"
+            title="Delete wallet"
+          >
+            <LuTrash2 className="h-5 w-5" />
+          </button>
+        )}
       </div>
     );
   };

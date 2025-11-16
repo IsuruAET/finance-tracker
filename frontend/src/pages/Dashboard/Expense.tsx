@@ -15,6 +15,7 @@ import AddExpenseForm, {
 import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
 import DateRangePicker from "../../components/DateRangePicker";
+import { MdFilterList } from "react-icons/md";
 
 const Expense = () => {
   const { dateRange } = useDateRange();
@@ -175,7 +176,8 @@ const Expense = () => {
   return (
     <DashboardLayout activeMenu="Expense">
       <div className="my-5 mx-auto">
-        <div className="mb-4 flex justify-start">
+        <div className="mb-4 flex items-center justify-start gap-3">
+          <MdFilterList className="text-gray-600 text-xl ml-2" />
           <DateRangePicker />
         </div>
         <div className="grid grid-cols-1 gap-6">

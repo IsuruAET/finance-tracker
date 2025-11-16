@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 
 interface ModalProps {
   children: React.ReactNode;
@@ -15,11 +15,31 @@ const Modal: React.FC<ModalProps> = ({
   title,
   hideCloseButton = false,
 }) => {
+  // Prevent body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "unset";
+    }
+
+    // Cleanup on unmount
+    return () => {
+      document.body.style.overflow = "unset";
+    };
+  }, [isOpen]);
+
   if (!isOpen) return null;
 
   return (
-    <div className="fixed top-0 right-0 left-0 z-50 flex justify-center items-center w-full h-[calc(100%-1rem)] max-h-full overflow-y-auto overflow-x-hidden bg-black/20 bg-opacity-50">
-      <div className="relative p-4 w-full max-w-2xl max-h-full">
+    <div
+      className="fixed inset-0 z-50 flex justify-center items-center w-full h-screen bg-black/50 overflow-y-auto"
+      onClick={onClose}
+    >
+      <div
+        className="relative p-4 w-full max-w-2xl max-h-full"
+        onClick={(e) => e.stopPropagation()}
+      >
         {/* Modal Content */}
         <div className="relative bg-white rounded-lg shadow-sm">
           {/* Modal Header */}
