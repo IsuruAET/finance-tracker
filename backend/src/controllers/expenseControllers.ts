@@ -1,5 +1,6 @@
 import { Response } from "express";
 import Expense from "../models/Expense";
+import Wallet from "../models/Wallet";
 import { AuthenticatedRequest } from "../types/express";
 import ExcelJS from "exceljs";
 import { validateAndCreateDateFilter } from "../utils/dateFilter";
@@ -12,11 +13,25 @@ export const addExpense = async (
   const userId = req.user?._id;
 
   try {
-    const { icon, category, amount, date } = req.body || {};
+    const { icon, category, amount, date, walletId } = req.body || {};
 
     // Validation: Check for missing fields
-    if (!category || !amount || !date) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!category || !amount || !date || !walletId) {
+      return res
+        .status(400)
+        .json({ message: "All fields including wallet are required" });
+    }
+
+    // Verify wallet exists and belongs to user
+    const wallet = await Wallet.findOne({ _id: walletId, userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
+    }
+
+    if (wallet.balance < amount) {
+      return res
+        .status(400)
+        .json({ message: "Insufficient balance in selected wallet" });
     }
 
     const newExpense = new Expense({
@@ -25,9 +40,15 @@ export const addExpense = async (
       category,
       amount,
       date: new Date(date),
+      walletId,
     });
 
     await newExpense.save();
+
+    // Update wallet balance
+    wallet.balance -= amount;
+    await wallet.save();
+
     return res.status(201).json(newExpense);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -83,6 +104,18 @@ export const deleteExpense = async (
   res: Response
 ): Promise<Response> => {
   try {
+    const expense = await Expense.findById(req.params.id);
+    if (!expense) {
+      return res.status(404).json({ message: "Expense not found" });
+    }
+
+    // Update wallet balance
+    const wallet = await Wallet.findById(expense.walletId);
+    if (wallet) {
+      wallet.balance += expense.amount;
+      await wallet.save();
+    }
+
     await Expense.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: "Expense delete successfully" });
   } catch (error: unknown) {

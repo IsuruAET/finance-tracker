@@ -7,6 +7,7 @@ export interface IIncome extends Document {
   source: string; // Example: Salary, Freelance, etc.
   amount: number;
   date?: Date;
+  walletId: mongoose.Schema.Types.ObjectId;
 }
 
 // Define schema
@@ -21,6 +22,11 @@ const IncomeSchema = new Schema<IIncome>(
     source: { type: String, required: true },
     amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
+    walletId: {
+      type: Schema.Types.ObjectId,
+      ref: "Wallet",
+      required: true,
+    },
   },
   { timestamps: true }
 );

@@ -7,6 +7,7 @@ import authRoutes from "./routes/authRoutes";
 import incomeRoutes from "./routes/incomeRoutes";
 import expenseRoutes from "./routes/expenseRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
+import walletRoutes from "./routes/walletRoutes";
 
 dotenv.config();
 
@@ -29,6 +30,7 @@ app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/income", incomeRoutes);
 app.use("/api/v1/expense", expenseRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
+app.use("/api/v1/wallet", walletRoutes);
 
 const PORT: number = Number(process.env.PORT) || 5000;
 

@@ -59,7 +59,7 @@ const Income = () => {
 
   // Handle Add Income
   const handleAddIncome = async (income: IncomeData) => {
-    const { source, amount, date, icon } = income;
+    const { source, amount, date, icon, walletId } = income;
 
     if (!source.trim()) {
       toast.error("Source is required.");
@@ -76,12 +76,18 @@ const Income = () => {
       return;
     }
 
+    if (!walletId) {
+      toast.error("Please select a wallet");
+      return;
+    }
+
     try {
       await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME, {
         source,
         amount,
         date,
         icon,
+        walletId,
       });
 
       setOpenAddIncomeModal(false);

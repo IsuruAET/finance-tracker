@@ -1,5 +1,6 @@
 import { Response } from "express";
 import Income from "../models/Income";
+import Wallet from "../models/Wallet";
 import { AuthenticatedRequest } from "../types/express";
 import ExcelJS from "exceljs";
 import { validateAndCreateDateFilter } from "../utils/dateFilter";
@@ -12,11 +13,19 @@ export const addIncome = async (
   const userId = req.user?._id;
 
   try {
-    const { icon, source, amount, date } = req.body || {};
+    const { icon, source, amount, date, walletId } = req.body || {};
 
     // Validation: Check for missing fields
-    if (!source || !amount || !date) {
-      return res.status(400).json({ message: "All fields are required" });
+    if (!source || !amount || !date || !walletId) {
+      return res
+        .status(400)
+        .json({ message: "All fields including wallet are required" });
+    }
+
+    // Verify wallet exists and belongs to user
+    const wallet = await Wallet.findOne({ _id: walletId, userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
     }
 
     const newIncome = new Income({
@@ -25,9 +34,15 @@ export const addIncome = async (
       source,
       amount,
       date: new Date(date),
+      walletId,
     });
 
     await newIncome.save();
+
+    // Update wallet balance
+    wallet.balance += Number(amount);
+    await wallet.save();
+
     return res.status(201).json(newIncome);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -83,6 +98,18 @@ export const deleteIncome = async (
   res: Response
 ): Promise<Response> => {
   try {
+    const income = await Income.findById(req.params.id);
+    if (!income) {
+      return res.status(404).json({ message: "Income not found" });
+    }
+
+    // Update wallet balance
+    const wallet = await Wallet.findById(income.walletId);
+    if (wallet) {
+      wallet.balance -= Number(income.amount);
+      await wallet.save();
+    }
+
     await Income.findByIdAndDelete(req.params.id);
     return res.status(200).json({ message: "Income delete successfully" });
   } catch (error: unknown) {

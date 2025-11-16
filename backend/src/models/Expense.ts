@@ -7,6 +7,7 @@ export interface IExpense extends Document {
   category: string; // Example: Food, Groceries etc.
   amount: number;
   date?: Date;
+  walletId: mongoose.Schema.Types.ObjectId;
 }
 
 // Define schema
@@ -21,6 +22,11 @@ const ExpenseSchema = new Schema<IExpense>(
     category: { type: String, required: true },
     amount: { type: Number, required: true },
     date: { type: Date, default: Date.now },
+    walletId: {
+      type: Schema.Types.ObjectId,
+      ref: "Wallet",
+      required: true,
+    },
   },
   { timestamps: true }
 );

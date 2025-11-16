@@ -58,7 +58,7 @@ const Expense = () => {
 
   // Handle Add Expense
   const handleAddExpense = async (expense: ExpenseData) => {
-    const { category, amount, date, icon } = expense;
+    const { category, amount, date, icon, walletId } = expense;
 
     if (!category.trim()) {
       toast.error("Category is required.");
@@ -75,12 +75,18 @@ const Expense = () => {
       return;
     }
 
+    if (!walletId) {
+      toast.error("Please select a wallet");
+      return;
+    }
+
     try {
       await axiosInstance.post(API_PATHS.EXPENSE.ADD_EXPENSE, {
         category,
         amount,
         date,
         icon,
+        walletId,
       });
 
       setOpenAddExpenseModal(false);

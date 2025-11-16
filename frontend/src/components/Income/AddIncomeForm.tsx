@@ -1,12 +1,24 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Input from "../Inputs/Input";
+import Select from "../Inputs/Select";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
+import axiosInstance from "../../utils/axiosInstance";
+import { API_PATHS } from "../../utils/apiPaths";
 
 export interface IncomeData {
   source: string;
   amount: number;
   date: string;
   icon: string;
+  walletId: string;
+}
+
+interface Wallet {
+  _id: string;
+  name: string;
+  type: "cash" | "card";
+  balance: number;
+  icon?: string;
 }
 
 interface AddIncomeFormProps {
@@ -19,7 +31,26 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
     amount: 0,
     date: "",
     icon: "",
+    walletId: "",
   });
+  const [wallets, setWallets] = useState<Wallet[]>([]);
+
+  useEffect(() => {
+    const fetchWallets = async () => {
+      try {
+        const response = await axiosInstance.get<Wallet[]>(
+          API_PATHS.WALLET.GET_ALL
+        );
+        setWallets(response.data);
+        if (response.data.length > 0 && !income.walletId) {
+          setIncome((prev) => ({ ...prev, walletId: response.data[0]._id }));
+        }
+      } catch (error) {
+        console.error("Error fetching wallets", error);
+      }
+    };
+    fetchWallets();
+  }, []);
 
   const handleChange = (key: keyof IncomeData, value: string) => {
     setIncome((prev) => ({ ...prev, [key]: value }));
@@ -50,6 +81,19 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
         label="Amount"
         placeholder=""
         type="number"
+      />
+
+      <Select
+        value={income.walletId}
+        onChange={(e) => handleChange("walletId", e.target.value)}
+        label="Add to Wallet"
+        placeholder="Select a wallet"
+        options={wallets.map((wallet) => ({
+          value: wallet._id,
+          label: `${wallet.name} (Balance: ${wallet.balance.toFixed(2)})`,
+          icon: wallet.icon,
+        }))}
+        required
       />
 
       <Input

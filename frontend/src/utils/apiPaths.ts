@@ -27,4 +27,13 @@ export const API_PATHS = {
   IMAGE: {
     UPLOAD_IMAGE: "/api/v1/auth/uploadImage",
   },
+  WALLET: {
+    INITIALIZE: "/api/v1/wallet/initialize",
+    GET_ALL: "/api/v1/wallet/get",
+    ADD: "/api/v1/wallet/add",
+    TRANSFER: "/api/v1/wallet/transfer",
+    GET_TRANSFERS: "/api/v1/wallet/transfers",
+    DELETE_WALLET: (walletId: string | number): string =>
+      `/api/v1/wallet/${walletId}`,
+  },
 };

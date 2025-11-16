@@ -9,10 +9,19 @@ export type Transaction = {
   type?: "income" | "expense";
 };
 
+export type Wallet = {
+  _id: string;
+  name: string;
+  type: "cash" | "card";
+  balance: number;
+  icon?: string;
+};
+
 export type DashboardDataResponse = {
   totalBalance: number;
   totalIncome: number;
   totalExpenses: number;
+  wallets?: Wallet[];
   last30DaysExpenses: {
     total: number;
     transactions: Transaction[];

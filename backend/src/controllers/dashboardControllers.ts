@@ -1,6 +1,7 @@
 import { Response } from "express";
 import Income from "../models/Income";
 import Expense from "../models/Expense";
+import Wallet from "../models/Wallet";
 import { AuthenticatedRequest } from "../types/express";
 import { Types } from "mongoose";
 import { validateAndCreateDateFilter } from "../utils/dateFilter";
@@ -102,12 +103,16 @@ export const getDashboardData = async (
       })),
     ].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)); // Sort latest first
 
+    // Get wallet balances
+    const wallets = await Wallet.find({ userId: userObjectId });
+
     // Final Response
     return res.status(200).json({
       totalBalance:
         (totalIncome[0]?.total || 0) - (totalExpense[0]?.total || 0),
       totalIncome: totalIncome[0]?.total || 0,
       totalExpenses: totalExpense[0]?.total || 0,
+      wallets,
       last30DaysExpenses: {
         total: expensesLast30Days,
         transactions: last30DaysExpenseTransactions,
