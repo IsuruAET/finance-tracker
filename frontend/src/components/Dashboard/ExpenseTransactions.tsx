@@ -1,7 +1,6 @@
 import { LuArrowRight } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
 import type React from "react";
-import { formatDate } from "../../utils/helper";
 import type { Transaction } from "../../types/dashboard";
 
 interface ExpenseTransactionsProps {
@@ -27,10 +26,7 @@ const ExpenseTransactions: React.FC<ExpenseTransactionsProps> = ({
         {transactions?.slice(0, 4)?.map((item) => (
           <TransactionInfoCard
             key={item._id}
-            title={item.category}
-            icon={item.icon}
-            date={formatDate(item.date)}
-            amount={item.amount}
+            transaction={item}
             type="expense"
             hideDeleteBtn
           />

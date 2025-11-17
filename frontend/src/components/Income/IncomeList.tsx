@@ -1,6 +1,5 @@
 import { LuDownload } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
-import { formatDate } from "../../utils/helper";
 import type { Transaction } from "../../types/dashboard";
 
 interface IncomeListProps {
@@ -28,10 +27,7 @@ const IncomeList = ({
         {transactions?.map((item) => (
           <TransactionInfoCard
             key={item._id}
-            title={item.source}
-            icon={item.icon}
-            date={formatDate(item.date)}
-            amount={item.amount}
+            transaction={item}
             type="income"
             onDelete={() => onDelete(item._id)}
           />

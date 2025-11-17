@@ -1,7 +1,6 @@
 import { LuArrowRight } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
 import type { Transaction } from "../../types/dashboard";
-import { formatDate } from "../../utils/helper";
 
 interface RecentTransactionsProps {
   transactions: Transaction[];
@@ -23,10 +22,7 @@ const RecentIncome = ({ transactions, onSeeMore }: RecentTransactionsProps) => {
         {transactions?.slice(0, 5)?.map((item) => (
           <TransactionInfoCard
             key={item._id}
-            title={item.source}
-            icon={item.icon}
-            date={formatDate(item.date)}
-            amount={item.amount}
+            transaction={item}
             type="income"
             hideDeleteBtn
           />

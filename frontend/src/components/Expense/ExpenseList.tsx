@@ -1,6 +1,5 @@
 import { LuDownload } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
-import { formatDate } from "../../utils/helper";
 import type { Transaction } from "../../types/dashboard";
 
 interface ExpenseListProps {
@@ -28,10 +27,7 @@ const ExpenseList = ({
         {transactions?.map((item) => (
           <TransactionInfoCard
             key={item._id}
-            title={item.category}
-            icon={item.icon}
-            date={formatDate(item.date)}
-            amount={item.amount}
+            transaction={item}
             type="expense"
             onDelete={() => onDelete(item._id)}
           />

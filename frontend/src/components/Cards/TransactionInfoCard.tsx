@@ -5,26 +5,59 @@ import {
   LuTrash2,
   LuRepeat,
 } from "react-icons/lu";
+import type { Transaction } from "../../types/dashboard";
+import { formatDate } from "../../utils/helper";
 
 interface TransactionInfoCardProps {
-  title: string | undefined;
-  icon?: string;
-  date: string;
-  amount: number | string;
+  transaction?: Transaction;
   type?: "income" | "expense" | "transfer";
   hideDeleteBtn?: boolean;
   onDelete?: () => void;
 }
 
 const TransactionInfoCard = ({
-  title,
-  icon,
-  date,
-  amount,
-  type,
+  transaction,
+  type: typeProp,
   hideDeleteBtn,
   onDelete,
 }: TransactionInfoCardProps) => {
+  const getTransactionTitleAndIcon = (item: Transaction) => {
+    if (item.type === "transfer") {
+      const fromWallet =
+        typeof item.fromWalletId === "object"
+          ? item.fromWalletId?.name
+          : "Wallet";
+      const toWallet =
+        typeof item.toWalletId === "object" ? item.toWalletId?.name : "Wallet";
+      return {
+        title: `From ${fromWallet} to ${toWallet}`,
+        icon:
+          typeof item.fromWalletId === "object"
+            ? item.fromWalletId?.icon
+            : undefined,
+      };
+    } else if (item.type === "expense") {
+      return {
+        title: item.category,
+        icon: item.icon,
+      };
+    } else {
+      return {
+        title: item.source,
+        icon: item.icon,
+      };
+    }
+  };
+
+  if (!transaction && !typeProp) return null;
+
+  const { title, icon } = transaction
+    ? getTransactionTitleAndIcon(transaction)
+    : { title: "", icon: undefined };
+  const date = transaction ? formatDate(transaction.date) : "";
+  const amount = transaction?.amount ?? 0;
+  const type = typeProp ?? transaction?.type;
+
   const getAmountStyles = () => {
     if (type === "income") return "bg-green-50 text-green-500";
     if (type === "expense") return "bg-red-50 text-red-500";
@@ -63,7 +96,8 @@ const TransactionInfoCard = ({
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${getAmountStyles()}`}
           >
             <h6 className="text-xs font-medium">
-              {type === "income" ? "+" : type === "expense" ? "-" : ""} AU${amount}
+              {type === "income" ? "+" : type === "expense" ? "-" : ""} AU$
+              {amount}
             </h6>
             {type === "income" ? (
               <LuTrendingUp />
