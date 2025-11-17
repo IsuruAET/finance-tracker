@@ -6,7 +6,17 @@ export type Transaction = {
   category?: string;
   source?: string;
   icon?: string;
-  type?: "income" | "expense";
+  type?: "income" | "expense" | "transfer";
+  fromWalletId?: {
+    _id: string;
+    name: string;
+    icon?: string;
+  } | string;
+  toWalletId?: {
+    _id: string;
+    name: string;
+    icon?: string;
+  } | string;
 };
 
 export type Wallet = {

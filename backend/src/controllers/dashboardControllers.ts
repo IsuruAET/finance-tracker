@@ -2,6 +2,7 @@ import { Response } from "express";
 import Income from "../models/Income";
 import Expense from "../models/Expense";
 import Wallet from "../models/Wallet";
+import Transfer from "../models/Transfer";
 import { AuthenticatedRequest } from "../types/express";
 import { Types } from "mongoose";
 
@@ -72,9 +73,14 @@ export const getDashboardData = async (
       0
     );
 
-    // Fetch last 5 transactions (income + expenses)
+    // Fetch last 5 transactions (income + expenses + transfers)
     const incomeQuery = Income.find(baseMatch).sort({ date: -1 }).limit(5);
     const expenseQuery = Expense.find(baseMatch).sort({ date: -1 }).limit(5);
+    const transferQuery = Transfer.find(baseMatch)
+      .populate("fromWalletId", "name type icon")
+      .populate("toWalletId", "name type icon")
+      .sort({ date: -1 })
+      .limit(5);
 
     const lastTransactions = [
       ...(await incomeQuery).map((txn) => ({
@@ -84,6 +90,10 @@ export const getDashboardData = async (
       ...(await expenseQuery).map((txn) => ({
         ...txn.toObject(),
         type: "expense" as const,
+      })),
+      ...(await transferQuery).map((txn) => ({
+        ...txn.toObject(),
+        type: "transfer" as const,
       })),
     ].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)); // Sort latest first
 
