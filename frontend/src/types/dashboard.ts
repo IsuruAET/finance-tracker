@@ -1,3 +1,34 @@
+export interface TransactionApiResponse {
+  _id: string;
+  userId: string;
+  type: "INCOME" | "EXPENSE" | "TRANSFER" | "INITIAL_BALANCE";
+  amount: number;
+  date: string;
+  desc?: string;
+  walletId?: {
+    _id: string;
+    name: string;
+    type: string;
+    balance?: number;
+  };
+  categoryId?: {
+    _id: string;
+    name: string;
+    type: string;
+    icon: string;
+  };
+  fromWalletId?: {
+    _id: string;
+    name: string;
+    type: string;
+  };
+  toWalletId?: {
+    _id: string;
+    name: string;
+    type: string;
+  };
+}
+
 export type Transaction = {
   _id: string;
   userId: string;

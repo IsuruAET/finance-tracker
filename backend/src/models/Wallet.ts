@@ -1,16 +1,17 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-// Define the Wallet interface
+export type WalletType = "CASH" | "BANK" | "CARD" | "OTHER";
+
 export interface IWallet extends Document {
   userId: mongoose.Schema.Types.ObjectId;
-  name: string; // "Cash In Hand", "Card 1", "Card 2", etc.
-  type: "cash" | "card";
+  name: string;
+  type: WalletType;
   balance: number;
-  icon?: string;
-  createdDate: Date;
+  initializedAt: Date;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
-// Define schema
 const WalletSchema = new Schema<IWallet>(
   {
     userId: {
@@ -18,15 +19,25 @@ const WalletSchema = new Schema<IWallet>(
       ref: "User",
       required: true,
     },
-    name: { type: String, required: true },
-    type: { type: String, enum: ["cash", "card"], required: true },
-    balance: { type: Number, default: 0, required: true },
-    icon: { type: String },
-    createdDate: { type: Date, default: Date.now, required: true },
+    name: { type: String, required: true, trim: true },
+    type: {
+      type: String,
+      enum: ["CASH", "BANK", "CARD", "OTHER"],
+      required: true,
+    },
+    balance: {
+      type: Number,
+      default: 0,
+      required: true,
+    },
+    initializedAt: {
+      type: Date,
+      default: Date.now,
+      required: true,
+    },
   },
   { timestamps: true }
 );
 
-// Export model
 const Wallet = mongoose.model<IWallet>("Wallet", WalletSchema);
 export default Wallet;

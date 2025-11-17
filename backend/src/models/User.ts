@@ -7,6 +7,7 @@ export interface IUser extends Document {
   email: string;
   password: string;
   profileImageUrl?: string | null;
+  accountInitializedDate: Date;
   comparePassword(candidatePassword: string): Promise<boolean>;
 }
 
@@ -17,6 +18,11 @@ const UserSchema = new Schema<IUser>(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     profileImageUrl: { type: String, default: null },
+    accountInitializedDate: {
+      type: Date,
+      default: Date.now,
+      immutable: true,
+    },
   },
   { timestamps: true }
 );

@@ -1,8 +1,6 @@
 import { Response } from "express";
 import Wallet from "../models/Wallet";
-import Transfer from "../models/Transfer";
-import Income from "../models/Income";
-import Expense from "../models/Expense";
+import Transaction from "../models/Transaction";
 import { AuthenticatedRequest } from "../types/express";
 
 // Initialize wallets (cash in hand + cards)
@@ -30,12 +28,24 @@ export const initializeWallets = async (
       const cashWallet = new Wallet({
         userId,
         name: "Cash In Hand",
-        type: "cash",
+        type: "CASH",
         balance: cashInHand,
-        icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png",
-        createdDate: new Date(),
+        initializedAt: new Date(),
       });
       await cashWallet.save();
+
+      // Create initial balance transaction if balance > 0
+      if (cashInHand > 0) {
+        const initialTransaction = new Transaction({
+          userId,
+          type: "INITIAL_BALANCE",
+          amount: cashInHand,
+          walletId: cashWallet._id,
+          date: new Date(),
+        });
+        await initialTransaction.save();
+      }
+
       wallets.push(cashWallet);
     }
 
@@ -46,14 +56,24 @@ export const initializeWallets = async (
           const cardWallet = new Wallet({
             userId,
             name: card.name,
-            type: "card",
+            type: "CARD",
             balance: card.balance || 0,
-            icon:
-              card.icon ||
-              "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
-            createdDate: new Date(),
+            initializedAt: new Date(),
           });
           await cardWallet.save();
+
+          // Create initial balance transaction if balance > 0
+          if (card.balance > 0) {
+            const initialTransaction = new Transaction({
+              userId,
+              type: "INITIAL_BALANCE",
+              amount: card.balance,
+              walletId: cardWallet._id,
+              date: new Date(),
+            });
+            await initialTransaction.save();
+          }
+
           wallets.push(cardWallet);
         }
       }
@@ -101,7 +121,7 @@ export const addWallet = async (
   const userId = req.user?._id;
 
   try {
-    const { name, type, balance, icon, createdDate } = req.body || {};
+    const { name, type, balance } = req.body || {};
 
     if (!name || !type || balance === undefined) {
       return res
@@ -109,8 +129,10 @@ export const addWallet = async (
         .json({ message: "Name, type, and balance are required" });
     }
 
-    if (!["cash", "card"].includes(type)) {
-      return res.status(400).json({ message: "Type must be 'cash' or 'card'" });
+    if (!["CASH", "BANK", "CARD", "OTHER"].includes(type)) {
+      return res.status(400).json({
+        message: "Type must be 'CASH', 'BANK', 'CARD', or 'OTHER'",
+      });
     }
 
     const wallet = new Wallet({
@@ -118,15 +140,23 @@ export const addWallet = async (
       name,
       type,
       balance: balance || 0,
-      icon:
-        icon ||
-        (type === "cash"
-          ? "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png"
-          : "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png"),
-      createdDate: createdDate ? new Date(createdDate) : new Date(),
+      initializedAt: new Date(),
     });
 
     await wallet.save();
+
+    // Create initial balance transaction if balance > 0
+    if (balance > 0) {
+      const initialTransaction = new Transaction({
+        userId,
+        type: "INITIAL_BALANCE",
+        amount: balance,
+        walletId: wallet._id,
+        date: new Date(),
+      });
+      await initialTransaction.save();
+    }
+
     return res.status(201).json(wallet);
   } catch (error: unknown) {
     if (error instanceof Error) {
@@ -185,14 +215,15 @@ export const transferBetweenWallets = async (
     await fromWallet.save();
     await toWallet.save();
 
-    // Create transfer record
-    const transfer = new Transfer({
+    // Create transfer transaction
+    const transfer = new Transaction({
       userId,
+      type: "TRANSFER",
       fromWalletId,
       toWalletId,
       amount,
+      desc: note,
       date: date ? new Date(date) : new Date(),
-      note,
     });
 
     await transfer.save();
@@ -220,9 +251,12 @@ export const getTransfers = async (
   const userId = req.user?._id;
 
   try {
-    const transfers = await Transfer.find({ userId })
-      .populate("fromWalletId", "name type icon")
-      .populate("toWalletId", "name type icon")
+    const transfers = await Transaction.find({
+      userId,
+      type: "TRANSFER",
+    })
+      .populate("fromWalletId", "name type")
+      .populate("toWalletId", "name type")
       .sort({ date: -1 });
 
     return res.status(200).json(transfers);
@@ -261,19 +295,15 @@ export const deleteWallet = async (
     }
 
     // Check for associated transactions
-    const [incomeCount, expenseCount, transferFromCount, transferToCount] =
-      await Promise.all([
-        Income.countDocuments({ walletId }),
-        Expense.countDocuments({ walletId }),
-        Transfer.countDocuments({ fromWalletId: walletId }),
-        Transfer.countDocuments({ toWalletId: walletId }),
-      ]);
+    const transactionCount = await Transaction.countDocuments({
+      $or: [
+        { walletId },
+        { fromWalletId: walletId },
+        { toWalletId: walletId },
+      ],
+    });
 
-    const hasTransactions =
-      incomeCount > 0 ||
-      expenseCount > 0 ||
-      transferFromCount > 0 ||
-      transferToCount > 0;
+    const hasTransactions = transactionCount > 0;
 
     // Allow deletion if:
     // 1. No associated transactions, OR

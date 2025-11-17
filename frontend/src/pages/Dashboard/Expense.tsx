@@ -16,6 +16,8 @@ import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
 import DateRangePicker from "../../components/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
+import { findOrCreateCategory } from "../../utils/helper";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 const Expense = () => {
   const { dateRange } = useDateRange();
@@ -38,18 +40,48 @@ const Expense = () => {
       const startDate = dateRange.startDate.toISOString().split("T")[0];
       const endDate = dateRange.endDate.toISOString().split("T")[0];
 
-      const response = await axiosInstance.get<Transaction[]>(
-        `${API_PATHS.EXPENSE.GET_ALL_EXPENSES}`,
+      const response = await axiosInstance.get<TransactionApiResponse[]>(
+        `${API_PATHS.TRANSACTIONS.GET_ALL}`,
         {
           params: {
             startDate,
             endDate,
+            type: "EXPENSE",
           },
         }
       );
 
       if (response.data) {
-        setExpenseData(response.data);
+        // Map the response to match the expected Transaction format
+        const mappedData: Transaction[] = response.data.map(
+          (item: TransactionApiResponse) => ({
+            _id: item._id,
+            userId: item.userId,
+            date: item.date,
+            amount: item.amount,
+            source: item.categoryId?.name || item.desc || "",
+            category: item.categoryId?.name || item.desc || "",
+            icon: item.categoryId?.icon || "",
+            type: item.type.toLowerCase() as "income" | "expense" | "transfer",
+            note: item.desc,
+            walletId: item.walletId?._id || item.walletId,
+            fromWalletId: item.fromWalletId
+              ? {
+                  _id: item.fromWalletId._id,
+                  name: item.fromWalletId.name,
+                  icon: item.fromWalletId.type,
+                }
+              : undefined,
+            toWalletId: item.toWalletId
+              ? {
+                  _id: item.toWalletId._id,
+                  name: item.toWalletId.name,
+                  icon: item.toWalletId.type,
+                }
+              : undefined,
+          })
+        );
+        setExpenseData(mappedData);
       }
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
@@ -83,12 +115,21 @@ const Expense = () => {
     }
 
     try {
-      await axiosInstance.post(API_PATHS.EXPENSE.ADD_EXPENSE, {
-        category,
-        amount,
+      // Find or create category
+      const categoryId = await findOrCreateCategory(category, "EXPENSE", icon);
+
+      if (!categoryId) {
+        toast.error("Failed to create or find category. Please try again.");
+        return;
+      }
+
+      await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
+        type: "EXPENSE",
+        amount: Number(amount),
         date,
-        icon,
         walletId,
+        categoryId,
+        desc: category,
       });
 
       setOpenAddExpenseModal(false);
@@ -101,8 +142,13 @@ const Expense = () => {
           error.response?.data?.message ||
             "Something went wrong. Please try again."
         );
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
       } else {
         console.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   };
@@ -110,7 +156,7 @@ const Expense = () => {
   // Delete Expense
   const deleteExpense = async (id: string) => {
     try {
-      await axiosInstance.delete(API_PATHS.EXPENSE.DELETE_EXPENSE(id));
+      await axiosInstance.delete(API_PATHS.TRANSACTIONS.DELETE(id));
 
       setOpenDeleteAlert({ show: false, data: null });
       toast.success("Expense details deleted successfully");
@@ -122,8 +168,13 @@ const Expense = () => {
           error.response?.data?.message ||
             "Something went wrong. Please try again."
         );
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
       } else {
         console.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   };
@@ -136,12 +187,13 @@ const Expense = () => {
       const endDate = dateRange.endDate.toISOString().split("T")[0];
 
       const response = await axiosInstance.get(
-        API_PATHS.EXPENSE.DOWNLOAD_EXPENSE,
+        API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,
         {
           responseType: "blob",
           params: {
             startDate,
             endDate,
+            type: "EXPENSE",
           },
         }
       );

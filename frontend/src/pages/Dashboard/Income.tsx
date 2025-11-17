@@ -13,10 +13,14 @@ import IncomeList from "../../components/Income/IncomeList";
 import DeleteAlert, {
   type DeleteAlertState,
 } from "../../components/DeleteAlert";
-import type { Transaction } from "../../types/dashboard";
+import type {
+  Transaction,
+  TransactionApiResponse,
+} from "../../types/dashboard";
 import axios from "axios";
 import DateRangePicker from "../../components/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
+import { findOrCreateCategory } from "../../utils/helper";
 
 const Income = () => {
   const { dateRange } = useDateRange();
@@ -39,18 +43,48 @@ const Income = () => {
       const startDate = dateRange.startDate.toISOString().split("T")[0];
       const endDate = dateRange.endDate.toISOString().split("T")[0];
 
-      const response = await axiosInstance.get<Transaction[]>(
-        `${API_PATHS.INCOME.GET_ALL_INCOME}`,
+      const response = await axiosInstance.get<TransactionApiResponse[]>(
+        `${API_PATHS.TRANSACTIONS.GET_ALL}`,
         {
           params: {
             startDate,
             endDate,
+            type: "INCOME",
           },
         }
       );
 
       if (response.data) {
-        setIncomeData(response.data);
+        // Map the response to match the expected Transaction format
+        const mappedData: Transaction[] = response.data.map(
+          (item: TransactionApiResponse) => ({
+            _id: item._id,
+            userId: item.userId,
+            date: item.date,
+            amount: item.amount,
+            source: item.categoryId?.name || item.desc || "",
+            category: item.categoryId?.name || item.desc || "",
+            icon: item.categoryId?.icon || "",
+            type: item.type.toLowerCase() as "income" | "expense" | "transfer",
+            note: item.desc,
+            walletId: item.walletId?._id || item.walletId,
+            fromWalletId: item.fromWalletId
+              ? {
+                  _id: item.fromWalletId._id,
+                  name: item.fromWalletId.name,
+                  icon: item.fromWalletId.type,
+                }
+              : undefined,
+            toWalletId: item.toWalletId
+              ? {
+                  _id: item.toWalletId._id,
+                  name: item.toWalletId.name,
+                  icon: item.toWalletId.type,
+                }
+              : undefined,
+          })
+        );
+        setIncomeData(mappedData);
       }
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
@@ -84,12 +118,21 @@ const Income = () => {
     }
 
     try {
-      await axiosInstance.post(API_PATHS.INCOME.ADD_INCOME, {
-        source,
-        amount,
+      // Find or create category
+      const categoryId = await findOrCreateCategory(source, "INCOME", icon);
+
+      if (!categoryId) {
+        toast.error("Failed to create or find category. Please try again.");
+        return;
+      }
+
+      await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
+        type: "INCOME",
+        amount: Number(amount),
         date,
-        icon,
         walletId,
+        categoryId,
+        desc: source,
       });
 
       setOpenAddIncomeModal(false);
@@ -102,8 +145,13 @@ const Income = () => {
           error.response?.data?.message ||
             "Something went wrong. Please try again."
         );
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
       } else {
         console.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   };
@@ -111,7 +159,7 @@ const Income = () => {
   // Delete Income
   const deleteIncome = async (id: string) => {
     try {
-      await axiosInstance.delete(API_PATHS.INCOME.DELETE_INCOME(id));
+      await axiosInstance.delete(API_PATHS.TRANSACTIONS.DELETE(id));
 
       setOpenDeleteAlert({ show: false, data: null });
       toast.success("Income details deleted successfully");
@@ -123,8 +171,13 @@ const Income = () => {
           error.response?.data?.message ||
             "Something went wrong. Please try again."
         );
+        toast.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
       } else {
         console.error("Something went wrong. Please try again.");
+        toast.error("Something went wrong. Please try again.");
       }
     }
   };
@@ -137,12 +190,13 @@ const Income = () => {
       const endDate = dateRange.endDate.toISOString().split("T")[0];
 
       const response = await axiosInstance.get(
-        API_PATHS.INCOME.DOWNLOAD_INCOME,
+        API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,
         {
           responseType: "blob",
           params: {
             startDate,
             endDate,
+            type: "INCOME",
           },
         }
       );

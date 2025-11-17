@@ -1,5 +1,7 @@
 import { DateTime } from "luxon";
 import type { Transaction } from "../types/dashboard";
+import axiosInstance from "./axiosInstance";
+import { API_PATHS } from "./apiPaths";
 
 export const validateEmail = (email: string): boolean => {
   const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -79,4 +81,56 @@ export const prepareExpenseLineChartData = (data: Transaction[] = []) => {
   }));
 
   return chartData;
+};
+
+interface Category {
+  _id: string;
+  name: string;
+  type: "INCOME" | "EXPENSE";
+  icon: string;
+  isDefault?: boolean;
+  userId?: string;
+}
+
+// Find or create a category by name and type
+export const findOrCreateCategory = async (
+  name: string,
+  type: "INCOME" | "EXPENSE",
+  icon?: string
+): Promise<string | null> => {
+  try {
+    // First, try to get all categories and find a match
+    const response = await axiosInstance.get<{
+      default?: Category[];
+      custom?: Category[];
+    }>(API_PATHS.CATEGORIES.GET_ALL, {
+      params: { type },
+    });
+
+    const allCategories: Category[] = [
+      ...(response.data?.default || []),
+      ...(response.data?.custom || []),
+    ];
+
+    // Find existing category by name (case-insensitive)
+    const existingCategory = allCategories.find(
+      (cat: Category) => cat.name.toLowerCase() === name.trim().toLowerCase()
+    );
+
+    if (existingCategory) {
+      return existingCategory._id;
+    }
+
+    // Create new category if not found
+    const createResponse = await axiosInstance.post(API_PATHS.CATEGORIES.ADD, {
+      name: name.trim(),
+      type,
+      icon: icon || "💰",
+    });
+
+    return createResponse.data?._id || null;
+  } catch (error) {
+    console.error("Error finding or creating category:", error);
+    return null;
+  }
 };

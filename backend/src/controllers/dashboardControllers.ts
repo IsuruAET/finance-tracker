@@ -1,8 +1,6 @@
 import { Response } from "express";
-import Income from "../models/Income";
-import Expense from "../models/Expense";
+import Transaction from "../models/Transaction";
 import Wallet from "../models/Wallet";
-import Transfer from "../models/Transfer";
 import { AuthenticatedRequest } from "../types/express";
 import { Types } from "mongoose";
 
@@ -21,35 +19,34 @@ export const getDashboardData = async (
 
     // Build match conditions
     const baseMatch = { userId: userObjectId };
-    const incomeMatch = baseMatch;
-    const expenseMatch = baseMatch;
 
     // Fetch total income & expenses
-    const totalIncome = await Income.aggregate([
-      { $match: incomeMatch },
+    const totalIncomeResult = await Transaction.aggregate([
+      { $match: { ...baseMatch, type: { $in: ["INCOME", "INITIAL_BALANCE"] } } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-    console.log("totalIncome", {
-      totalIncome,
-      userId,
-      isValidObjectId: Types.ObjectId.isValid(userId),
-    });
-
-    const totalExpense = await Expense.aggregate([
-      { $match: expenseMatch },
+    const totalExpenseResult = await Transaction.aggregate([
+      { $match: { ...baseMatch, type: "EXPENSE" } },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
+
+    const totalIncome = totalIncomeResult[0]?.total || 0;
+    const totalExpense = totalExpenseResult[0]?.total || 0;
 
     // Get income transactions for last 60 days
     const incomeDateFilter = {
       $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
     };
 
-    const last60DaysIncomeTransactions = await Income.find({
+    const last60DaysIncomeTransactions = await Transaction.find({
       userId: userObjectId,
+      type: { $in: ["INCOME", "INITIAL_BALANCE"] },
       date: incomeDateFilter,
-    }).sort({ date: -1 });
+    })
+      .populate("walletId", "name type")
+      .populate("categoryId", "name type icon")
+      .sort({ date: -1 });
 
     // Get total income for filtered period
     const incomeLast60Days = last60DaysIncomeTransactions.reduce(
@@ -62,10 +59,14 @@ export const getDashboardData = async (
       $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
     };
 
-    const last30DaysExpenseTransactions = await Expense.find({
+    const last30DaysExpenseTransactions = await Transaction.find({
       userId: userObjectId,
+      type: "EXPENSE",
       date: expenseDateFilter,
-    }).sort({ date: -1 });
+    })
+      .populate("walletId", "name type")
+      .populate("categoryId", "name type icon")
+      .sort({ date: -1 });
 
     // Get total expenses for filtered period
     const expensesLast30Days = last30DaysExpenseTransactions.reduce(
@@ -73,39 +74,23 @@ export const getDashboardData = async (
       0
     );
 
-    // Fetch last 5 transactions (income + expenses + transfers)
-    const incomeQuery = Income.find(baseMatch).sort({ date: -1 }).limit(5);
-    const expenseQuery = Expense.find(baseMatch).sort({ date: -1 }).limit(5);
-    const transferQuery = Transfer.find(baseMatch)
-      .populate("fromWalletId", "name type icon")
-      .populate("toWalletId", "name type icon")
+    // Fetch last 5 transactions (all types)
+    const lastTransactions = await Transaction.find(baseMatch)
+      .populate("walletId", "name type")
+      .populate("fromWalletId", "name type")
+      .populate("toWalletId", "name type")
+      .populate("categoryId", "name type icon")
       .sort({ date: -1 })
       .limit(5);
-
-    const lastTransactions = [
-      ...(await incomeQuery).map((txn) => ({
-        ...txn.toObject(),
-        type: "income" as const,
-      })),
-      ...(await expenseQuery).map((txn) => ({
-        ...txn.toObject(),
-        type: "expense" as const,
-      })),
-      ...(await transferQuery).map((txn) => ({
-        ...txn.toObject(),
-        type: "transfer" as const,
-      })),
-    ].sort((a, b) => (b.date?.getTime() ?? 0) - (a.date?.getTime() ?? 0)); // Sort latest first
 
     // Get wallet balances
     const wallets = await Wallet.find({ userId: userObjectId });
 
     // Final Response
     return res.status(200).json({
-      totalBalance:
-        (totalIncome[0]?.total || 0) - (totalExpense[0]?.total || 0),
-      totalIncome: totalIncome[0]?.total || 0,
-      totalExpenses: totalExpense[0]?.total || 0,
+      totalBalance: totalIncome - totalExpense,
+      totalIncome,
+      totalExpenses: totalExpense,
       wallets,
       last30DaysExpenses: {
         total: expensesLast30Days,
