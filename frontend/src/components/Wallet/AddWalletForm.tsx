@@ -14,11 +14,15 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
   const [name, setName] = useState("");
   const [type, setType] = useState<"cash" | "card">(walletType);
   const [balance, setBalance] = useState<string>("0");
+  const [createdDate, setCreatedDate] = useState<string>(
+    new Date().toISOString().split("T")[0]
+  );
 
   useEffect(() => {
     setType(walletType);
     setName("");
     setBalance("0");
+    setCreatedDate(new Date().toISOString().split("T")[0]);
   }, [walletType]);
 
   const handleSubmit = async () => {
@@ -44,11 +48,13 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
         type,
         balance: balanceNum,
         icon: defaultIcon,
+        createdDate: createdDate || new Date().toISOString().split("T")[0],
       });
 
       toast.success("Wallet added successfully!");
       setName("");
       setBalance("0");
+      setCreatedDate(new Date().toISOString().split("T")[0]);
       onAddComplete();
     } catch (error: unknown) {
       const errorMessage =
@@ -95,6 +101,14 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
         label="Initial Balance"
         placeholder="0"
         type="number"
+      />
+
+      <Input
+        value={createdDate}
+        onChange={(e) => setCreatedDate(e.target.value)}
+        label="Created Date"
+        placeholder=""
+        type="date"
       />
 
       <div className="flex justify-end mt-6">

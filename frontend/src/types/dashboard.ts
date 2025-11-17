@@ -30,6 +30,7 @@ export type Wallet = {
   type: "cash" | "card";
   balance: number;
   icon?: string;
+  createdDate?: string;
 };
 
 export type DashboardDataResponse = {

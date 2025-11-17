@@ -23,6 +23,7 @@ interface Wallet {
   type: "cash" | "card";
   balance: number;
   icon?: string;
+  createdDate?: string;
 }
 
 const Wallet = () => {
@@ -150,6 +151,7 @@ const Wallet = () => {
           label={wallet.name}
           value={addThousandsSeparator(wallet.balance)}
           color={color}
+          desc={wallet.createdDate}
         />
         {canDelete && (
           <button

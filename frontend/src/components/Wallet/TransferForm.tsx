@@ -11,6 +11,7 @@ interface Wallet {
   type: "cash" | "card";
   balance: number;
   icon?: string;
+  createdDate?: string;
 }
 
 interface TransferFormProps {

@@ -33,6 +33,7 @@ export const initializeWallets = async (
         type: "cash",
         balance: cashInHand,
         icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png",
+        createdDate: new Date(),
       });
       await cashWallet.save();
       wallets.push(cashWallet);
@@ -47,7 +48,10 @@ export const initializeWallets = async (
             name: card.name,
             type: "card",
             balance: card.balance || 0,
-            icon: card.icon || "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
+            icon:
+              card.icon ||
+              "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
+            createdDate: new Date(),
           });
           await cardWallet.save();
           wallets.push(cardWallet);
@@ -97,7 +101,7 @@ export const addWallet = async (
   const userId = req.user?._id;
 
   try {
-    const { name, type, balance, icon } = req.body || {};
+    const { name, type, balance, icon, createdDate } = req.body || {};
 
     if (!name || !type || balance === undefined) {
       return res
@@ -114,9 +118,12 @@ export const addWallet = async (
       name,
       type,
       balance: balance || 0,
-      icon: icon || (type === "cash" 
-        ? "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png" 
-        : "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png"),
+      icon:
+        icon ||
+        (type === "cash"
+          ? "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png"
+          : "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png"),
+      createdDate: createdDate ? new Date(createdDate) : new Date(),
     });
 
     await wallet.save();

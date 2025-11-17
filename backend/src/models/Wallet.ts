@@ -7,6 +7,7 @@ export interface IWallet extends Document {
   type: "cash" | "card";
   balance: number;
   icon?: string;
+  createdDate: Date;
 }
 
 // Define schema
@@ -21,6 +22,7 @@ const WalletSchema = new Schema<IWallet>(
     type: { type: String, enum: ["cash", "card"], required: true },
     balance: { type: Number, default: 0, required: true },
     icon: { type: String },
+    createdDate: { type: Date, default: Date.now, required: true },
   },
   { timestamps: true }
 );
