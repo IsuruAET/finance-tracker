@@ -7,6 +7,7 @@ export type Transaction = {
   source?: string;
   icon?: string;
   type?: "income" | "expense" | "transfer";
+  note?: string;
   fromWalletId?: {
     _id: string;
     name: string;

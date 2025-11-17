@@ -3,8 +3,8 @@ import {
   LuTrendingUp,
   LuTrendingDown,
   LuTrash2,
-  LuRepeat,
 } from "react-icons/lu";
+import { BiTransfer } from "react-icons/bi";
 import type { Transaction } from "../../types/dashboard";
 import { formatDate } from "../../utils/helper";
 
@@ -30,11 +30,8 @@ const TransactionInfoCard = ({
       const toWallet =
         typeof item.toWalletId === "object" ? item.toWalletId?.name : "Wallet";
       return {
-        title: `From ${fromWallet} to ${toWallet}`,
-        icon:
-          typeof item.fromWalletId === "object"
-            ? item.fromWalletId?.icon
-            : undefined,
+        title: `${fromWallet} → ${toWallet}`,
+        icon: undefined,
       };
     } else if (item.type === "expense") {
       return {
@@ -55,6 +52,7 @@ const TransactionInfoCard = ({
     ? getTransactionTitleAndIcon(transaction)
     : { title: "", icon: undefined };
   const date = transaction ? formatDate(transaction.date) : "";
+  const note = transaction?.note;
   const amount = transaction?.amount ?? 0;
   const type = typeProp ?? transaction?.type;
 
@@ -70,7 +68,7 @@ const TransactionInfoCard = ({
         {icon ? (
           <img src={icon} alt={title} className="w-6 h-6" />
         ) : type === "transfer" ? (
-          <LuRepeat />
+          <BiTransfer className="w-6 h-6" />
         ) : (
           <LuUtensils />
         )}
@@ -79,7 +77,9 @@ const TransactionInfoCard = ({
       <div className="flex-1 flex items-center justify-between">
         <div>
           <p className="text-sm text-gray-700 font-medium">{title}</p>
-          <p className="text-xs text-gray-400 mt-1">{date}</p>
+          <p className="text-xs text-gray-400 mt-1">
+            {date} {note ? `• ${note}` : ""}
+          </p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -104,7 +104,7 @@ const TransactionInfoCard = ({
             ) : type === "expense" ? (
               <LuTrendingDown />
             ) : (
-              <LuRepeat />
+              <BiTransfer />
             )}
           </div>
         </div>

@@ -1,6 +1,5 @@
-import { addThousandsSeparator, formatDate } from "../../utils/helper";
-import TransferInfoCard from "../Cards/TransferInfoCard";
-import { BiTransfer } from "react-icons/bi";
+import TransactionInfoCard from "../Cards/TransactionInfoCard";
+import type { Transaction } from "../../types/dashboard";
 
 interface TransferWalletRef {
   _id: string;
@@ -31,14 +30,23 @@ const TransferList = ({ transfers }: TransferListProps) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2">
         {transfers.map((t) => {
+          const transaction: Transaction = {
+            _id: t._id,
+            userId: "",
+            date: t.date,
+            amount: t.amount,
+            type: "transfer",
+            note: t.note,
+            fromWalletId: t.fromWalletId,
+            toWalletId: t.toWalletId,
+          };
+
           return (
-            <TransferInfoCard
+            <TransactionInfoCard
               key={t._id}
-              title={`${t.fromWalletId?.name} → ${t.toWalletId?.name}`}
-              icon={<BiTransfer className="w-6 h-6" />}
-              date={formatDate(t.date)}
-              note={t.note}
-              amount={addThousandsSeparator(t.amount)}
+              transaction={transaction}
+              type="transfer"
+              hideDeleteBtn={true}
             />
           );
         })}
