@@ -8,16 +8,20 @@ export type Transaction = {
   icon?: string;
   type?: "income" | "expense" | "transfer";
   note?: string;
-  fromWalletId?: {
-    _id: string;
-    name: string;
-    icon?: string;
-  } | string;
-  toWalletId?: {
-    _id: string;
-    name: string;
-    icon?: string;
-  } | string;
+  fromWalletId?:
+    | {
+        _id: string;
+        name: string;
+        icon?: string;
+      }
+    | string;
+  toWalletId?:
+    | {
+        _id: string;
+        name: string;
+        icon?: string;
+      }
+    | string;
 };
 
 export type Wallet = {
