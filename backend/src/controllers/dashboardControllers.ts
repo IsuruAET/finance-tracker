@@ -20,28 +20,116 @@ export const getDashboardData = async (
     // Build match conditions
     const baseMatch = { userId: userObjectId };
 
-    // Fetch total income & expenses
-    const totalIncomeResult = await Transaction.aggregate([
-      { $match: { ...baseMatch, type: { $in: ["INCOME", "INITIAL_BALANCE"] } } },
+    // Get current date and calculate month boundaries
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth();
+
+    // First day of current month
+    const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1);
+    // First day of next month (end of current month)
+    const firstDayOfNextMonth = new Date(currentYear, currentMonth + 1, 1);
+    // End of last month
+    const endOfLastMonth = new Date(
+      currentYear,
+      currentMonth,
+      0,
+      23,
+      59,
+      59,
+      999
+    );
+
+    // Calculate This Month metrics
+    const thisMonthIncomeResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "INCOME",
+          date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
+        },
+      },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-    const totalExpenseResult = await Transaction.aggregate([
-      { $match: { ...baseMatch, type: "EXPENSE" } },
+    const thisMonthExpenseResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "EXPENSE",
+          date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
+        },
+      },
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-    const totalIncome = totalIncomeResult[0]?.total || 0;
-    const totalExpense = totalExpenseResult[0]?.total || 0;
+    // Get INITIAL_BALANCE separately for balance calculation (not income)
+    const thisMonthInitialBalanceResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "INITIAL_BALANCE",
+          date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
 
-    // Get income transactions for last 60 days
+    const thisMonthIncome = thisMonthIncomeResult[0]?.total || 0;
+    const thisMonthExpenses = thisMonthExpenseResult[0]?.total || 0;
+    const thisMonthInitialBalance = thisMonthInitialBalanceResult[0]?.total || 0;
+    // Include INITIAL_BALANCE in balance calculation but not in income
+    const thisMonthTotalBalance = thisMonthIncome + thisMonthInitialBalance - thisMonthExpenses;
+    const thisMonthNewSavings = thisMonthTotalBalance;
+
+    // Calculate Broad Forward Balance Last Month (all transactions up to end of last month)
+    const lastMonthIncomeResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "INCOME",
+          date: { $lte: endOfLastMonth },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    const lastMonthExpenseResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "EXPENSE",
+          date: { $lte: endOfLastMonth },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    // Get INITIAL_BALANCE separately for balance calculation (not income)
+    const lastMonthInitialBalanceResult = await Transaction.aggregate([
+      {
+        $match: {
+          ...baseMatch,
+          type: "INITIAL_BALANCE",
+          date: { $lte: endOfLastMonth },
+        },
+      },
+      { $group: { _id: null, total: { $sum: "$amount" } } },
+    ]);
+
+    const broadForwardBalanceLastMonth =
+      (lastMonthIncomeResult[0]?.total || 0) +
+      (lastMonthInitialBalanceResult[0]?.total || 0) -
+      (lastMonthExpenseResult[0]?.total || 0);
+
+    // Get income transactions for last 60 days (excluding INITIAL_BALANCE)
     const incomeDateFilter = {
       $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
     };
 
     const last60DaysIncomeTransactions = await Transaction.find({
       userId: userObjectId,
-      type: { $in: ["INCOME", "INITIAL_BALANCE"] },
+      type: "INCOME",
       date: incomeDateFilter,
     })
       .populate("walletId", "name type")
@@ -88,9 +176,11 @@ export const getDashboardData = async (
 
     // Final Response
     return res.status(200).json({
-      totalBalance: totalIncome - totalExpense,
-      totalIncome,
-      totalExpenses: totalExpense,
+      broadForwardBalanceLastMonth,
+      thisMonthNewSavings,
+      thisMonthTotalIncome: thisMonthIncome,
+      thisMonthTotalExpenses: thisMonthExpenses,
+      thisMonthTotalBalance,
       wallets,
       last30DaysExpenses: {
         total: expensesLast30Days,

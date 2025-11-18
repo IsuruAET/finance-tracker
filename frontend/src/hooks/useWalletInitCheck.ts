@@ -55,6 +55,8 @@ export function useWalletInitCheck({
   const handleInitComplete = () => {
     setShowInitModal(false);
     setWalletsInitialized(true);
+    // Dispatch custom event to notify components (like Dashboard) to refetch data
+    window.dispatchEvent(new CustomEvent("walletsInitialized"));
   };
 
   return {

@@ -5,6 +5,11 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus } from "react-icons/lu";
 
+interface CashWallet {
+  name: string;
+  balance: number;
+}
+
 interface Card {
   name: string;
   balance: number;
@@ -16,10 +21,32 @@ interface InitializeWalletsProps {
 }
 
 const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
-  const [cashInHand, setCashInHand] = useState<string>("0");
+  const [cashWallets, setCashWallets] = useState<CashWallet[]>([
+    { name: "", balance: 0 },
+  ]);
   const [cards, setCards] = useState<Card[]>([
     { name: "", balance: 0, icon: "💳" },
   ]);
+
+  const addCashWallet = () => {
+    setCashWallets([...cashWallets, { name: "", balance: 0 }]);
+  };
+
+  const updateCashWallet = (
+    index: number,
+    field: keyof CashWallet,
+    value: string | number
+  ) => {
+    const updated = [...cashWallets];
+    updated[index] = { ...updated[index], [field]: value };
+    setCashWallets(updated);
+  };
+
+  const removeCashWallet = (index: number) => {
+    if (cashWallets.length > 1) {
+      setCashWallets(cashWallets.filter((_, i) => i !== index));
+    }
+  };
 
   const addCard = () => {
     setCards([...cards, { name: "", balance: 0, icon: "💳" }]);
@@ -42,22 +69,49 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   };
 
   const handleSubmit = async () => {
-    const cashAmount = Number(cashInHand) || 0;
+    const validCashWallets = cashWallets.filter(
+      (cash) => cash.name.trim() !== ""
+    );
     const validCards = cards.filter((card) => card.name.trim() !== "");
 
-    if (cashAmount < 0) {
-      toast.error("Cash in hand cannot be negative");
+    // Validate balances
+    for (const cash of validCashWallets) {
+      if (Number(cash.balance) < 0) {
+        toast.error("Cash wallet balance cannot be negative");
+        return;
+      }
+    }
+
+    for (const card of validCards) {
+      if (Number(card.balance) < 0) {
+        toast.error("Card wallet balance cannot be negative");
+        return;
+      }
+    }
+
+    if (validCashWallets.length === 0 && validCards.length === 0) {
+      toast.error("Please add at least one wallet with a name");
       return;
     }
 
-    if (validCards.length === 0 && cashAmount === 0) {
-      toast.error("Please add at least one wallet with a balance");
+    // Check if at least one wallet has a balance > 0
+    const hasBalance = [...validCashWallets, ...validCards].some(
+      (wallet) => Number(wallet.balance) > 0
+    );
+
+    if (!hasBalance) {
+      toast.error(
+        "Please add at least one wallet with a balance greater than 0"
+      );
       return;
     }
 
     try {
       await axiosInstance.post(API_PATHS.WALLET.INITIALIZE, {
-        cashInHand: cashAmount,
+        cashWallets: validCashWallets.map((cash) => ({
+          name: cash.name,
+          balance: Number(cash.balance) || 0,
+        })),
         cards: validCards.map((card) => ({
           name: card.name,
           balance: Number(card.balance) || 0,
@@ -79,13 +133,54 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   return (
     <div>
       <div className="mb-6">
-        <Input
-          value={cashInHand}
-          onChange={(e) => setCashInHand(e.target.value)}
-          label="Cash In Hand"
-          placeholder="0"
-          type="number"
-        />
+        <div className="flex justify-between items-center mb-3">
+          <label className="text-[13px] text-slate-800">Cash Wallets</label>
+          <button type="button" onClick={addCashWallet} className="add-btn">
+            <LuPlus className="text-lg" />
+            Add Cash Wallet
+          </button>
+        </div>
+
+        {cashWallets.map((cash, index) => (
+          <div
+            key={index}
+            className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50"
+          >
+            <div className="flex justify-between items-start mb-2">
+              <div className="flex-1 mr-2">
+                <Input
+                  value={cash.name}
+                  onChange={(e) =>
+                    updateCashWallet(index, "name", e.target.value)
+                  }
+                  label="Cash Wallet Name"
+                  placeholder="e.g., Wallet, Home Cash, Office Cash"
+                  type="text"
+                />
+              </div>
+              {cashWallets.length > 1 && (
+                <button
+                  type="button"
+                  onClick={() => removeCashWallet(index)}
+                  className="mt-8 inline-flex items-center justify-center rounded-full border border-red-200 text-red-600 hover:text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-colors duration-150 p-2"
+                  aria-label="Remove cash wallet"
+                  title="Remove cash wallet"
+                >
+                  <LuMinus className="text-lg" />
+                </button>
+              )}
+            </div>
+            <Input
+              value={String(cash.balance)}
+              onChange={(e) =>
+                updateCashWallet(index, "balance", e.target.value)
+              }
+              label="Initial Balance"
+              placeholder="0"
+              type="number"
+            />
+          </div>
+        ))}
       </div>
 
       <div className="mb-6">
@@ -93,7 +188,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
           <label className="text-[13px] text-slate-800">Card Wallets</label>
           <button type="button" onClick={addCard} className="add-btn">
             <LuPlus className="text-lg" />
-            Add Card
+            Add Card Wallet
           </button>
         </div>
 

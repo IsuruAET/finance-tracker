@@ -11,7 +11,7 @@ export const initializeWallets = async (
   const userId = req.user?._id;
 
   try {
-    const { cashInHand, cards } = req.body || {};
+    const { cashInHand, cashWallets, cards } = req.body || {};
 
     // Check if user already has wallets
     const existingWallets = await Wallet.find({ userId });
@@ -23,8 +23,8 @@ export const initializeWallets = async (
 
     const wallets = [];
 
-    // Create cash in hand wallet
-    if (cashInHand !== undefined && cashInHand >= 0) {
+    // Support legacy cashInHand for backward compatibility
+    if (cashInHand !== undefined && cashInHand >= 0 && (!cashWallets || cashWallets.length === 0)) {
       const cashWallet = new Wallet({
         userId,
         name: "Cash In Hand",
@@ -47,6 +47,36 @@ export const initializeWallets = async (
       }
 
       wallets.push(cashWallet);
+    }
+
+    // Create cash wallets (new format - multiple cash wallets with names)
+    if (cashWallets && Array.isArray(cashWallets)) {
+      for (const cash of cashWallets) {
+        if (cash.name && cash.balance !== undefined && cash.balance >= 0) {
+          const cashWallet = new Wallet({
+            userId,
+            name: cash.name,
+            type: "CASH",
+            balance: cash.balance || 0,
+            initializedAt: new Date(),
+          });
+          await cashWallet.save();
+
+          // Create initial balance transaction if balance > 0
+          if (cash.balance > 0) {
+            const initialTransaction = new Transaction({
+              userId,
+              type: "INITIAL_BALANCE",
+              amount: cash.balance,
+              walletId: cashWallet._id,
+              date: new Date(),
+            });
+            await initialTransaction.save();
+          }
+
+          wallets.push(cashWallet);
+        }
+      }
     }
 
     // Create card wallets

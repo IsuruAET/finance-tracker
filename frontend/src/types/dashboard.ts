@@ -65,9 +65,11 @@ export type Wallet = {
 };
 
 export type DashboardDataResponse = {
-  totalBalance: number;
-  totalIncome: number;
-  totalExpenses: number;
+  broadForwardBalanceLastMonth: number;
+  thisMonthNewSavings: number;
+  thisMonthTotalIncome: number;
+  thisMonthTotalExpenses: number;
+  thisMonthTotalBalance: number;
   wallets?: Wallet[];
   last30DaysExpenses: {
     total: number;

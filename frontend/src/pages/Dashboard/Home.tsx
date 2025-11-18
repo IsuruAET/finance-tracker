@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState, useRef } from "react";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 
-import { LuHandCoins, LuWalletMinimal } from "react-icons/lu";
+import { LuHandCoins, LuWalletMinimal, LuWallet } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
 import { addThousandsSeparator } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
@@ -15,6 +15,7 @@ import Last30DaysExpenses from "../../components/Dashboard/Last30DaysExpenses";
 import RecentIncomeWithChart from "../../components/Dashboard/RecentIncomeWithChart";
 import type { DashboardDataResponse } from "../../types/dashboard";
 import RecentIncome from "../../components/Dashboard/RecentIncome";
+import { RiWallet3Fill } from "react-icons/ri";
 
 const Home = () => {
   const navigate = useNavigate();
@@ -45,29 +46,73 @@ const Home = () => {
     fetchDashboardData();
   }, [fetchDashboardData]);
 
+  // Listen for wallet initialization to refetch dashboard data
+  useEffect(() => {
+    const handleWalletsInitialized = () => {
+      fetchDashboardData();
+    };
+
+    window.addEventListener("walletsInitialized", handleWalletsInitialized);
+    return () => {
+      window.removeEventListener(
+        "walletsInitialized",
+        handleWalletsInitialized
+      );
+    };
+  }, [fetchDashboardData]);
+
   return (
     <DashboardLayout activeMenu="Dashboard">
       <div className="my-5 mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <InfoCard
             icon={<IoMdCard />}
-            label="Total Balance"
-            value={addThousandsSeparator(dashboardData?.totalBalance || 0)}
-            color="bg-primary"
+            label="Broad Forward Balance"
+            value={addThousandsSeparator(
+              dashboardData?.broadForwardBalanceLastMonth || 0
+            )}
+            desc="Last Month"
+            color="bg-blue-500"
+          />
+
+          <InfoCard
+            icon={<RiWallet3Fill />}
+            label="Total New Savings"
+            value={addThousandsSeparator(
+              dashboardData?.thisMonthNewSavings || 0
+            )}
+            desc="This Month"
+            color="bg-orange-500"
           />
 
           <InfoCard
             icon={<LuWalletMinimal />}
             label="Total Income"
-            value={addThousandsSeparator(dashboardData?.totalIncome || 0)}
-            color="bg-orange-500"
+            value={addThousandsSeparator(
+              dashboardData?.thisMonthTotalIncome || 0
+            )}
+            desc="This Month"
+            color="bg-green-500"
           />
 
           <InfoCard
             icon={<LuHandCoins />}
             label="Total Expenses"
-            value={addThousandsSeparator(dashboardData?.totalExpenses || 0)}
+            value={addThousandsSeparator(
+              dashboardData?.thisMonthTotalExpenses || 0
+            )}
+            desc="This Month"
             color="bg-red-500"
+          />
+
+          <InfoCard
+            icon={<LuWallet />}
+            label="Total Balance"
+            value={addThousandsSeparator(
+              dashboardData?.thisMonthTotalBalance || 0
+            )}
+            desc="This Month"
+            color="bg-primary"
           />
         </div>
 
@@ -78,9 +123,9 @@ const Home = () => {
           />
 
           <FinanceOverview
-            totalBalance={dashboardData?.totalBalance || 0}
-            totalIncome={dashboardData?.totalIncome || 0}
-            totalExpense={dashboardData?.totalExpenses || 0}
+            totalBalance={dashboardData?.thisMonthTotalBalance || 0}
+            totalIncome={dashboardData?.thisMonthTotalIncome || 0}
+            totalExpense={dashboardData?.thisMonthTotalExpenses || 0}
           />
 
           <ExpenseTransactions
@@ -96,7 +141,7 @@ const Home = () => {
             data={
               dashboardData?.last60DaysIncome?.transactions?.slice(0, 4) || []
             }
-            totalIncome={dashboardData?.totalIncome || 0}
+            totalIncome={dashboardData?.thisMonthTotalIncome || 0}
           />
 
           <RecentIncome
