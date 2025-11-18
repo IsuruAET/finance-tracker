@@ -20,7 +20,6 @@ import type {
 import axios from "axios";
 import DateRangePicker from "../../components/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
-import { findOrCreateCategory } from "../../utils/helper";
 
 const Income = () => {
   const { dateRange } = useDateRange();
@@ -95,10 +94,10 @@ const Income = () => {
 
   // Handle Add Income
   const handleAddIncome = async (income: IncomeData) => {
-    const { source, amount, date, icon, walletId } = income;
+    const { categoryId, amount, date, walletId } = income;
 
-    if (!source.trim()) {
-      toast.error("Source is required.");
+    if (!categoryId) {
+      toast.error("Category is required.");
       return;
     }
 
@@ -118,21 +117,12 @@ const Income = () => {
     }
 
     try {
-      // Find or create category
-      const categoryId = await findOrCreateCategory(source, "INCOME", icon);
-
-      if (!categoryId) {
-        toast.error("Failed to create or find category. Please try again.");
-        return;
-      }
-
       await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
         type: "INCOME",
         amount: Number(amount),
         date,
         walletId,
         categoryId,
-        desc: source,
       });
 
       setOpenAddIncomeModal(false);

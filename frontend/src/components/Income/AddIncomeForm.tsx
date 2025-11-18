@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import Input from "../Inputs/Input";
 import Select from "../Inputs/Select";
+import AutoComplete from "../Inputs/AutoComplete";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 
 export interface IncomeData {
-  source: string;
+  categoryId: string;
   amount: number;
   date: string;
   icon: string;
@@ -16,10 +17,19 @@ export interface IncomeData {
 interface Wallet {
   _id: string;
   name: string;
-  type: "cash" | "card";
+  type: "CASH" | "BANK" | "CARD" | "OTHER";
   balance: number;
   icon?: string;
   createdDate?: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  type: "INCOME" | "EXPENSE";
+  icon: string;
+  isDefault?: boolean;
+  userId?: string;
 }
 
 interface AddIncomeFormProps {
@@ -28,13 +38,14 @@ interface AddIncomeFormProps {
 
 const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
   const [income, setIncome] = useState<IncomeData>({
-    source: "",
+    categoryId: "",
     amount: 0,
     date: "",
     icon: "",
     walletId: "",
   });
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -43,8 +54,13 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
           API_PATHS.WALLET.GET_ALL
         );
         setWallets(response.data);
-        if (response.data.length > 0 && !income.walletId) {
-          setIncome((prev) => ({ ...prev, walletId: response.data[0]._id }));
+        if (response.data.length > 0) {
+          setIncome((prev) => {
+            if (!prev.walletId) {
+              return { ...prev, walletId: response.data[0]._id };
+            }
+            return prev;
+          });
         }
       } catch (error) {
         console.error("Error fetching wallets", error);
@@ -53,8 +69,39 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
     fetchWallets();
   }, []);
 
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get<{
+          default?: Category[];
+          custom?: Category[];
+        }>(API_PATHS.CATEGORIES.GET_ALL, {
+          params: { type: "INCOME" },
+        });
+        const allCategories: Category[] = [
+          ...(response.data?.default || []),
+          ...(response.data?.custom || []),
+        ];
+        setCategories(allCategories);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    };
+    fetchCategories();
+  }, []);
+
   const handleChange = (key: keyof IncomeData, value: string) => {
-    setIncome((prev) => ({ ...prev, [key]: value }));
+    setIncome((prev) => {
+      const updated = { ...prev, [key]: value };
+      // Update icon when category changes
+      if (key === "categoryId") {
+        const selectedCategory = categories.find((cat) => cat._id === value);
+        if (selectedCategory) {
+          updated.icon = selectedCategory.icon;
+        }
+      }
+      return updated;
+    });
   };
 
   return (
@@ -64,14 +111,17 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
         onSelect={(selectedIcon: string) => handleChange("icon", selectedIcon)}
       />
 
-      <Input
-        value={income.source}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleChange("source", e.target.value)
-        }
-        label="Income Source"
-        placeholder="Freelance, Salary, etc"
-        type="text"
+      <AutoComplete
+        value={income.categoryId}
+        onChange={(e) => handleChange("categoryId", e.target.value)}
+        label="Income Category"
+        placeholder="Select or search for a category"
+        options={categories.map((category) => ({
+          value: category._id,
+          label: category.name,
+          icon: category.icon,
+        }))}
+        required
       />
 
       <Input

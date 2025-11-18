@@ -6,23 +6,21 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 
 interface AddWalletFormProps {
-  walletType: "cash" | "card";
+  walletType: "CASH" | "BANK" | "CARD" | "OTHER";
   onAddComplete: () => void;
 }
 
 const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
   const [name, setName] = useState("");
-  const [type, setType] = useState<"cash" | "card">(walletType);
-  const [balance, setBalance] = useState<string>("0");
-  const [createdDate, setCreatedDate] = useState<string>(
-    new Date().toISOString().split("T")[0]
+  const [type, setType] = useState<"CASH" | "BANK" | "CARD" | "OTHER">(
+    walletType
   );
+  const [balance, setBalance] = useState<string>("0");
 
   useEffect(() => {
     setType(walletType);
     setName("");
     setBalance("0");
-    setCreatedDate(new Date().toISOString().split("T")[0]);
   }, [walletType]);
 
   const handleSubmit = async () => {
@@ -39,7 +37,7 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
 
     try {
       const defaultIcon =
-        type === "cash"
+        type === "CASH"
           ? "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png"
           : "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png";
 
@@ -48,13 +46,11 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
         type,
         balance: balanceNum,
         icon: defaultIcon,
-        createdDate: createdDate || new Date().toISOString().split("T")[0],
       });
 
       toast.success("Wallet added successfully!");
       setName("");
       setBalance("0");
-      setCreatedDate(new Date().toISOString().split("T")[0]);
       onAddComplete();
     } catch (error: unknown) {
       const errorMessage =
@@ -77,18 +73,30 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
 
       <Select
         value={type}
-        onChange={(e) => setType(e.target.value as "cash" | "card")}
+        onChange={(e) =>
+          setType(e.target.value as "CASH" | "BANK" | "CARD" | "OTHER")
+        }
         label="Wallet Type"
         placeholder="Select wallet type"
         options={[
           {
-            value: "cash",
+            value: "CASH",
             label: "Cash",
             icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b5.png",
           },
           {
-            value: "card",
+            value: "BANK",
+            label: "Bank",
+            icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
+          },
+          {
+            value: "CARD",
             label: "Card",
+            icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
+          },
+          {
+            value: "OTHER",
+            label: "Other",
             icon: "https://cdn.jsdelivr.net/npm/emoji-datasource-apple/img/apple/64/1f4b3.png",
           },
         ]}
@@ -101,14 +109,6 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
         label="Initial Balance"
         placeholder="0"
         type="number"
-      />
-
-      <Input
-        value={createdDate}
-        onChange={(e) => setCreatedDate(e.target.value)}
-        label="Created Date"
-        placeholder=""
-        type="date"
       />
 
       <div className="flex justify-end mt-6">
