@@ -37,7 +37,7 @@ export type Transaction = {
   category?: string;
   source?: string;
   icon?: string;
-  type?: "income" | "expense" | "transfer";
+  type?: "income" | "expense" | "transfer" | "savings";
   note?: string;
   fromWalletId?:
     | {
@@ -79,5 +79,5 @@ export type DashboardDataResponse = {
     total: number;
     transactions: Transaction[];
   };
-  recentTransactions: Transaction[];
+  recentTransactions: TransactionApiResponse[];
 };
