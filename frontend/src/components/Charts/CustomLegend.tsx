@@ -3,14 +3,27 @@ import type { LegendProps, LegendPayload } from "recharts";
 
 interface CustomLegendProps extends LegendProps {
   payload?: LegendPayload[];
+  order?: string[];
 }
 
-const CustomLegend: React.FC<CustomLegendProps> = ({ payload }) => {
+const CustomLegend: React.FC<CustomLegendProps> = ({ payload, order }) => {
   if (!payload) return null;
+
+  // Sort payload based on order array if provided
+  const sortedPayload = order
+    ? [...payload].sort((a, b) => {
+        const indexA = order.indexOf(a.value as string);
+        const indexB = order.indexOf(b.value as string);
+        // If not found in order, keep original position
+        if (indexA === -1) return 1;
+        if (indexB === -1) return -1;
+        return indexA - indexB;
+      })
+    : payload;
 
   return (
     <div className="flex flex-wrap justify-center gap-2 mt-4">
-      {payload.map((entry, index) => (
+      {sortedPayload.map((entry, index) => (
         <div key={index} className="flex items-center space-x-2">
           <div
             className="w-2.5 h-2.5 rounded-full"

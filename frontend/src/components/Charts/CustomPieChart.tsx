@@ -23,6 +23,7 @@ interface CustomPieChartProps {
   totalAmount: string | number;
   colors: string[];
   showTextAnchor?: boolean;
+  legendOrder?: string[];
 }
 
 const CustomPieChart = ({
@@ -31,6 +32,7 @@ const CustomPieChart = ({
   totalAmount,
   colors,
   showTextAnchor = true,
+  legendOrder,
 }: CustomPieChartProps) => {
   return (
     <ResponsiveContainer width="100%" height={380}>
@@ -57,7 +59,9 @@ const CustomPieChart = ({
           )}
         />
         <Legend
-          content={(props) => <CustomLegend {...(props as LegendProps)} />}
+          content={(props) => (
+            <CustomLegend {...(props as LegendProps)} order={legendOrder} />
+          )}
         />
 
         {showTextAnchor && (

@@ -123,18 +123,18 @@ const Home = () => {
           />
 
           <FinanceOverview
+            broadForwardBalance={
+              dashboardData?.broadForwardBalanceLastMonth || 0
+            }
+            savings={dashboardData?.thisMonthNewSavings || 0}
+            income={dashboardData?.thisMonthTotalIncome || 0}
+            expenses={dashboardData?.thisMonthTotalExpenses || 0}
             totalBalance={dashboardData?.thisMonthTotalBalance || 0}
-            totalIncome={dashboardData?.thisMonthTotalIncome || 0}
-            totalExpense={dashboardData?.thisMonthTotalExpenses || 0}
           />
 
-          <ExpenseTransactions
-            transactions={dashboardData?.last30DaysExpenses?.transactions || []}
-            onSeeMore={() => navigate("/expense")}
-          />
-
-          <Last30DaysExpenses
-            Transactions={dashboardData?.last30DaysExpenses?.transactions || []}
+          <RecentIncome
+            transactions={dashboardData?.last60DaysIncome?.transactions || []}
+            onSeeMore={() => navigate("/income")}
           />
 
           <RecentIncomeWithChart
@@ -144,9 +144,13 @@ const Home = () => {
             totalIncome={dashboardData?.thisMonthTotalIncome || 0}
           />
 
-          <RecentIncome
-            transactions={dashboardData?.last60DaysIncome?.transactions || []}
-            onSeeMore={() => navigate("/income")}
+          <ExpenseTransactions
+            transactions={dashboardData?.last30DaysExpenses?.transactions || []}
+            onSeeMore={() => navigate("/expense")}
+          />
+
+          <Last30DaysExpenses
+            Transactions={dashboardData?.last30DaysExpenses?.transactions || []}
           />
         </div>
       </div>

@@ -1,22 +1,35 @@
 import CustomPieChart from "../Charts/CustomPieChart";
 
-const COLORS = ["#875CF5", "#FF6900", "#FA2C37"];
+// Tailwind CSS color values matching data order: BF Balance, Savings, Income, Expenses, Total Balance
+const COLORS = [
+  "#3b82f6", // blue-500 - BF Balance
+  "#f97316", // orange-500 - Savings
+  "#22c55e", // green-500 - Income
+  "#ef4444", // red-500 - Expenses
+  "#a855f7", // purple-500 - Total Balance
+];
 
 interface FinanceOverviewProps {
+  broadForwardBalance: number;
+  savings: number;
+  income: number;
+  expenses: number;
   totalBalance: number;
-  totalIncome: number;
-  totalExpense: number;
 }
 
 const FinanceOverview: React.FC<FinanceOverviewProps> = ({
+  broadForwardBalance,
+  savings,
+  income,
+  expenses,
   totalBalance,
-  totalIncome,
-  totalExpense,
 }) => {
   const balanceData = [
+    { name: "BF Balance", value: broadForwardBalance },
+    { name: "Savings", value: savings },
+    { name: "Income", value: income },
+    { name: "Expenses", value: expenses },
     { name: "Total Balance", value: totalBalance },
-    { name: "Total Income", value: totalIncome },
-    { name: "Total Expense", value: totalExpense },
   ];
 
   return (
@@ -28,9 +41,16 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
       <CustomPieChart
         data={balanceData}
         label="Total Balance"
-        totalAmount={`AU$${totalBalance}`}
+        totalAmount={`AU$${totalBalance.toFixed(2)}`}
         colors={COLORS}
         showTextAnchor
+        legendOrder={[
+          "BF Balance",
+          "Savings",
+          "Income",
+          "Expenses",
+          "Total Balance",
+        ]}
       />
     </div>
   );
