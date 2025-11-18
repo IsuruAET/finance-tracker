@@ -6,7 +6,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 
 import { LuHandCoins, LuWalletMinimal, LuWallet } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
-import { addThousandsSeparator } from "../../utils/helper";
+import { addThousandsSeparator, getCurrentMonthYear } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
 import RecentTransactions from "../../components/Dashboard/RecentTransactions";
 import FinanceOverview from "../../components/Dashboard/FinanceOverview";
@@ -67,21 +67,21 @@ const Home = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
           <InfoCard
             icon={<IoMdCard />}
-            label="Broad Forward Balance"
+            label="Opening Balance"
             value={addThousandsSeparator(
               dashboardData?.broadForwardBalanceLastMonth || 0
             )}
-            desc="Last Month"
+            desc={getCurrentMonthYear()}
             color="bg-blue-500"
           />
 
           <InfoCard
             icon={<RiWallet3Fill />}
-            label="Total New Savings"
+            label="External Initial Deposit"
             value={addThousandsSeparator(
               dashboardData?.thisMonthNewSavings || 0
             )}
-            desc="This Month"
+            desc={getCurrentMonthYear()}
             color="bg-orange-500"
           />
 
@@ -91,7 +91,7 @@ const Home = () => {
             value={addThousandsSeparator(
               dashboardData?.thisMonthTotalIncome || 0
             )}
-            desc="This Month"
+            desc={getCurrentMonthYear()}
             color="bg-green-500"
           />
 
@@ -101,17 +101,17 @@ const Home = () => {
             value={addThousandsSeparator(
               dashboardData?.thisMonthTotalExpenses || 0
             )}
-            desc="This Month"
+            desc={getCurrentMonthYear()}
             color="bg-red-500"
           />
 
           <InfoCard
             icon={<LuWallet />}
-            label="Total Balance"
+            label="Closing Balance"
             value={addThousandsSeparator(
               dashboardData?.thisMonthTotalBalance || 0
             )}
-            desc="This Month"
+            desc={getCurrentMonthYear()}
             color="bg-primary"
           />
         </div>

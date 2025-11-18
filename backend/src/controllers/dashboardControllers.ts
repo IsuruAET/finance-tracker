@@ -75,13 +75,6 @@ export const getDashboardData = async (
       { $group: { _id: null, total: { $sum: "$amount" } } },
     ]);
 
-    const thisMonthIncome = thisMonthIncomeResult[0]?.total || 0;
-    const thisMonthExpenses = thisMonthExpenseResult[0]?.total || 0;
-    const thisMonthInitialBalance = thisMonthInitialBalanceResult[0]?.total || 0;
-    // Include INITIAL_BALANCE in balance calculation but not in income
-    const thisMonthTotalBalance = thisMonthIncome + thisMonthInitialBalance - thisMonthExpenses;
-    const thisMonthNewSavings = thisMonthTotalBalance;
-
     // Calculate Broad Forward Balance Last Month (all transactions up to end of last month)
     const lastMonthIncomeResult = await Transaction.aggregate([
       {
@@ -121,6 +114,20 @@ export const getDashboardData = async (
       (lastMonthIncomeResult[0]?.total || 0) +
       (lastMonthInitialBalanceResult[0]?.total || 0) -
       (lastMonthExpenseResult[0]?.total || 0);
+
+    const thisMonthIncome = thisMonthIncomeResult[0]?.total || 0;
+    const thisMonthExpenses = thisMonthExpenseResult[0]?.total || 0;
+    const thisMonthInitialBalance = thisMonthInitialBalanceResult[0]?.total || 0;
+    
+    // New Savings = External Seed Money (Initial Funding of New Accounts / External Initial Deposit)
+    const thisMonthNewSavings = thisMonthInitialBalance;
+    
+    // Total Balance = BF + ExternalSeedMoney + Income - Expenses
+    const thisMonthTotalBalance =
+      broadForwardBalanceLastMonth +
+      thisMonthNewSavings +
+      thisMonthIncome -
+      thisMonthExpenses;
 
     // Get income transactions for last 60 days (excluding INITIAL_BALANCE)
     const incomeDateFilter = {

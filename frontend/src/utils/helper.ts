@@ -134,3 +134,7 @@ export const findOrCreateCategory = async (
     return null;
   }
 };
+
+export const getCurrentMonthYear = () => {
+  return DateTime.now().toFormat("MMMM yyyy");
+};
