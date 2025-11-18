@@ -13,17 +13,14 @@ import IncomeList from "../../components/Income/IncomeList";
 import DeleteAlert, {
   type DeleteAlertState,
 } from "../../components/DeleteAlert";
-import type {
-  Transaction,
-  TransactionApiResponse,
-} from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
-import DateRangePicker from "../../components/DateRangePicker";
+import DateRangePicker from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 
 const Income = () => {
   const { dateRange } = useDateRange();
-  const [incomeData, setIncomeData] = useState<Transaction[]>([]);
+  const [incomeData, setIncomeData] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     show: false,
@@ -54,36 +51,7 @@ const Income = () => {
       );
 
       if (response.data) {
-        // Map the response to match the expected Transaction format
-        const mappedData: Transaction[] = response.data.map(
-          (item: TransactionApiResponse) => ({
-            _id: item._id,
-            userId: item.userId,
-            date: item.date,
-            amount: item.amount,
-            source: item.categoryId?.name || item.desc || "",
-            category: item.categoryId?.name || item.desc || "",
-            icon: item.categoryId?.icon || "",
-            type: item.type.toLowerCase() as "income" | "expense" | "transfer",
-            note: item.desc,
-            walletId: item.walletId?._id || item.walletId,
-            fromWalletId: item.fromWalletId
-              ? {
-                  _id: item.fromWalletId._id,
-                  name: item.fromWalletId.name,
-                  icon: item.fromWalletId.type,
-                }
-              : undefined,
-            toWalletId: item.toWalletId
-              ? {
-                  _id: item.toWalletId._id,
-                  name: item.toWalletId.name,
-                  icon: item.toWalletId.type,
-                }
-              : undefined,
-          })
-        );
-        setIncomeData(mappedData);
+        setIncomeData(response.data);
       }
     } catch (error) {
       console.error("Something went wrong. Please try again", error);

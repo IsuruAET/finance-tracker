@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { prepareExpenseBarChartData } from "../../utils/helper";
 import CustomBarChart, { type ChartDataItem } from "../Charts/CustomBarChart";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 const Last30DaysExpenses = ({
   Transactions,
 }: {
-  Transactions: Transaction[];
+  Transactions: TransactionApiResponse[];
 }) => {
   const [chartData, setChartData] = useState<ChartDataItem[]>([]);
 

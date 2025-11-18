@@ -1,6 +1,5 @@
 import { useCallback, useEffect, useState, useRef } from "react";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
-import type { Transaction } from "../../types/dashboard";
 import type { DeleteAlertState } from "../../components/DeleteAlert";
 import { API_PATHS } from "../../utils/apiPaths";
 import { useDateRange } from "../../context/DateRangeContext";
@@ -14,14 +13,13 @@ import AddExpenseForm, {
 } from "../../components/Expense/AddExpenseForm";
 import ExpenseList from "../../components/Expense/ExpenseList";
 import DeleteAlert from "../../components/DeleteAlert";
-import DateRangePicker from "../../components/DateRangePicker";
+import DateRangePicker from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
-import { findOrCreateCategory } from "../../utils/helper";
 import type { TransactionApiResponse } from "../../types/dashboard";
 
 const Expense = () => {
   const { dateRange } = useDateRange();
-  const [expenseData, setExpenseData] = useState<Transaction[]>([]);
+  const [expenseData, setExpenseData] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     show: false,
@@ -52,36 +50,7 @@ const Expense = () => {
       );
 
       if (response.data) {
-        // Map the response to match the expected Transaction format
-        const mappedData: Transaction[] = response.data.map(
-          (item: TransactionApiResponse) => ({
-            _id: item._id,
-            userId: item.userId,
-            date: item.date,
-            amount: item.amount,
-            source: item.categoryId?.name || item.desc || "",
-            category: item.categoryId?.name || item.desc || "",
-            icon: item.categoryId?.icon || "",
-            type: item.type.toLowerCase() as "income" | "expense" | "transfer",
-            note: item.desc,
-            walletId: item.walletId?._id || item.walletId,
-            fromWalletId: item.fromWalletId
-              ? {
-                  _id: item.fromWalletId._id,
-                  name: item.fromWalletId.name,
-                  icon: item.fromWalletId.type,
-                }
-              : undefined,
-            toWalletId: item.toWalletId
-              ? {
-                  _id: item.toWalletId._id,
-                  name: item.toWalletId.name,
-                  icon: item.toWalletId.type,
-                }
-              : undefined,
-          })
-        );
-        setExpenseData(mappedData);
+        setExpenseData(response.data);
       }
     } catch (error) {
       console.error("Something went wrong. Please try again", error);
@@ -92,9 +61,9 @@ const Expense = () => {
 
   // Handle Add Expense
   const handleAddExpense = async (expense: ExpenseData) => {
-    const { category, amount, date, icon, walletId } = expense;
+    const { categoryId, amount, date, walletId } = expense;
 
-    if (!category.trim()) {
+    if (!categoryId) {
       toast.error("Category is required.");
       return;
     }
@@ -115,21 +84,12 @@ const Expense = () => {
     }
 
     try {
-      // Find or create category
-      const categoryId = await findOrCreateCategory(category, "EXPENSE", icon);
-
-      if (!categoryId) {
-        toast.error("Failed to create or find category. Please try again.");
-        return;
-      }
-
       await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
         type: "EXPENSE",
         amount: Number(amount),
         date,
         walletId,
         categoryId,
-        desc: category,
       });
 
       setOpenAddExpenseModal(false);

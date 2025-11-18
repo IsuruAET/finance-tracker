@@ -1,10 +1,10 @@
 import { LuArrowRight } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
 import type React from "react";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface ExpenseTransactionsProps {
-  transactions: Transaction[];
+  transactions: TransactionApiResponse[];
   onSeeMore: () => void;
 }
 
@@ -27,7 +27,6 @@ const ExpenseTransactions: React.FC<ExpenseTransactionsProps> = ({
           <TransactionInfoCard
             key={item._id}
             transaction={item}
-            type="expense"
             hideDeleteBtn
           />
         ))}

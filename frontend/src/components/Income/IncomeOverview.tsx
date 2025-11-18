@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { prepareIncomeBarChartData } from "../../utils/helper";
 import { LuPlus } from "react-icons/lu";
 import CustomBarChart, { type ChartDataItem } from "../Charts/CustomBarChart";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface IncomeOverviewProps {
-  transactions: Transaction[];
+  transactions: TransactionApiResponse[];
   onAddIncome: () => void;
 }
 

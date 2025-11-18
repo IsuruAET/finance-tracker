@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import Input from "../Inputs/Input";
 import Select from "../Inputs/Select";
+import AutoComplete from "../Inputs/AutoComplete";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 
 export interface ExpenseData {
-  category: string;
+  categoryId: string;
   amount: number;
   date: string;
   icon: string;
@@ -16,10 +17,19 @@ export interface ExpenseData {
 interface Wallet {
   _id: string;
   name: string;
-  type: "cash" | "card";
+  type: "CASH" | "BANK" | "CARD" | "OTHER";
   balance: number;
   icon?: string;
   createdDate?: string;
+}
+
+interface Category {
+  _id: string;
+  name: string;
+  type: "INCOME" | "EXPENSE";
+  icon: string;
+  isDefault?: boolean;
+  userId?: string;
 }
 
 interface AddExpenseFormProps {
@@ -28,13 +38,14 @@ interface AddExpenseFormProps {
 
 const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
   const [expense, setExpense] = useState<ExpenseData>({
-    category: "",
+    categoryId: "",
     amount: 0,
     date: "",
     icon: "",
     walletId: "",
   });
   const [wallets, setWallets] = useState<Wallet[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
 
   useEffect(() => {
     const fetchWallets = async () => {
@@ -43,19 +54,54 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
           API_PATHS.WALLET.GET_ALL
         );
         setWallets(response.data);
-        if (response.data.length > 0 && !expense.walletId) {
-          setExpense((prev) => ({ ...prev, walletId: response.data[0]._id }));
+        if (response.data.length > 0) {
+          setExpense((prev) => {
+            if (!prev.walletId) {
+              return { ...prev, walletId: response.data[0]._id };
+            }
+            return prev;
+          });
         }
       } catch (error) {
         console.error("Error fetching wallets", error);
       }
     };
     fetchWallets();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const response = await axiosInstance.get<{
+          default?: Category[];
+          custom?: Category[];
+        }>(API_PATHS.CATEGORIES.GET_ALL, {
+          params: { type: "EXPENSE" },
+        });
+        const allCategories: Category[] = [
+          ...(response.data?.default || []),
+          ...(response.data?.custom || []),
+        ];
+        setCategories(allCategories);
+      } catch (error) {
+        console.error("Error fetching categories", error);
+      }
+    };
+    fetchCategories();
   }, []);
 
   const handleChange = (key: keyof ExpenseData, value: string) => {
-    setExpense((prev) => ({ ...prev, [key]: value }));
+    setExpense((prev) => {
+      const updated = { ...prev, [key]: value };
+      // Update icon when category changes
+      if (key === "categoryId") {
+        const selectedCategory = categories.find((cat) => cat._id === value);
+        if (selectedCategory) {
+          updated.icon = selectedCategory.icon;
+        }
+      }
+      return updated;
+    });
   };
 
   return (
@@ -65,14 +111,17 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
         onSelect={(selectedIcon: string) => handleChange("icon", selectedIcon)}
       />
 
-      <Input
-        value={expense.category}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleChange("category", e.target.value)
-        }
+      <AutoComplete
+        value={expense.categoryId}
+        onChange={(e) => handleChange("categoryId", e.target.value)}
         label="Expense Category"
-        placeholder="Rent, Groceries, etc"
-        type="text"
+        placeholder="Select or search for a category"
+        options={categories.map((category) => ({
+          value: category._id,
+          label: category.name,
+          icon: category.icon,
+        }))}
+        required
       />
 
       <Input

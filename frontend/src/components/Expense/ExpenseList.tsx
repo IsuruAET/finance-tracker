@@ -1,9 +1,9 @@
 import { LuDownload } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface ExpenseListProps {
-  transactions: Transaction[];
+  transactions: TransactionApiResponse[];
   onDelete: (id: string) => void;
   onDownload: () => void;
 }
@@ -28,7 +28,6 @@ const ExpenseList = ({
           <TransactionInfoCard
             key={item._id}
             transaction={item}
-            type="expense"
             onDelete={() => onDelete(item._id)}
           />
         ))}

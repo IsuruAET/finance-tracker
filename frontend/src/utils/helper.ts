@@ -1,5 +1,5 @@
 import { DateTime } from "luxon";
-import type { Transaction } from "../types/dashboard";
+import type { TransactionApiResponse } from "../types/dashboard";
 import axiosInstance from "./axiosInstance";
 import { API_PATHS } from "./apiPaths";
 
@@ -29,11 +29,11 @@ export const addThousandsSeparator = (number: number): string => {
   });
 };
 
-export const prepareExpenseBarChartData = (data: Transaction[] = []) => {
+export const prepareExpenseBarChartData = (data: TransactionApiResponse[] = []) => {
   return data.map((item) => ({
-    title: item.category ?? "Unknown",
+    title: item.categoryId?.name ?? item.desc ?? "Unknown",
     yAxisValue: item.amount,
-    xAxisValue: item.category ?? "Unknown",
+    xAxisValue: item.categoryId?.name ?? item.desc ?? "Unknown",
   }));
 };
 
@@ -51,7 +51,7 @@ export const formatLocalDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-export const prepareIncomeBarChartData = (data: Transaction[] = []) => {
+export const prepareIncomeBarChartData = (data: TransactionApiResponse[] = []) => {
   // Sort by date ascending
   const sortedData = [...data].sort((a, b) => {
     return new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -59,7 +59,7 @@ export const prepareIncomeBarChartData = (data: Transaction[] = []) => {
 
   // Map to chart data
   const chartData = sortedData.map((item) => ({
-    title: item.source ?? "Unknown",
+    title: item.categoryId?.name ?? item.desc ?? "Unknown",
     yAxisValue: item.amount,
     xAxisValue: DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM"),
   }));
@@ -67,7 +67,7 @@ export const prepareIncomeBarChartData = (data: Transaction[] = []) => {
   return chartData;
 };
 
-export const prepareExpenseLineChartData = (data: Transaction[] = []) => {
+export const prepareExpenseLineChartData = (data: TransactionApiResponse[] = []) => {
   // Sort by date ascending
   const sortedData = [...data].sort((a, b) => {
     return new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -75,7 +75,7 @@ export const prepareExpenseLineChartData = (data: Transaction[] = []) => {
 
   // Map to chart data
   const chartData = sortedData.map((item) => ({
-    title: item.category ?? "Unknown",
+    title: item.categoryId?.name ?? item.desc ?? "Unknown",
     yAxisValue: item.amount,
     xAxisValue: DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM"),
   }));

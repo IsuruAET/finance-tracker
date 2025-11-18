@@ -1,5 +1,5 @@
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface TransferWalletRef {
   _id: string;
@@ -30,13 +30,13 @@ const TransferList = ({ transfers }: TransferListProps) => {
 
       <div className="grid grid-cols-1 md:grid-cols-2">
         {transfers.map((t) => {
-          const transaction: Transaction = {
+          const transaction: TransactionApiResponse = {
             _id: t._id,
             userId: "",
             date: t.date,
             amount: t.amount,
-            type: "transfer",
-            note: t.note,
+            type: "TRANSFER",
+            desc: t.note,
             fromWalletId: t.fromWalletId,
             toWalletId: t.toWalletId,
           };
@@ -45,7 +45,6 @@ const TransferList = ({ transfers }: TransferListProps) => {
             <TransactionInfoCard
               key={t._id}
               transaction={transaction}
-              type="transfer"
               hideDeleteBtn={true}
             />
           );

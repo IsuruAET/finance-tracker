@@ -25,8 +25,8 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
   totalBalance,
 }) => {
   const balanceData = [
-    { name: "BF Balance", value: broadForwardBalance },
-    { name: "Savings", value: savings },
+    { name: "Opening Balance", value: broadForwardBalance },
+    { name: "External Deposit", value: savings },
     { name: "Income", value: income },
     { name: "Expenses", value: expenses },
     { name: "Total Balance", value: totalBalance },
@@ -45,8 +45,8 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
         colors={COLORS}
         showTextAnchor
         legendOrder={[
-          "BF Balance",
-          "Savings",
+          "Opening Balance",
+          "External Deposit",
           "Income",
           "Expenses",
           "Total Balance",

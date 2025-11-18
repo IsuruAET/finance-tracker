@@ -1,7 +1,7 @@
 import React from "react";
 import type { LegendProps, LegendPayload } from "recharts";
 
-interface CustomLegendProps extends LegendProps {
+interface CustomLegendProps extends Omit<LegendProps, "payload" | "order"> {
   payload?: LegendPayload[];
   order?: string[];
 }

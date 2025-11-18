@@ -1,9 +1,9 @@
 import { LuArrowRight } from "react-icons/lu";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface RecentTransactionsProps {
-  transactions: Transaction[];
+  transactions: TransactionApiResponse[] | undefined;
   onSeeMore: () => void;
 }
 
@@ -23,7 +23,6 @@ const RecentIncome = ({ transactions, onSeeMore }: RecentTransactionsProps) => {
           <TransactionInfoCard
             key={item._id}
             transaction={item}
-            type="income"
             hideDeleteBtn
           />
         ))}

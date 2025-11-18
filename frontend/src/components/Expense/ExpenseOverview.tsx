@@ -2,10 +2,10 @@ import { useEffect, useState } from "react";
 import { prepareExpenseLineChartData } from "../../utils/helper";
 import { LuPlus } from "react-icons/lu";
 import CustomLineChart, { type ChartDataItem } from "../Charts/CustomLineChart";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface ExpenseOverviewProps {
-  transactions: Transaction[];
+  transactions: TransactionApiResponse[];
   onAddExpense: () => void;
 }
 

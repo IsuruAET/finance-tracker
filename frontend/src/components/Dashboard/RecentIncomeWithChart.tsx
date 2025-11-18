@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useState } from "react";
 import CustomPieChart from "../Charts/CustomPieChart";
-import type { Transaction } from "../../types/dashboard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 import type { PieChartData } from "../Charts/CustomPieChart";
 
 interface RecentIncomeWithChartProps {
-  data: Transaction[];
+  data: TransactionApiResponse[];
   totalIncome: number;
 }
 
@@ -20,7 +20,7 @@ const RecentIncomeWithChart = ({
   const prepareChartData = useCallback(() => {
     const dataArr: PieChartData[] =
       data?.map((item) => ({
-        name: item?.source || "Unknown",
+        name: item?.categoryId?.name || item?.desc || "Unknown",
         value: item?.amount,
       })) || [];
 

@@ -10,15 +10,13 @@ import type { TransactionApiResponse } from "../../types/dashboard";
 import { formatDate } from "../../utils/helper";
 
 interface TransactionInfoCardProps {
-  transaction?: TransactionApiResponse;
-  type?: "income" | "expense" | "transfer" | "savings";
+  transaction: TransactionApiResponse;
   hideDeleteBtn?: boolean;
   onDelete?: () => void;
 }
 
 const TransactionInfoCard = ({
   transaction,
-  type: typeProp,
   hideDeleteBtn,
   onDelete,
 }: TransactionInfoCardProps) => {
@@ -48,28 +46,16 @@ const TransactionInfoCard = ({
     }
   };
 
-  if (!transaction && !typeProp) return null;
-
-  const { title, icon } = transaction
-    ? getTransactionTitleAndIcon(transaction)
-    : { title: "", icon: undefined };
-  const date = transaction ? formatDate(transaction.date) : "";
-  const note = transaction?.desc;
-  const amount = transaction?.amount ?? 0;
-  const type =
-    typeProp ??
-    (transaction?.type === "INITIAL_BALANCE"
-      ? "savings"
-      : (transaction?.type?.toLowerCase() as
-          | "income"
-          | "expense"
-          | "transfer"
-          | undefined));
+  const { title, icon } = getTransactionTitleAndIcon(transaction);
+  const date = formatDate(transaction.date);
+  const note = transaction.desc;
+  const amount = transaction.amount;
+  const type = transaction.type;
 
   const getAmountStyles = () => {
-    if (type === "income") return "bg-green-50 text-green-500";
-    if (type === "expense") return "bg-red-50 text-red-500";
-    if (type === "savings") return "bg-orange-50 text-orange-500";
+    if (type === "INCOME") return "bg-green-50 text-green-500";
+    if (type === "EXPENSE") return "bg-red-50 text-red-500";
+    if (type === "INITIAL_BALANCE") return "bg-orange-50 text-orange-500";
     return "bg-blue-50 text-blue-500";
   };
 
@@ -78,9 +64,9 @@ const TransactionInfoCard = ({
       <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 bg-gray-100 rounded-full">
         {icon ? (
           <img src={icon} alt={title} className="w-6 h-6" />
-        ) : type === "transfer" ? (
+        ) : type === "TRANSFER" ? (
           <BiTransfer className="w-6 h-6" />
-        ) : type === "savings" ? (
+        ) : type === "INITIAL_BALANCE" ? (
           <LuWallet className="w-6 h-6" />
         ) : (
           <LuUtensils />
@@ -109,19 +95,19 @@ const TransactionInfoCard = ({
             className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${getAmountStyles()}`}
           >
             <h6 className="text-xs font-medium">
-              {type === "income" || type === "savings"
+              {type === "INCOME" || type === "INITIAL_BALANCE"
                 ? "+"
-                : type === "expense"
+                : type === "EXPENSE"
                 ? "-"
                 : ""}{" "}
               AU$
               {amount}
             </h6>
-            {type === "income" ? (
+            {type === "INCOME" ? (
               <LuTrendingUp />
-            ) : type === "expense" ? (
+            ) : type === "EXPENSE" ? (
               <LuTrendingDown />
-            ) : type === "savings" ? (
+            ) : type === "INITIAL_BALANCE" ? (
               <LuTrendingUp />
             ) : (
               <BiTransfer />
