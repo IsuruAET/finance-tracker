@@ -32,11 +32,24 @@ export const addThousandsSeparator = (number: number): string => {
 export const prepareExpenseBarChartData = (
   data: TransactionApiResponse[] = []
 ) => {
-  return data.map((item) => ({
-    title: item.categoryId?.name ?? item.desc ?? "Unknown",
-    yAxisValue: item.amount,
-    xAxisValue: item.categoryId?.name ?? item.desc ?? "Unknown",
-  }));
+  // Group transactions by category and sum amounts
+  const categoryMap = new Map<string, number>();
+
+  data.forEach((item) => {
+    const categoryName = item.categoryId?.name ?? item.desc ?? "Unknown";
+    const currentAmount = categoryMap.get(categoryName) || 0;
+    categoryMap.set(categoryName, currentAmount + item.amount);
+  });
+
+  // Convert map to array, sort by amount descending, and take top 7
+  return Array.from(categoryMap.entries())
+    .map(([categoryName, totalAmount]) => ({
+      title: categoryName,
+      yAxisValue: totalAmount,
+      xAxisValue: categoryName,
+    }))
+    .sort((a, b) => b.yAxisValue - a.yAxisValue)
+    .slice(0, 7);
 };
 
 export const formatDate = (date: string | Date): string => {

@@ -60,6 +60,12 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
     return null;
   };
 
+  // Truncate long labels for x-axis
+  const truncateLabel = (label: string, maxLength: number = 12): string => {
+    if (label.length <= maxLength) return label;
+    return label.substring(0, maxLength) + "...";
+  };
+
   return (
     <div className="bg-white mt-6">
       <ResponsiveContainer width="100%" height={300}>
@@ -70,6 +76,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
             dataKey="xAxisValue"
             tick={{ fontSize: 12, fill: "#555" }}
             stroke="none"
+            tickFormatter={(value) => truncateLabel(value)}
           />
           <YAxis tick={{ fontSize: 12, fill: "#555" }} stroke="none" />
 
