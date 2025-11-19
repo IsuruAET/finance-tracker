@@ -117,11 +117,12 @@ export const getDashboardData = async (
 
     const thisMonthIncome = thisMonthIncomeResult[0]?.total || 0;
     const thisMonthExpenses = thisMonthExpenseResult[0]?.total || 0;
-    const thisMonthInitialBalance = thisMonthInitialBalanceResult[0]?.total || 0;
-    
+    const thisMonthInitialBalance =
+      thisMonthInitialBalanceResult[0]?.total || 0;
+
     // New Savings = External Seed Money (Initial Funding of New Accounts / External Initial Deposit)
     const thisMonthNewSavings = thisMonthInitialBalance;
-    
+
     // Total Balance = BF + ExternalSeedMoney + Income - Expenses
     const thisMonthTotalBalance =
       broadForwardBalanceLastMonth +
@@ -141,7 +142,7 @@ export const getDashboardData = async (
     })
       .populate("walletId", "name type")
       .populate("categoryId", "name type icon")
-      .sort({ date: -1 });
+      .sort({ date: -1, createdAt: -1 });
 
     // Get total income for filtered period
     const incomeLast60Days = last60DaysIncomeTransactions.reduce(
@@ -161,7 +162,7 @@ export const getDashboardData = async (
     })
       .populate("walletId", "name type")
       .populate("categoryId", "name type icon")
-      .sort({ date: -1 });
+      .sort({ date: -1, createdAt: -1 });
 
     // Get total expenses for filtered period
     const expensesLast30Days = last30DaysExpenseTransactions.reduce(
@@ -175,7 +176,7 @@ export const getDashboardData = async (
       .populate("fromWalletId", "name type")
       .populate("toWalletId", "name type")
       .populate("categoryId", "name type icon")
-      .sort({ date: -1 })
+      .sort({ date: -1, createdAt: -1 })
       .limit(5);
 
     // Get wallet balances

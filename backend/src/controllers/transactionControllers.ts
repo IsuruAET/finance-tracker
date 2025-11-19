@@ -193,7 +193,7 @@ export const getAllTransactions = async (
       .populate("fromWalletId", "name type")
       .populate("toWalletId", "name type")
       .populate("categoryId", "name type icon")
-      .sort({ date: -1 });
+      .sort({ date: -1, createdAt: -1 });
 
     return res.status(200).json(transactions);
   } catch (error: unknown) {
@@ -501,7 +501,7 @@ export const downloadTransactionExcel = async (
       .populate("fromWalletId", "name")
       .populate("toWalletId", "name")
       .populate("categoryId", "name")
-      .sort({ date: -1 });
+      .sort({ date: -1, createdAt: -1 });
 
     const workbook = new ExcelJS.Workbook();
     const worksheet = workbook.addWorksheet("Transaction Details");
