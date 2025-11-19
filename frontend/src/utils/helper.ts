@@ -75,11 +75,16 @@ export const prepareIncomeBarChartData = (
   });
 
   // Map to chart data
-  const chartData = sortedData.map((item) => ({
-    title: item.categoryId?.name ?? item.desc ?? "Unknown",
-    yAxisValue: item.amount,
-    xAxisValue: DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM"),
-  }));
+  const chartData = sortedData.map((item) => {
+    const date = DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM");
+    const desc = item.desc ?? item.categoryId?.name ?? "Unknown";
+    return {
+      title: item.categoryId?.name ?? item.desc ?? "Unknown",
+      yAxisValue: item.amount,
+      xAxisValue: `${date} - ${desc}`,
+      desc: item.desc,
+    };
+  });
 
   return chartData;
 };

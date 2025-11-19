@@ -15,6 +15,7 @@ export interface ChartDataItem {
   title: string;
   yAxisValue: number;
   xAxisValue: string;
+  desc?: string;
 }
 
 interface CustomBarChartProps {
@@ -31,6 +32,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   interface BarData {
     title: string;
     yAxisValue: number;
+    desc?: string;
   }
 
   // Type the props manually
@@ -44,10 +46,11 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
 
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
-      const { title, yAxisValue } = payload[0].payload;
+      const { title, yAxisValue, desc } = payload[0].payload;
       return (
         <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">
           <p className="text-xs font-semibold text-purple-800 mb-1">{title}</p>
+          {desc && <p className="text-xs text-gray-500 mb-1">{desc}</p>}
           <p className="text-sm text-gray-600">
             Amount:{" "}
             <span className="text-sm font-medium text-gray-900">
