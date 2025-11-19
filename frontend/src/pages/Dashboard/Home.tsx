@@ -6,7 +6,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 
 import { LuHandCoins, LuWalletMinimal, LuWallet } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
-import { addThousandsSeparator, getCurrentMonthYear } from "../../utils/helper";
+import { getCurrentMonthYear } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
 import RecentTransactions from "../../components/Dashboard/RecentTransactions";
 import FinanceOverview from "../../components/Dashboard/FinanceOverview";
@@ -68,9 +68,7 @@ const Home = () => {
           <InfoCard
             icon={<IoMdCard />}
             label="Opening Balance"
-            value={addThousandsSeparator(
-              dashboardData?.broadForwardBalanceLastMonth || 0
-            )}
+            value={dashboardData?.broadForwardBalanceLastMonth || 0}
             desc={getCurrentMonthYear()}
             color="bg-blue-500"
           />
@@ -79,9 +77,7 @@ const Home = () => {
             <InfoCard
               icon={<RiWallet3Fill />}
               label="External Initial Deposit"
-              value={addThousandsSeparator(
-                dashboardData?.thisMonthNewSavings ?? 0
-              )}
+              value={dashboardData?.thisMonthNewSavings ?? 0}
               desc={getCurrentMonthYear()}
               color="bg-orange-500"
             />
@@ -90,9 +86,7 @@ const Home = () => {
           <InfoCard
             icon={<LuWalletMinimal />}
             label="Total Income"
-            value={addThousandsSeparator(
-              dashboardData?.thisMonthTotalIncome || 0
-            )}
+            value={dashboardData?.thisMonthTotalIncome || 0}
             desc={getCurrentMonthYear()}
             color="bg-green-500"
           />
@@ -100,9 +94,7 @@ const Home = () => {
           <InfoCard
             icon={<LuHandCoins />}
             label="Total Expenses"
-            value={addThousandsSeparator(
-              dashboardData?.thisMonthTotalExpenses || 0
-            )}
+            value={dashboardData?.thisMonthTotalExpenses || 0}
             desc={getCurrentMonthYear()}
             color="bg-red-500"
           />
@@ -110,9 +102,7 @@ const Home = () => {
           <InfoCard
             icon={<LuWallet />}
             label="Closing Balance"
-            value={addThousandsSeparator(
-              dashboardData?.thisMonthTotalBalance || 0
-            )}
+            value={dashboardData?.thisMonthTotalBalance || 0}
             desc={getCurrentMonthYear()}
             color="bg-primary"
           />

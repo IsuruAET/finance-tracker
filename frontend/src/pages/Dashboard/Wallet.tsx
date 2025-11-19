@@ -256,7 +256,7 @@ const Wallet = () => {
         <InfoCard
           icon={renderWalletIcon(wallet)}
           label={wallet.name}
-          value={addThousandsSeparator(wallet.balance)}
+          value={wallet.balance}
           color={color}
           desc={formatDate(wallet?.initializedAt || "")}
         />

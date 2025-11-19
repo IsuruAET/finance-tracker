@@ -1,7 +1,9 @@
+import { addThousandsSeparator } from "../../utils/helper";
+
 interface InfoCardProps {
   icon: React.ReactNode;
   label: string;
-  value: number | string;
+  value: number;
   color: string; // Tailwind color class, e.g. "bg-red-500"
   desc?: string; // Optional date/description text to display
 }
@@ -17,7 +19,7 @@ const InfoCard = ({ icon, label, value, color, desc }: InfoCardProps) => {
       <div className="flex-1">
         <h6 className="text-sm text-gray-500 mb-1">{label}</h6>
         {desc && <p className="text-xs text-gray-400 mb-1">{desc}</p>}
-        <span className="text-[22px]">AU${value}</span>
+        <span className="text-[22px]">AU${addThousandsSeparator(value)}</span>
       </div>
     </div>
   );
