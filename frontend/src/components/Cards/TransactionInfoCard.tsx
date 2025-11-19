@@ -7,7 +7,7 @@ import {
 } from "react-icons/lu";
 import { BiTransfer } from "react-icons/bi";
 import type { TransactionApiResponse } from "../../types/dashboard";
-import { formatDate, addThousandsSeparator } from "../../utils/helper";
+import { formatDate, formatCurrency } from "../../utils/helper";
 
 interface TransactionInfoCardProps {
   transaction: TransactionApiResponse;
@@ -100,7 +100,7 @@ const TransactionInfoCard = ({
                 : type === "EXPENSE"
                 ? "-"
                 : ""}{" "}
-              AU${addThousandsSeparator(amount)}
+              {formatCurrency(amount)}
             </h6>
             {type === "INCOME" ? (
               <LuTrendingUp />

@@ -1,4 +1,4 @@
-import { addThousandsSeparator } from "../../utils/helper";
+import { formatCurrency } from "../../utils/helper";
 
 interface InfoCardProps {
   icon: React.ReactNode;
@@ -19,7 +19,7 @@ const InfoCard = ({ icon, label, value, color, desc }: InfoCardProps) => {
       <div className="flex-1">
         <h6 className="text-sm text-gray-500 mb-1">{label}</h6>
         {desc && <p className="text-xs text-gray-400 mb-1">{desc}</p>}
-        <span className="text-[22px]">AU${addThousandsSeparator(value)}</span>
+        <span className="text-[22px]">{formatCurrency(value)}</span>
       </div>
     </div>
   );

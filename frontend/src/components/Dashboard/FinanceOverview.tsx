@@ -1,5 +1,5 @@
 import CustomPieChart from "../Charts/CustomPieChart";
-import { addThousandsSeparator } from "../../utils/helper";
+import { formatCurrency } from "../../utils/helper";
 
 // Tailwind CSS color values matching data order: BF Balance, Savings, Income, Expenses, Total Balance
 const COLORS = [
@@ -58,7 +58,7 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
       <CustomPieChart
         data={balanceData}
         label="Total Balance"
-        totalAmount={`AU$${addThousandsSeparator(totalBalance)}`}
+        totalAmount={formatCurrency(totalBalance)}
         colors={colors}
         showTextAnchor
         legendOrder={legendOrder}

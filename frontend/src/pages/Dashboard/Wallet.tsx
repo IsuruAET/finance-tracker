@@ -9,7 +9,7 @@ import DeleteAlert, {
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
-import { addThousandsSeparator, formatDate } from "../../utils/helper";
+import { formatCurrency, formatDate } from "../../utils/helper";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
 import TransferList from "../../components/Wallet/TransferList";
 import axios from "axios";
@@ -284,7 +284,7 @@ const Wallet = () => {
                 <div className="flex flex-col mt-2">
                   <span className="text-sm text-gray-500">Total Balance</span>
                   <span className="text-[22px] font-medium text-gray-800">
-                    AU${addThousandsSeparator(totalBalance)}
+                    {formatCurrency(totalBalance)}
                   </span>
                 </div>
               </div>
@@ -314,7 +314,7 @@ const Wallet = () => {
               <div className="flex flex-col items-end">
                 <span className="text-sm text-gray-500">Total Balance</span>
                 <span className="text-[22px] font-medium text-gray-800">
-                  AU${addThousandsSeparator(cashBalance)}
+                  {formatCurrency(cashBalance)}
                 </span>
               </div>
             </div>
@@ -336,7 +336,7 @@ const Wallet = () => {
               <div className="flex flex-col items-end">
                 <span className="text-sm text-gray-500">Total Balance</span>
                 <span className="text-[22px] font-medium text-gray-800">
-                  AU${addThousandsSeparator(cardBalance)}
+                  {formatCurrency(cardBalance)}
                 </span>
               </div>
             </div>

@@ -1,6 +1,6 @@
 import React from "react";
 import type { TooltipProps } from "recharts";
-import { addThousandsSeparator } from "../../utils/helper";
+import { formatCurrency } from "../../utils/helper";
 
 // Define the shape of your pie chart data
 interface PieData {
@@ -25,7 +25,7 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload }) => {
         <p className="text-sm text-gray-600">
           Amount:{" "}
           <span className="text-sm font-medium text-gray-900">
-            AU${addThousandsSeparator(data.value)}
+            {formatCurrency(data.value)}
           </span>
         </p>
       </div>

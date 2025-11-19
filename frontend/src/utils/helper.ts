@@ -18,19 +18,21 @@ export const getInitials = (name: string): string =>
         .join("")
     : "";
 
-export const addThousandsSeparator = (number: number): string => {
+export const formatCurrency = (number: number): string => {
   if (number == null || isNaN(number)) return "";
 
   // Round to 2 decimal places
   const rounded = Math.round(number * 100) / 100;
-  
+
   // Check if the rounded number has decimal part
   const hasDecimal = rounded % 1 !== 0;
 
-  return rounded.toLocaleString("en-AU", {
+  const formatted = rounded.toLocaleString("en-AU", {
     minimumFractionDigits: hasDecimal ? 2 : 0,
     maximumFractionDigits: 2,
   });
+
+  return `AU$${formatted}`;
 };
 
 export const prepareExpenseBarChartData = (
@@ -195,8 +197,7 @@ export const groupTransactionsByDate = (
   // Sort transactions within each date group (newest first)
   grouped.forEach((transactions) => {
     transactions.sort(
-      (a, b) =>
-        new Date(b.date).getTime() - new Date(a.date).getTime()
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
     );
   });
 

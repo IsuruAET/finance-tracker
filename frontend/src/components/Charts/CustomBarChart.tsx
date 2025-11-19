@@ -9,7 +9,7 @@ import {
   Cell,
 } from "recharts";
 import type { TooltipProps } from "recharts";
-import { addThousandsSeparator } from "../../utils/helper";
+import { formatCurrency } from "../../utils/helper";
 
 // Define data type
 export interface ChartDataItem {
@@ -55,7 +55,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
           <p className="text-sm text-gray-600">
             Amount:{" "}
             <span className="text-sm font-medium text-gray-900">
-              AU${addThousandsSeparator(yAxisValue)}
+              {formatCurrency(yAxisValue)}
             </span>
           </p>
         </div>
