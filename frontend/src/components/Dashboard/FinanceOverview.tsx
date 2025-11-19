@@ -26,10 +26,26 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
 }) => {
   const balanceData = [
     { name: "Opening Balance", value: broadForwardBalance },
-    { name: "External Deposit", value: savings },
+    ...(savings ? [{ name: "External Deposit", value: savings }] : []),
     { name: "Income", value: income },
     { name: "Expenses", value: expenses },
     { name: "Total Balance", value: totalBalance },
+  ];
+
+  const legendOrder = [
+    "Opening Balance",
+    ...(savings ? ["External Deposit"] : []),
+    "Income",
+    "Expenses",
+    "Total Balance",
+  ];
+
+  const colors = [
+    COLORS[0], // Opening Balance
+    ...(savings ? [COLORS[1]] : []), // External Deposit
+    COLORS[2], // Income
+    COLORS[3], // Expenses
+    COLORS[4], // Total Balance
   ];
 
   return (
@@ -42,15 +58,9 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
         data={balanceData}
         label="Total Balance"
         totalAmount={`AU$${totalBalance.toFixed(2)}`}
-        colors={COLORS}
+        colors={colors}
         showTextAnchor
-        legendOrder={[
-          "Opening Balance",
-          "External Deposit",
-          "Income",
-          "Expenses",
-          "Total Balance",
-        ]}
+        legendOrder={legendOrder}
       />
     </div>
   );
