@@ -325,7 +325,7 @@ export const deleteWallet = async (
     }
 
     // Check for associated transactions
-    const transactionCount = await Transaction.countDocuments({
+    const transactions = await Transaction.find({
       $or: [
         { walletId },
         { fromWalletId: walletId },
@@ -333,15 +333,32 @@ export const deleteWallet = async (
       ],
     });
 
-    const hasTransactions = transactionCount > 0;
+    const hasTransactions = transactions.length > 0;
+
+    // Check if all transactions are INITIAL_BALANCE type
+    const allInitialBalance = hasTransactions && transactions.every(
+      (tx) => tx.type === "INITIAL_BALANCE"
+    );
 
     // Allow deletion if:
     // 1. No associated transactions, OR
-    // 2. Has transactions but balance is 0
-    if (hasTransactions && wallet.balance !== 0) {
+    // 2. Has transactions but balance is 0, OR
+    // 3. All transactions are INITIAL_BALANCE type
+    if (hasTransactions && wallet.balance !== 0 && !allInitialBalance) {
       return res.status(400).json({
         message:
           "Cannot delete wallet with transactions and non-zero balance. Please transfer or remove all funds first.",
+      });
+    }
+
+    // Delete associated transactions
+    if (hasTransactions) {
+      await Transaction.deleteMany({
+        $or: [
+          { walletId },
+          { fromWalletId: walletId },
+          { toWalletId: walletId },
+        ],
       });
     }
 

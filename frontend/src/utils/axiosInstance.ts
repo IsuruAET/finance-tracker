@@ -31,8 +31,12 @@ axiosInstance.interceptors.response.use(
   },
   (error) => {
     // Handle common errors globally
-    if (error.Response) {
+    if (error.response) {
       if (error.response.status === 401) {
+        // Token expired or invalid - automatically logout
+        localStorage.removeItem("token");
+        // Dispatch event to clear user context
+        window.dispatchEvent(new Event("token-expired"));
         // Redirect to login page
         window.location.href = "/login";
       } else if (error.response.status === 500) {
