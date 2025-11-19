@@ -64,7 +64,7 @@ const Home = () => {
   return (
     <DashboardLayout activeMenu="Dashboard">
       <div className="my-5 mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-5 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-[repeat(auto-fit,minmax(200px,1fr))] gap-6">
           <InfoCard
             icon={<IoMdCard />}
             label="Opening Balance"
@@ -75,15 +75,17 @@ const Home = () => {
             color="bg-blue-500"
           />
 
-          <InfoCard
-            icon={<RiWallet3Fill />}
-            label="External Initial Deposit"
-            value={addThousandsSeparator(
-              dashboardData?.thisMonthNewSavings || 0
-            )}
-            desc={getCurrentMonthYear()}
-            color="bg-orange-500"
-          />
+          {(dashboardData?.thisMonthNewSavings ?? 0) > 0 && (
+            <InfoCard
+              icon={<RiWallet3Fill />}
+              label="External Initial Deposit"
+              value={addThousandsSeparator(
+                dashboardData?.thisMonthNewSavings ?? 0
+              )}
+              desc={getCurrentMonthYear()}
+              color="bg-orange-500"
+            />
+          )}
 
           <InfoCard
             icon={<LuWalletMinimal />}
