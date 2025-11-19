@@ -280,10 +280,13 @@ const Wallet = () => {
           <div className="card">
             <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <h2 className="text-2xl font-bold text-gray-800">My Wallets</h2>
-                <p className="text-gray-600 mt-1">
-                  Total Balance: {addThousandsSeparator(totalBalance)}
-                </p>
+                <h5 className="text-lg">My Wallets</h5>
+                <div className="flex flex-col mt-2">
+                  <span className="text-sm text-gray-500">Total Balance</span>
+                  <span className="text-[22px] font-medium text-gray-800">
+                    AU${addThousandsSeparator(totalBalance)}
+                  </span>
+                </div>
               </div>
               <div className="flex flex-wrap gap-3">
                 <button
@@ -306,11 +309,14 @@ const Wallet = () => {
 
           {/* Cash/Savings Wallets Section */}
           <div className="card">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div className="flex flex-row items-start justify-between mb-4">
               <h5 className="text-lg">Cash in Hand</h5>
-              <p className="text-gray-600">
-                Balance: {addThousandsSeparator(cashBalance)}
-              </p>
+              <div className="flex flex-col items-end">
+                <span className="text-sm text-gray-500">Total Balance</span>
+                <span className="text-[22px] font-medium text-gray-800">
+                  AU${addThousandsSeparator(cashBalance)}
+                </span>
+              </div>
             </div>
             {cashWallets.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -325,11 +331,14 @@ const Wallet = () => {
 
           {/* Card Wallets Section */}
           <div className="card">
-            <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between mb-4">
+            <div className="flex flex-row items-start justify-between mb-4">
               <h5 className="text-lg">Card Wallets</h5>
-              <p className="text-gray-600">
-                Balance: {addThousandsSeparator(cardBalance)}
-              </p>
+              <div className="flex flex-col items-end">
+                <span className="text-sm text-gray-500">Total Balance</span>
+                <span className="text-[22px] font-medium text-gray-800">
+                  AU${addThousandsSeparator(cardBalance)}
+                </span>
+              </div>
             </div>
             {cardWallets.length > 0 ? (
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

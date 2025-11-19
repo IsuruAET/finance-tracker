@@ -28,7 +28,7 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
   };
 
   return (
-    <div className="w-64 h-full bg-white border-r border-gray-200/50 p-5">
+    <div className="w-64 h-full bg-white border-r border-gray-200/50 p-5 overflow-y-auto">
       <div className="flex flex-col items-center justify-center gap-3 mt-3 mb-7">
         {user?.profileImageUrl ? (
           <img

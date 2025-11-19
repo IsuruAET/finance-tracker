@@ -16,7 +16,7 @@ const DashboardLayout = ({ children, activeMenu }: DashboardLayoutProps) => {
 
       {user && (
         <div className="flex">
-          <div className="max-[1080px]:hidden">
+          <div className="max-[1080px]:hidden sticky top-[61px] h-[calc(100vh-61px)] self-start">
             <SideMenu activeMenu={activeMenu} />
           </div>
 
