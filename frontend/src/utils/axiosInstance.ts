@@ -35,10 +35,8 @@ axiosInstance.interceptors.response.use(
       if (error.response.status === 401) {
         // Token expired or invalid - automatically logout
         localStorage.removeItem("token");
-        // Dispatch event to clear user context
+        // Dispatch event to clear user context and navigate
         window.dispatchEvent(new Event("token-expired"));
-        // Redirect to login page
-        window.location.href = "/login";
       } else if (error.response.status === 500) {
         console.error("Server error. Please try again later.");
       }
