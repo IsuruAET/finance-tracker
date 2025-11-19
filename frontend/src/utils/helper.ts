@@ -173,3 +173,49 @@ export const findOrCreateCategory = async (
 export const getCurrentMonthYear = () => {
   return DateTime.now().toFormat("MMMM yyyy");
 };
+
+// Group transactions by date
+export const groupTransactionsByDate = (
+  transactions: TransactionApiResponse[]
+): Map<string, TransactionApiResponse[]> => {
+  const grouped = new Map<string, TransactionApiResponse[]>();
+
+  transactions.forEach((transaction) => {
+    const dateKey = DateTime.fromISO(transaction.date).toISODate() || "";
+    if (!grouped.has(dateKey)) {
+      grouped.set(dateKey, []);
+    }
+    grouped.get(dateKey)?.push(transaction);
+  });
+
+  // Sort transactions within each date group (newest first)
+  grouped.forEach((transactions) => {
+    transactions.sort(
+      (a, b) =>
+        new Date(b.date).getTime() - new Date(a.date).getTime()
+    );
+  });
+
+  return grouped;
+};
+
+// Format date header with relative labels
+export const formatDateHeader = (dateString: string): string => {
+  const dt = DateTime.fromISO(dateString);
+  const now = DateTime.now();
+  const today = now.startOf("day");
+  const yesterday = today.minus({ days: 1 });
+  const dateStart = dt.startOf("day");
+
+  if (dateStart.equals(today)) {
+    return "Today";
+  } else if (dateStart.equals(yesterday)) {
+    return "Yesterday";
+  } else if (dateStart > today.minus({ days: 7 })) {
+    return dt.toFormat("EEEE"); // Day name (Monday, Tuesday, etc.)
+  } else if (dateStart.year === today.year) {
+    return dt.toFormat("MMM d"); // "Jan 15"
+  } else {
+    return dt.toFormat("MMM d, yyyy"); // "Jan 15, 2024"
+  }
+};
