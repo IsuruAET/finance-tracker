@@ -61,7 +61,7 @@ const Expense = () => {
 
   // Handle Add Expense
   const handleAddExpense = async (expense: ExpenseData) => {
-    const { categoryId, amount, date, walletId } = expense;
+    const { categoryId, amount, date, walletId, desc } = expense;
 
     if (!categoryId) {
       toast.error("Category is required.");
@@ -90,6 +90,7 @@ const Expense = () => {
         date,
         walletId,
         categoryId,
+        desc,
       });
 
       setOpenAddExpenseModal(false);

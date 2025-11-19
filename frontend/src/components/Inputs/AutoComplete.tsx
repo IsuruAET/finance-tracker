@@ -89,6 +89,13 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
     setIsOpen(true);
   };
 
+  const handleContainerClick = () => {
+    if (!isOpen) {
+      setIsOpen(true);
+      inputRef.current?.focus();
+    }
+  };
+
   const hasIcons = options.some((opt) => opt.icon);
 
   return (
@@ -96,7 +103,10 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
       <label className="text-[13px] text-slate-800">{label}</label>
 
       <div className="input-box relative" ref={dropdownRef}>
-        <div className="w-full bg-transparent outline-none text-sm text-black flex items-center gap-2">
+        <div
+          className="w-full bg-transparent outline-none text-sm text-black flex items-center gap-2 cursor-pointer"
+          onClick={handleContainerClick}
+        >
           {selectedOption?.icon && hasIcons && (
             <img
               src={selectedOption.icon}

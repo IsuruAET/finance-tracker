@@ -12,6 +12,7 @@ export interface IncomeData {
   date: string;
   icon: string;
   walletId: string;
+  desc?: string;
 }
 
 interface Wallet {
@@ -43,6 +44,7 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
     date: "",
     icon: "",
     walletId: "",
+    desc: "",
   });
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -155,6 +157,16 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
         label="Date"
         placeholder=""
         type="date"
+      />
+
+      <Input
+        value={income.desc || ""}
+        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
+          handleChange("desc", e.target.value)
+        }
+        label="Note (Optional)"
+        placeholder="Add a note"
+        type="text"
       />
 
       <div className="flex justify-end mt-6">

@@ -29,7 +29,9 @@ export const addThousandsSeparator = (number: number): string => {
   });
 };
 
-export const prepareExpenseBarChartData = (data: TransactionApiResponse[] = []) => {
+export const prepareExpenseBarChartData = (
+  data: TransactionApiResponse[] = []
+) => {
   return data.map((item) => ({
     title: item.categoryId?.name ?? item.desc ?? "Unknown",
     yAxisValue: item.amount,
@@ -40,7 +42,7 @@ export const prepareExpenseBarChartData = (data: TransactionApiResponse[] = []) 
 export const formatDate = (date: string | Date): string => {
   const dt =
     date instanceof Date ? DateTime.fromJSDate(date) : DateTime.fromISO(date);
-  return dt.toFormat("d MMM yyyy"); // e.g., "11 Nov 2025"
+  return dt.toFormat("MMM d, yyyy"); // e.g., "Jan 5, 2025"
 };
 
 // Format dates as YYYY-MM-DD for API (using local time, not UTC)
@@ -51,7 +53,9 @@ export const formatLocalDate = (date: Date): string => {
   return `${year}-${month}-${day}`;
 };
 
-export const prepareIncomeBarChartData = (data: TransactionApiResponse[] = []) => {
+export const prepareIncomeBarChartData = (
+  data: TransactionApiResponse[] = []
+) => {
   // Sort by date ascending
   const sortedData = [...data].sort((a, b) => {
     return new Date(a.date).getTime() - new Date(b.date).getTime();
@@ -67,7 +71,9 @@ export const prepareIncomeBarChartData = (data: TransactionApiResponse[] = []) =
   return chartData;
 };
 
-export const prepareExpenseLineChartData = (data: TransactionApiResponse[] = []) => {
+export const prepareExpenseLineChartData = (
+  data: TransactionApiResponse[] = []
+) => {
   // Sort by date ascending
   const sortedData = [...data].sort((a, b) => {
     return new Date(a.date).getTime() - new Date(b.date).getTime();

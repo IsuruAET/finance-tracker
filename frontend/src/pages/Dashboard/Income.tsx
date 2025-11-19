@@ -62,7 +62,7 @@ const Income = () => {
 
   // Handle Add Income
   const handleAddIncome = async (income: IncomeData) => {
-    const { categoryId, amount, date, walletId } = income;
+    const { categoryId, amount, date, walletId, desc } = income;
 
     if (!categoryId) {
       toast.error("Category is required.");
@@ -91,6 +91,7 @@ const Income = () => {
         date,
         walletId,
         categoryId,
+        desc,
       });
 
       setOpenAddIncomeModal(false);
