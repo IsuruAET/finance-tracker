@@ -79,12 +79,23 @@ export const prepareExpenseLineChartData = (
     return new Date(a.date).getTime() - new Date(b.date).getTime();
   });
 
-  // Map to chart data
-  const chartData = sortedData.map((item) => ({
-    title: item.categoryId?.name ?? item.desc ?? "Unknown",
-    yAxisValue: item.amount,
-    xAxisValue: DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM"),
-  }));
+  // Group expenses by date and sum amounts
+  const dateMap = new Map<string, number>();
+
+  sortedData.forEach((item) => {
+    const dateKey = DateTime.fromJSDate(new Date(item.date)).toFormat("d MMM");
+    const currentAmount = dateMap.get(dateKey) || 0;
+    dateMap.set(dateKey, currentAmount + item.amount);
+  });
+
+  // Convert map to chart data array
+  const chartData = Array.from(dateMap.entries()).map(
+    ([date, totalAmount]) => ({
+      title: "Total Expenses",
+      yAxisValue: totalAmount,
+      xAxisValue: date,
+    })
+  );
 
   return chartData;
 };
