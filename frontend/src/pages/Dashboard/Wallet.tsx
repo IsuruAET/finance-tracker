@@ -9,26 +9,48 @@ import DeleteAlert, {
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
-import { addThousandsSeparator } from "../../utils/helper";
+import { addThousandsSeparator, formatDate } from "../../utils/helper";
 import { LuPlus, LuTrash2 } from "react-icons/lu";
-import TransferList, {
-  type Transfer as TransferType,
-} from "../../components/Wallet/TransferList";
+import TransferList from "../../components/Wallet/TransferList";
 import axios from "axios";
 import InfoCard from "../../components/Cards/InfoCard";
+import type { TransactionApiResponse } from "../../types/dashboard";
 
 interface Wallet {
   _id: string;
   name: string;
-  type: "cash" | "card";
+  type: "CASH" | "BANK" | "CARD" | "OTHER";
   balance: number;
   icon?: string;
-  createdDate?: string;
+  createdAt?: string;
+  initializedAt?: string;
+}
+
+interface BackendTransfer {
+  _id: string;
+  fromWalletId:
+    | {
+        _id: string;
+        name: string;
+        type: "CASH" | "BANK" | "CARD" | "OTHER";
+      }
+    | string;
+  toWalletId:
+    | {
+        _id: string;
+        name: string;
+        type: "CASH" | "BANK" | "CARD" | "OTHER";
+      }
+    | string;
+  amount: number;
+  date: string;
+  desc?: string;
+  note?: string;
 }
 
 const Wallet = () => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
-  const [transfers, setTransfers] = useState<TransferType[]>([]);
+  const [transfers, setTransfers] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
   const transfersLoadingRef = useRef(false);
   const [openTransferModal, setOpenTransferModal] = useState(false);
@@ -63,11 +85,47 @@ const Wallet = () => {
     if (transfersLoadingRef.current) return;
     transfersLoadingRef.current = true;
     try {
-      const response = await axiosInstance.get<TransferType[]>(
+      const response = await axiosInstance.get<BackendTransfer[]>(
         API_PATHS.WALLET.GET_TRANSFERS
       );
       if (response.data) {
-        setTransfers(response.data);
+        // Map backend transfer format to TransactionApiResponse format
+        const mappedTransfers: TransactionApiResponse[] = response.data.map(
+          (transfer) => {
+            const fromWallet =
+              typeof transfer.fromWalletId === "string"
+                ? {
+                    _id: transfer.fromWalletId,
+                    name: "",
+                    type: "CASH",
+                  }
+                : transfer.fromWalletId;
+            const toWallet =
+              typeof transfer.toWalletId === "string"
+                ? { _id: transfer.toWalletId, name: "", type: "CASH" }
+                : transfer.toWalletId;
+
+            return {
+              _id: transfer._id,
+              userId: "",
+              type: "TRANSFER" as const,
+              amount: transfer.amount,
+              date: transfer.date,
+              desc: transfer.desc || transfer.note,
+              fromWalletId: {
+                _id: fromWallet._id,
+                name: fromWallet.name,
+                type: fromWallet.type,
+              },
+              toWalletId: {
+                _id: toWallet._id,
+                name: toWallet.name,
+                type: toWallet.type,
+              },
+            };
+          }
+        );
+        setTransfers(mappedTransfers);
       }
     } catch (error) {
       console.error("Failed to load transfers", error);
@@ -112,14 +170,50 @@ const Wallet = () => {
     }
   };
 
+  const handleDownloadTransferDetails = async () => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,
+        {
+          responseType: "blob",
+          params: {
+            type: "TRANSFER",
+          },
+        }
+      );
+
+      // Create a URL for the blob
+      const url = window.URL.createObjectURL(new Blob([response.data]));
+      const link = document.createElement("a");
+      link.href = url;
+      link.setAttribute("download", "transfer_details.xlsx");
+      document.body.appendChild(link);
+      link.click();
+      link.parentNode?.removeChild(link);
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error(
+          error.response?.data?.message ||
+            "Something went wrong. Please try again."
+        );
+      } else {
+        console.error("Something went wrong. Please try again.");
+      }
+      toast.error("Failed to download transfer details. Please try again.");
+    }
+  };
+
   useEffect(() => {
     fetchWallets();
     fetchTransfers();
   }, [fetchWallets, fetchTransfers]);
 
   const totalBalance = wallets.reduce((sum, wallet) => sum + wallet.balance, 0);
-  const cashWallets = wallets.filter((wallet) => wallet.type === "cash");
-  const cardWallets = wallets.filter((wallet) => wallet.type === "card");
+  const cashWallets = wallets.filter((wallet) => wallet.type === "CASH");
+  const cardWallets = wallets.filter(
+    (wallet) => wallet.type === "CARD" || wallet.type === "BANK"
+  );
   const cashBalance = cashWallets.reduce(
     (sum, wallet) => sum + wallet.balance,
     0
@@ -142,7 +236,20 @@ const Wallet = () => {
   const renderWalletCard = (wallet: Wallet) => {
     // Hide delete button if there's only one wallet
     const canDelete = wallets.length > 1;
-    const color = wallet.type === "cash" ? "bg-green-50" : "bg-blue-50";
+    const getWalletColor = (type: Wallet["type"]) => {
+      switch (type) {
+        case "CASH":
+          return "bg-green-50";
+        case "CARD":
+        case "BANK":
+          return "bg-blue-50";
+        case "OTHER":
+          return "bg-purple-50";
+        default:
+          return "bg-gray-50";
+      }
+    };
+    const color = getWalletColor(wallet.type);
 
     return (
       <div key={wallet._id} className="relative group">
@@ -151,7 +258,7 @@ const Wallet = () => {
           label={wallet.name}
           value={addThousandsSeparator(wallet.balance)}
           color={color}
-          desc={wallet.createdDate}
+          desc={formatDate(wallet?.initializedAt || "")}
         />
         {canDelete && (
           <button
@@ -235,7 +342,10 @@ const Wallet = () => {
             )}
           </div>
 
-          <TransferList transfers={transfers} />
+          <TransferList
+            transactions={transfers}
+            onDownload={handleDownloadTransferDetails}
+          />
         </div>
 
         <Modal
@@ -252,7 +362,7 @@ const Wallet = () => {
           title="Add Wallet"
         >
           <AddWalletForm
-            walletType="cash"
+            walletType="CASH"
             onAddComplete={handleAddWalletComplete}
           />
         </Modal>

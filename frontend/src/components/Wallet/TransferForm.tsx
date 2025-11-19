@@ -8,10 +8,11 @@ import toast from "react-hot-toast";
 interface Wallet {
   _id: string;
   name: string;
-  type: "cash" | "card";
+  type: "CASH" | "BANK" | "CARD" | "OTHER";
   balance: number;
   icon?: string;
-  createdDate?: string;
+  createdAt?: string;
+  initializedAt?: string;
 }
 
 interface TransferFormProps {
