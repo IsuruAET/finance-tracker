@@ -5,6 +5,7 @@ import AutoComplete from "../Inputs/AutoComplete";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import { addThousandsSeparator } from "../../utils/helper";
 
 export interface IncomeData {
   categoryId: string;
@@ -143,7 +144,9 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
         placeholder="Select a wallet"
         options={wallets.map((wallet) => ({
           value: wallet._id,
-          label: `${wallet.name} (Balance: ${wallet.balance.toFixed(2)})`,
+          label: `${wallet.name} (Balance: AU$${addThousandsSeparator(
+            wallet.balance
+          )})`,
           icon: wallet.icon,
         }))}
         required

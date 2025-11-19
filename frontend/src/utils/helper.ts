@@ -21,9 +21,13 @@ export const getInitials = (name: string): string =>
 export const addThousandsSeparator = (number: number): string => {
   if (number == null || isNaN(number)) return "";
 
-  const hasDecimal = number % 1 !== 0;
+  // Round to 2 decimal places
+  const rounded = Math.round(number * 100) / 100;
+  
+  // Check if the rounded number has decimal part
+  const hasDecimal = rounded % 1 !== 0;
 
-  return number.toLocaleString("en-AU", {
+  return rounded.toLocaleString("en-AU", {
     minimumFractionDigits: hasDecimal ? 2 : 0,
     maximumFractionDigits: 2,
   });

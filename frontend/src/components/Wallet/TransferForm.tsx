@@ -4,6 +4,7 @@ import Select from "../Inputs/Select";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
+import { addThousandsSeparator } from "../../utils/helper";
 
 interface Wallet {
   _id: string;
@@ -63,8 +64,8 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
     const selectedFromWallet = wallets.find((w) => w._id === fromWalletId);
     if (selectedFromWallet && transferAmount > selectedFromWallet.balance) {
       toast.error(
-        `Insufficient balance. Available: ${selectedFromWallet.balance.toFixed(
-          2
+        `Insufficient balance. Available: AU$${addThousandsSeparator(
+          selectedFromWallet.balance
         )}`
       );
       return;
@@ -92,7 +93,9 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
 
   const fromWalletOptions = wallets.map((wallet) => ({
     value: wallet._id,
-    label: `${wallet.name} (Balance: ${wallet.balance.toFixed(2)})`,
+    label: `${wallet.name} (Balance: AU$${addThousandsSeparator(
+      wallet.balance
+    )})`,
     icon: wallet.icon,
   }));
 
@@ -100,7 +103,9 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
     .filter((w) => w._id !== fromWalletId)
     .map((wallet) => ({
       value: wallet._id,
-      label: `${wallet.name} (Balance: ${wallet.balance.toFixed(2)})`,
+      label: `${wallet.name} (Balance: AU$${addThousandsSeparator(
+        wallet.balance
+      )})`,
       icon: wallet.icon,
     }));
 
@@ -137,8 +142,8 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
 
       {selectedFromWallet && transferAmount > selectedFromWallet.balance && (
         <p className="text-red-600 text-sm mt-1 mb-4">
-          Insufficient balance. Available:{" "}
-          {selectedFromWallet.balance.toFixed(2)}
+          Insufficient balance. Available: AU$
+          {addThousandsSeparator(selectedFromWallet.balance)}
         </p>
       )}
 

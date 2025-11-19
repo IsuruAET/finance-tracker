@@ -8,6 +8,7 @@ import {
   AreaChart,
 } from "recharts";
 import type { TooltipProps } from "recharts";
+import { addThousandsSeparator } from "../../utils/helper";
 
 // Define data type
 export interface ChartDataItem {
@@ -45,7 +46,7 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
           <p className="text-sm text-gray-600">
             Amount:{" "}
             <span className="text-sm font-medium text-gray-900">
-              AU${yAxisValue}
+              AU${addThousandsSeparator(yAxisValue)}
             </span>
           </p>
         </div>

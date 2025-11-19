@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react";
 import CustomPieChart from "../Charts/CustomPieChart";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import type { PieChartData } from "../Charts/CustomPieChart";
+import { addThousandsSeparator } from "../../utils/helper";
 
 interface RecentIncomeWithChartProps {
   data: TransactionApiResponse[];
@@ -40,7 +41,7 @@ const RecentIncomeWithChart = ({
       <CustomPieChart
         data={chartData}
         label="Total Income"
-        totalAmount={`AU$${totalIncome}`}
+        totalAmount={`AU$${addThousandsSeparator(totalIncome)}`}
         colors={COLORS}
         showTextAnchor
       />
