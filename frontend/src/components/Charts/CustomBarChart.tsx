@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -23,7 +24,20 @@ interface CustomBarChartProps {
   data: ChartDataItem[];
 }
 
+const MOBILE_BREAKPOINT = 640;
+
 const CustomBarChart = ({ data }: CustomBarChartProps) => {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkViewport = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+
+    checkViewport();
+    window.addEventListener("resize", checkViewport);
+
+    return () => window.removeEventListener("resize", checkViewport);
+  }, []);
+
   // Function to alternate colors
   const getBarColor = (index: number): string => {
     return index % 2 === 0 ? "#875CF5" : "#CFBEFB";
@@ -72,17 +86,33 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
 
   return (
     <div className="bg-white mt-6">
-      <ResponsiveContainer width="100%" height={300}>
-        <BarChart data={data}>
+      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300}>
+        <BarChart
+          data={data}
+          barCategoryGap={isMobile ? "25%" : "15%"}
+          margin={{ top: 10, right: 6, left: 0, bottom: isMobile ? 36 : 10 }}
+        >
           <CartesianGrid stroke="none" />
 
           <XAxis
             dataKey="xAxisValue"
-            tick={{ fontSize: 12, fill: "#555" }}
+            interval={0}
+            height={isMobile ? 60 : undefined}
+            tick={{
+              fontSize: isMobile ? 10 : 12,
+              fill: "#555",
+            }}
+            angle={isMobile ? -40 : 0}
+            textAnchor={isMobile ? "end" : "middle"}
+            tickMargin={isMobile ? 8 : 16}
             stroke="none"
             tickFormatter={(value) => truncateLabel(value)}
           />
-          <YAxis tick={{ fontSize: 12, fill: "#555" }} stroke="none" />
+          <YAxis
+            tick={{ fontSize: isMobile ? 10 : 12, fill: "#555" }}
+            stroke="none"
+            width={isMobile ? 40 : 60}
+          />
 
           <Tooltip
             content={(props: TooltipProps<number, string>) => (
@@ -90,7 +120,12 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
             )}
           />
 
-          <Bar dataKey="yAxisValue" fill="#FF8042" radius={[10, 10, 0, 0]}>
+          <Bar
+            dataKey="yAxisValue"
+            fill="#FF8042"
+            radius={[10, 10, 0, 0]}
+            maxBarSize={isMobile ? 32 : undefined}
+          >
             {data.map((_entry, index) => (
               <Cell key={index} fill={getBarColor(index)} />
             ))}
