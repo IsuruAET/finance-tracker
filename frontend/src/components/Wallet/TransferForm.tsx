@@ -140,7 +140,8 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
 
       {selectedFromWallet && transferAmount > selectedFromWallet.balance && (
         <p className="text-red-600 dark:text-red-400 text-sm mt-1 mb-4 transition-colors">
-          Insufficient balance. Available: {formatCurrency(selectedFromWallet.balance)}
+          Insufficient balance. Available:{" "}
+          {formatCurrency(selectedFromWallet.balance)}
         </p>
       )}
 
