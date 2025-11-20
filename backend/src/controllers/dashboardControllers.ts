@@ -130,6 +130,132 @@ export const getDashboardData = async (
       thisMonthIncome -
       thisMonthExpenses;
 
+    // Closing balance history (last 5 full months + current month)
+    const monthsToInclude = 6;
+    const targetMonths: { year: number; monthIndex: number }[] = [];
+    for (let i = monthsToInclude - 1; i >= 0; i -= 1) {
+      const targetDate = new Date(currentYear, currentMonth - i, 1);
+      targetMonths.push({
+        year: targetDate.getFullYear(),
+        monthIndex: targetDate.getMonth(), // zero-based
+      });
+    }
+
+    let closingBalanceHistory: { monthLabel: string; balance: number }[] = [];
+
+    const [firstTargetMonth] = targetMonths;
+
+    if (firstTargetMonth) {
+      const closingWindowStart = new Date(
+        firstTargetMonth.year,
+        firstTargetMonth.monthIndex,
+        1
+      );
+
+      // Sum transactions prior to the window to get the starting balance
+      const balanceBeforeWindowAgg = await Transaction.aggregate([
+        {
+          $match: {
+            ...baseMatch,
+            date: { $lt: closingWindowStart },
+            type: { $in: ["INCOME", "EXPENSE", "INITIAL_BALANCE"] },
+          },
+        },
+        {
+          $group: {
+            _id: "$type",
+            total: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      const balanceBeforeWindow = balanceBeforeWindowAgg.reduce(
+        (acc, curr) => {
+          acc[curr._id as keyof typeof acc] = curr.total;
+          return acc;
+        },
+        {
+          INCOME: 0,
+          EXPENSE: 0,
+          INITIAL_BALANCE: 0,
+        }
+      );
+
+      const monthlyTotalsAgg = await Transaction.aggregate([
+        {
+          $match: {
+            ...baseMatch,
+            date: { $gte: closingWindowStart, $lt: firstDayOfNextMonth },
+            type: { $in: ["INCOME", "EXPENSE", "INITIAL_BALANCE"] },
+          },
+        },
+        {
+          $group: {
+            _id: {
+              year: { $year: "$date" },
+              month: { $month: "$date" },
+              type: "$type",
+            },
+            total: { $sum: "$amount" },
+          },
+        },
+      ]);
+
+      type MonthlyTotals = Record<
+        string,
+        { income: number; expense: number; initial: number }
+      >;
+
+      const monthlyTotals = monthlyTotalsAgg.reduce<MonthlyTotals>(
+        (acc, curr) => {
+          const monthKey = `${curr._id.year}-${curr._id.month}`;
+          if (!acc[monthKey]) {
+            acc[monthKey] = { income: 0, expense: 0, initial: 0 };
+          }
+
+          if (curr._id.type === "INCOME") {
+            acc[monthKey].income = curr.total;
+          } else if (curr._id.type === "EXPENSE") {
+            acc[monthKey].expense = curr.total;
+          } else if (curr._id.type === "INITIAL_BALANCE") {
+            acc[monthKey].initial = curr.total;
+          }
+
+          return acc;
+        },
+        {}
+      );
+
+      let rollingBalance =
+        (balanceBeforeWindow.INCOME || 0) +
+        (balanceBeforeWindow.INITIAL_BALANCE || 0) -
+        (balanceBeforeWindow.EXPENSE || 0);
+
+      closingBalanceHistory = targetMonths.map(({ year, monthIndex }) => {
+        const key = `${year}-${monthIndex + 1}`;
+        const totals = monthlyTotals[key] || {
+          income: 0,
+          expense: 0,
+          initial: 0,
+        };
+
+        rollingBalance += totals.income + totals.initial - totals.expense;
+
+        const monthLabel = new Date(year, monthIndex, 1).toLocaleString(
+          "default",
+          {
+            month: "short",
+            year: "numeric",
+          }
+        );
+
+        return {
+          monthLabel,
+          balance: rollingBalance,
+        };
+      });
+    }
+
     // Get income transactions for last 60 days (excluding INITIAL_BALANCE)
     const incomeDateFilter = {
       $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
@@ -199,6 +325,7 @@ export const getDashboardData = async (
         transactions: last60DaysIncomeTransactions,
       },
       recentTransactions: lastTransactions,
+      closingBalanceHistory,
     });
   } catch (error: unknown) {
     if (error instanceof Error) {

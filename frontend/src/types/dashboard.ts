@@ -29,6 +29,11 @@ export interface TransactionApiResponse {
   };
 }
 
+export interface ClosingBalanceHistoryItem {
+  monthLabel: string;
+  balance: number;
+}
+
 export type Wallet = {
   _id: string;
   name: string;
@@ -54,4 +59,5 @@ export type DashboardDataResponse = {
     transactions: TransactionApiResponse[];
   };
   recentTransactions: TransactionApiResponse[];
+  closingBalanceHistory?: ClosingBalanceHistoryItem[];
 };
