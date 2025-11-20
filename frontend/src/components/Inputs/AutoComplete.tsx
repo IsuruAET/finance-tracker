@@ -1,4 +1,5 @@
 import React, { useState, useRef, useEffect } from "react";
+import { IoIosArrowDown } from "react-icons/io";
 
 interface AutoCompleteOption {
   value: string;
@@ -100,13 +101,15 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
 
   return (
     <div>
-      <label className="text-[13px] text-text-secondary transition-colors">
-        {label}
-      </label>
+      {label && (
+        <label className="text-[13px] text-text-secondary transition-colors mb-1 block">
+          {label}
+        </label>
+      )}
 
-      <div className="input-box relative" ref={dropdownRef}>
+      <div className="relative mb-4 mt-3" ref={dropdownRef}>
         <div
-          className="w-full bg-transparent outline-none text-sm text-text-primary flex items-center gap-2 cursor-pointer transition-colors"
+          className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50"
           onClick={handleContainerClick}
         >
           {selectedOption?.icon && hasIcons && (
@@ -126,30 +129,20 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
             className="w-full bg-transparent outline-none flex-1 text-text-primary placeholder:text-text-secondary transition-colors"
             required={required}
           />
-          <svg
-            className={`w-4 h-4 transition-transform shrink-0 ${
+          <IoIosArrowDown
+            className={`w-4 h-4 text-text-secondary transition-transform duration-200 shrink-0 ${
               isOpen ? "rotate-180" : ""
             }`}
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M19 9l-7 7-7-7"
-            />
-          </svg>
+          />
         </div>
 
         {isOpen && filteredOptions.length > 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-md shadow-lg dark:shadow-black/20 max-h-60 overflow-auto transition-colors">
+          <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50 max-h-60 overflow-auto">
             {filteredOptions.map((option) => (
               <div
                 key={option.value}
                 onClick={() => handleSelect(option)}
-                className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
+                className={`px-4 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
                   option.value === value
                     ? "bg-purple-50 dark:bg-purple-900/20"
                     : ""
@@ -169,8 +162,8 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
         )}
 
         {isOpen && searchTerm && filteredOptions.length === 0 && (
-          <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-md shadow-lg dark:shadow-black/20 transition-colors">
-            <div className="px-3 py-2 text-sm text-text-secondary">
+          <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50">
+            <div className="px-4 py-2 text-sm text-text-secondary">
               No categories found
             </div>
           </div>

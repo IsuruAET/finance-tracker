@@ -1,7 +1,9 @@
 import { useState, useEffect } from "react";
+import { DateTime } from "luxon";
 import Input from "../Inputs/Input";
 import Select from "../Inputs/Select";
 import AutoComplete from "../Inputs/AutoComplete";
+import DatePicker from "../Inputs/DatePicker";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
@@ -42,7 +44,7 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
   const [income, setIncome] = useState<IncomeData>({
     categoryId: "",
     amount: 0,
-    date: "",
+    date: DateTime.now().toISODate() || "",
     icon: "",
     walletId: "",
     desc: "",
@@ -150,14 +152,11 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
         required
       />
 
-      <Input
+      <DatePicker
         value={income.date}
-        onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-          handleChange("date", e.target.value)
-        }
+        onChange={(value) => handleChange("date", value)}
         label="Date"
-        placeholder=""
-        type="date"
+        placeholder="Select a date"
       />
 
       <Input

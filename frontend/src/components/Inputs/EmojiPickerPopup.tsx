@@ -1,7 +1,8 @@
 import EmojiPicker from "emoji-picker-react";
-import type { EmojiClickData } from "emoji-picker-react";
+import type { EmojiClickData, Theme } from "emoji-picker-react";
 import { useState } from "react";
 import { LuImage, LuX } from "react-icons/lu";
+import { useTheme } from "../../hooks/useTheme";
 
 interface EmojiPickerPopupProps {
   icon?: string;
@@ -10,6 +11,7 @@ interface EmojiPickerPopupProps {
 
 const EmojiPickerPopup = ({ icon, onSelect }: EmojiPickerPopupProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
+  const { theme } = useTheme();
 
   return (
     <div className="flex flex-col md:flex-row items-start gap-5 mb-6">
@@ -25,7 +27,9 @@ const EmojiPickerPopup = ({ icon, onSelect }: EmojiPickerPopupProps) => {
           )}
         </div>
 
-        <p className="text-text-primary transition-colors">{icon ? "Change Icon" : "Pick Icon"}</p>
+        <p className="text-text-primary transition-colors">
+          {icon ? "Change Icon" : "Pick Icon"}
+        </p>
       </div>
 
       {isOpen && (
@@ -38,6 +42,7 @@ const EmojiPickerPopup = ({ icon, onSelect }: EmojiPickerPopupProps) => {
           </button>
 
           <EmojiPicker
+            theme={(theme === "dark" ? "dark" : "light") as Theme}
             onEmojiClick={(emojiData: EmojiClickData) =>
               onSelect(emojiData?.imageUrl || "")
             }

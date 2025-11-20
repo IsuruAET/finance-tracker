@@ -62,11 +62,13 @@ const Input: React.FC<InputProps> = ({
 
   return (
     <div>
-      <label className="text-[13px] text-text-secondary transition-colors">
-        {label}
-      </label>
+      {label && (
+        <label className="text-[13px] text-text-secondary transition-colors mb-1 block">
+          {label}
+        </label>
+      )}
 
-      <div className="input-box">
+      <div className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 mb-4 mt-3 flex items-center gap-2 text-sm text-text-primary transition-colors hover:border-purple-500/50">
         <input
           ref={inputRef}
           type={isPassword ? (showPassword ? "text" : "password") : type}
@@ -87,13 +89,13 @@ const Input: React.FC<InputProps> = ({
             {showPassword ? (
               <FaRegEye
                 size={22}
-                className="text-primary cursor-pointer"
+                className="text-primary cursor-pointer shrink-0"
                 onClick={() => toggleShowPassword()}
               />
             ) : (
               <FaRegEyeSlash
                 size={22}
-                className="text-text-secondary cursor-pointer transition-colors"
+                className="text-text-secondary cursor-pointer transition-colors shrink-0"
                 onClick={() => toggleShowPassword()}
               />
             )}

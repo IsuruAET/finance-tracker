@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
+import { DateTime } from "luxon";
 import Input from "../Inputs/Input";
 import Select from "../Inputs/Select";
+import DatePicker from "../Inputs/DatePicker";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
@@ -25,7 +27,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
   const [fromWalletId, setFromWalletId] = useState("");
   const [toWalletId, setToWalletId] = useState("");
   const [amount, setAmount] = useState<string>("0");
-  const [date, setDate] = useState(new Date().toISOString().split("T")[0]);
+  const [date, setDate] = useState(DateTime.now().toISODate() || "");
   const [note, setNote] = useState("");
 
   useEffect(() => {
@@ -142,12 +144,11 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
         </p>
       )}
 
-      <Input
+      <DatePicker
         value={date}
-        onChange={(e) => setDate(e.target.value)}
+        onChange={setDate}
         label="Date"
-        placeholder=""
-        type="date"
+        placeholder="Select a date"
       />
 
       <Input
