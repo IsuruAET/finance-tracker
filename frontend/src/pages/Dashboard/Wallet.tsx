@@ -263,7 +263,7 @@ const Wallet = () => {
         {canDelete && (
           <button
             onClick={() => handleDeleteWalletClick(wallet._id)}
-            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer p-1 rounded bg-white shadow-sm"
+            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer p-1 rounded bg-white shadow-sm"
             title="Delete wallet"
           >
             <LuTrash2 className="h-5 w-5" />
