@@ -95,6 +95,98 @@ export const prepareIncomeBarChartData = (
   return chartData;
 };
 
+export const prepareTransactionBarChartData = (
+  data: TransactionApiResponse[] = []
+) => {
+  const totalsMap = new Map<
+    string,
+    {
+      label: string;
+      income: number;
+      expense: number;
+      transfer: number;
+      initial: number;
+    }
+  >();
+
+  data.forEach((item) => {
+    const isoDate = DateTime.fromISO(item.date).toISODate();
+    if (!isoDate) return;
+
+    const label = DateTime.fromISO(item.date).toFormat("d MMM");
+    const entry =
+      totalsMap.get(isoDate) ??
+      {
+        label,
+        income: 0,
+        expense: 0,
+        transfer: 0,
+        initial: 0,
+      };
+
+    switch (item.type) {
+      case "INCOME":
+        entry.income += item.amount;
+        break;
+      case "EXPENSE":
+        entry.expense += item.amount;
+        break;
+      case "INITIAL_BALANCE":
+        entry.initial += item.amount;
+        break;
+      case "TRANSFER":
+        entry.transfer += item.amount;
+        break;
+      default:
+        break;
+    }
+
+    totalsMap.set(isoDate, entry);
+  });
+
+  return Array.from(totalsMap.entries())
+    .sort((a, b) => new Date(a[0]).getTime() - new Date(b[0]).getTime())
+    .map(([, entry]) => {
+      const net = entry.income + entry.initial - entry.expense;
+      const descParts: string[] = [];
+
+      if (entry.income) descParts.push(`Income ${formatCurrency(entry.income)}`);
+      if (entry.expense)
+        descParts.push(`Expense ${formatCurrency(entry.expense)}`);
+      if (entry.initial)
+        descParts.push(`Initial ${formatCurrency(entry.initial)}`);
+      if (entry.transfer)
+        descParts.push(`Transfers ${formatCurrency(entry.transfer)}`);
+
+      return {
+        title: entry.label,
+        yAxisValue: Number(net.toFixed(2)),
+        xAxisValue: entry.label,
+        desc: descParts.length
+          ? `Net ${formatCurrency(net)} • ${descParts.join(" | ")}`
+          : undefined,
+      };
+    });
+};
+
+export const filterTransactionsByDateRange = (
+  transactions: TransactionApiResponse[],
+  startDate: Date,
+  endDate: Date
+) => {
+  const start = DateTime.fromJSDate(startDate).startOf("day");
+  const end = DateTime.fromJSDate(endDate).endOf("day");
+
+  return transactions.filter((transaction) => {
+    const transactionDate = DateTime.fromISO(transaction.date);
+    if (!transactionDate.isValid) return false;
+    return (
+      transactionDate >= start &&
+      transactionDate <= end
+    );
+  });
+};
+
 export const prepareExpenseLineChartData = (
   data: TransactionApiResponse[] = []
 ) => {

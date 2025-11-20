@@ -12,6 +12,7 @@ const SignUp = lazy(() => import("../pages/Auth/SignUp"));
 const Income = lazy(() => import("../pages/Dashboard/Income"));
 const Expense = lazy(() => import("../pages/Dashboard/Expense"));
 const Wallet = lazy(() => import("../pages/Dashboard/Wallet"));
+const Transaction = lazy(() => import("../pages/Dashboard/Transaction"));
 const NotFound = lazy(() => import("../pages/NotFound"));
 
 const AppRoutes = () => {
@@ -32,6 +33,7 @@ const AppRoutes = () => {
           <Route path="/dashboard" element={<Home />} />
           <Route path="/income" element={<Income />} />
           <Route path="/expense" element={<Expense />} />
+          <Route path="/transaction" element={<Transaction />} />
           <Route path="/wallet" element={<Wallet />} />
         </Route>
 
