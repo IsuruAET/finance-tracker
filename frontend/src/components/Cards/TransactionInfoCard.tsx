@@ -92,14 +92,14 @@ const TransactionInfoCard = ({
           )}
 
           <div
-            className={`flex items-center gap-2 px-3 py-1.5 rounded-md ${getAmountStyles()}`}
+            className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-md w-28 min-w-28 shrink-0 ${getAmountStyles()}`}
           >
-            <h6 className="text-xs font-medium">
+            <h6 className="text-xs font-semibold tracking-tight text-right flex-1">
               {type === "INCOME" || type === "INITIAL_BALANCE"
                 ? "+"
                 : type === "EXPENSE"
                 ? "-"
-                : ""}{" "}
+                : ""}
               {formatCurrency(amount)}
             </h6>
             {type === "INCOME" ? (
