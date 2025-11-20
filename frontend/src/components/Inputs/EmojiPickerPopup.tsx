@@ -17,7 +17,7 @@ const EmojiPickerPopup = ({ icon, onSelect }: EmojiPickerPopupProps) => {
         className="flex items-center gap-4 cursor-pointer"
         onClick={() => setIsOpen(true)}
       >
-        <div className="w-12 h-12 flex items-center justify-center text-2xl bg-purple-50 text-primary rounded-lg">
+        <div className="w-12 h-12 flex items-center justify-center text-2xl bg-purple-50 dark:bg-purple-900/20 text-primary rounded-lg transition-colors">
           {icon ? (
             <img src={icon} alt="Icon" className="w-12 h-12" />
           ) : (
@@ -25,13 +25,13 @@ const EmojiPickerPopup = ({ icon, onSelect }: EmojiPickerPopupProps) => {
           )}
         </div>
 
-        <p>{icon ? "Change Icon" : "Pick Icon"}</p>
+        <p className="text-text-primary transition-colors">{icon ? "Change Icon" : "Pick Icon"}</p>
       </div>
 
       {isOpen && (
         <div className="relative">
           <button
-            className="w-7 h-7 flex items-center justify-center bg-white border border-gray-200 rounded-full absolute -top-2 -right-2 z-10 cursor-pointer"
+            className="w-7 h-7 flex items-center justify-center bg-bg-primary dark:bg-bg-secondary border border-border text-text-primary rounded-full absolute -top-2 -right-2 z-10 cursor-pointer hover:bg-hover transition-colors"
             onClick={() => setIsOpen(false)}
           >
             <LuX />

@@ -62,14 +62,16 @@ const Input: React.FC<InputProps> = ({
 
   return (
     <div>
-      <label className="text-[13px] text-slate-800">{label}</label>
+      <label className="text-[13px] text-text-secondary transition-colors">
+        {label}
+      </label>
 
       <div className="input-box">
         <input
           ref={inputRef}
           type={isPassword ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
-          className={`w-full bg-transparent outline-none ${
+          className={`w-full bg-transparent outline-none text-text-primary placeholder:text-text-secondary transition-colors ${
             isNumber
               ? "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               : ""
@@ -91,7 +93,7 @@ const Input: React.FC<InputProps> = ({
             ) : (
               <FaRegEyeSlash
                 size={22}
-                className="text-slate-400 cursor-pointer"
+                className="text-text-secondary cursor-pointer transition-colors"
                 onClick={() => toggleShowPassword()}
               />
             )}

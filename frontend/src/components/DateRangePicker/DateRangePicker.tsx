@@ -293,27 +293,27 @@ const DateRangePicker = () => {
     <div className="relative" ref={containerRef}>
       {/* Date Range Input */}
       <div
-        className="flex items-center gap-2 px-2 sm:px-3 py-2 border border-gray-300 rounded-lg cursor-pointer hover:border-gray-400 transition-colors bg-white"
+        className="flex items-center gap-2 px-2 sm:px-3 py-2 border border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-bg-primary"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <HiCalendar className="text-gray-600 text-base sm:text-lg shrink-0" />
+        <HiCalendar className="text-text-secondary text-base sm:text-lg shrink-0 transition-colors" />
         <input
           type="text"
           readOnly
           value={formatDateRange(dateRange)}
-          className="outline-none cursor-pointer text-xs sm:text-sm font-medium text-gray-700 bg-transparent w-full min-w-[140px] sm:min-w-[200px]"
+          className="outline-none cursor-pointer text-xs sm:text-sm font-medium text-text-primary bg-transparent w-full min-w-[140px] sm:min-w-[200px] transition-colors"
           placeholder="Select date range"
         />
       </div>
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 sm:right-0 mt-2 bg-white border border-gray-200 rounded-lg shadow-lg z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto max-h-[85vh] overflow-y-auto">
+        <div className="absolute top-full right-0 sm:right-0 mt-2 bg-bg-primary border border-border rounded-lg shadow-lg dark:shadow-black/20 z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto max-h-[85vh] overflow-y-auto transition-colors">
           {!showCustomPicker ? (
             // Predefined Ranges
             <div className="p-4">
               <div className="mb-4">
-                <h3 className="text-sm font-semibold text-gray-700 mb-2">
+                <h3 className="text-sm font-semibold text-text-primary mb-2 transition-colors">
                   Quick Select
                 </h3>
                 <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
@@ -324,7 +324,7 @@ const DateRangePicker = () => {
                       className={`px-3 py-2 text-sm rounded-md transition-colors ${
                         isRangeMatch(range)
                           ? "bg-primary text-white"
-                          : "bg-gray-100 text-gray-700 hover:bg-gray-200"
+                          : "bg-bg-secondary text-text-primary hover:bg-hover"
                       }`}
                     >
                       {range.label}
@@ -343,12 +343,12 @@ const DateRangePicker = () => {
             // Custom Date Picker
             <div className="p-4 pb-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-gray-700">
+                <h3 className="text-sm font-semibold text-text-primary transition-colors">
                   Select Date Range
                 </h3>
                 <button
                   onClick={cancelCustomSelection}
-                  className="text-sm text-gray-500 hover:text-gray-700"
+                  className="text-sm text-text-secondary hover:text-text-primary transition-colors"
                 >
                   Cancel
                 </button>
@@ -361,11 +361,11 @@ const DateRangePicker = () => {
                   <div className="flex items-center justify-between mb-2">
                     <button
                       onClick={() => navigateMonth("prev")}
-                      className="p-1 hover:bg-gray-100 rounded"
+                      className="p-1 hover:bg-hover rounded transition-colors"
                     >
-                      <IoChevronBack className="text-gray-600" />
+                      <IoChevronBack className="text-text-secondary transition-colors" />
                     </button>
-                    <h4 className="text-sm font-semibold text-gray-700">
+                    <h4 className="text-sm font-semibold text-text-primary transition-colors">
                       {currentMonth.toFormat("MMMM yyyy")}
                     </h4>
                     <div className="w-6" /> {/* Spacer */}
@@ -374,7 +374,7 @@ const DateRangePicker = () => {
                     {weekDays.map((day) => (
                       <div
                         key={day}
-                        className="text-center text-xs font-medium text-gray-500 py-1"
+                        className="text-center text-xs font-medium text-text-secondary py-1 transition-colors"
                       >
                         {day}
                       </div>
@@ -401,8 +401,8 @@ const DateRangePicker = () => {
                               : isInRange
                               ? "bg-primary/20 text-primary"
                               : isToday
-                              ? "bg-gray-100 text-gray-900 font-medium"
-                              : "text-gray-700 hover:bg-gray-100"
+                              ? "bg-bg-secondary dark:bg-hover text-text-primary font-medium"
+                              : "text-text-primary hover:bg-hover"
                           }`}
                         >
                           {DateTime.fromJSDate(date).day}
@@ -416,21 +416,21 @@ const DateRangePicker = () => {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <div className="w-6" /> {/* Spacer */}
-                    <h4 className="text-sm font-semibold text-gray-700">
+                    <h4 className="text-sm font-semibold text-text-primary transition-colors">
                       {currentMonth.plus({ months: 1 }).toFormat("MMMM yyyy")}
                     </h4>
                     <button
                       onClick={() => navigateMonth("next")}
-                      className="p-1 hover:bg-gray-100 rounded"
+                      className="p-1 hover:bg-hover rounded transition-colors"
                     >
-                      <IoChevronForward className="text-gray-600" />
+                      <IoChevronForward className="text-text-secondary transition-colors" />
                     </button>
                   </div>
                   <div className="grid grid-cols-7 gap-1">
                     {weekDays.map((day) => (
                       <div
                         key={day}
-                        className="text-center text-xs font-medium text-gray-500 py-1"
+                        className="text-center text-xs font-medium text-text-secondary py-1 transition-colors"
                       >
                         {day}
                       </div>
@@ -457,8 +457,8 @@ const DateRangePicker = () => {
                               : isInRange
                               ? "bg-primary/20 text-primary"
                               : isToday
-                              ? "bg-gray-100 text-gray-900 font-medium"
-                              : "text-gray-700 hover:bg-gray-100"
+                              ? "bg-bg-secondary dark:bg-hover text-text-primary font-medium"
+                              : "text-text-primary hover:bg-hover"
                           }`}
                         >
                           {DateTime.fromJSDate(date).day}
@@ -473,7 +473,7 @@ const DateRangePicker = () => {
               <button
                 onClick={applyCustomRange}
                 disabled={!selectedStartDate || !selectedEndDate}
-                className="w-full px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors"
+                className="w-full px-4 py-2 text-sm font-medium text-white bg-primary rounded-md hover:bg-primary/90 disabled:bg-gray-300 dark:disabled:bg-gray-600 disabled:text-gray-500 dark:disabled:text-gray-400 disabled:cursor-not-allowed transition-colors"
               >
                 Apply
               </button>

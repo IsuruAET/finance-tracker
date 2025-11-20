@@ -64,8 +64,10 @@ const Login = () => {
   return (
     <AuthLayout>
       <div className="lg:w-[70%] h-3/4 md:h-full flex flex-col justify-center">
-        <h3 className="text-xl font-semibold text-black">Welcome Back</h3>
-        <p className="text-xs text-slate-700 mt-[5px] mb-6">
+        <h3 className="text-xl font-semibold text-text-primary transition-colors">
+          Welcome Back
+        </h3>
+        <p className="text-xs text-text-secondary mt-[5px] mb-6 transition-colors">
           Please enter your details to log in
         </p>
 
@@ -92,7 +94,7 @@ const Login = () => {
             LOGIN
           </button>
 
-          <p className="text-[13px] text-slate-800 mt-3">
+          <p className="text-[13px] text-text-secondary mt-3 transition-colors">
             Don't have an account?{" "}
             <Link className="font-medium text-primary underline" to="/signup">
               SignUp

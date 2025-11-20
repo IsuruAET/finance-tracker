@@ -9,6 +9,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 import { formatCurrency } from "../../utils/helper";
+import { useTheme } from "../../hooks/useTheme";
 
 // Define data type
 export interface ChartDataItem {
@@ -22,6 +23,9 @@ interface CustomLineChartProps {
 }
 
 const CustomLineChart = ({ data }: CustomLineChartProps) => {
+  const { theme } = useTheme();
+  const tickColor = theme === "dark" ? "#b0b3b8" : "#555";
+  
   // Define your data type
   interface LineData {
     title: string;
@@ -41,11 +45,11 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
     if (active && payload && payload.length) {
       const { title, yAxisValue } = payload[0].payload;
       return (
-        <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">
-          <p className="text-xs font-semibold text-purple-800 mb-1">{title}</p>
-          <p className="text-sm text-gray-600">
+        <div className="bg-bg-primary dark:bg-bg-secondary shadow-md rounded-lg p-2 border border-border transition-colors">
+          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">{title}</p>
+          <p className="text-sm text-text-secondary transition-colors">
             Amount:{" "}
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-text-primary transition-colors">
               {formatCurrency(yAxisValue)}
             </span>
           </p>
@@ -56,7 +60,7 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
   };
 
   return (
-    <div className="bg-white mt-6">
+    <div className="bg-transparent mt-6">
       <ResponsiveContainer width="100%" height={300}>
         <AreaChart data={data}>
           <defs>
@@ -70,10 +74,10 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
 
           <XAxis
             dataKey="xAxisValue"
-            tick={{ fontSize: 12, fill: "#555" }}
+            tick={{ fontSize: 12, fill: tickColor }}
             stroke="none"
           />
-          <YAxis tick={{ fontSize: 12, fill: "#555" }} stroke="none" />
+          <YAxis tick={{ fontSize: 12, fill: tickColor }} stroke="none" />
 
           <Tooltip
             content={(props: TooltipProps<number, string>) => (

@@ -64,13 +64,13 @@ const Select: React.FC<SelectProps> = ({
   if (!hasIcons) {
     return (
       <div>
-        <label className="text-[13px] text-slate-800">{label}</label>
+        <label className="text-[13px] text-text-secondary transition-colors">{label}</label>
 
         <div className="input-box">
           <select
             value={value}
             onChange={onChange}
-            className="w-full bg-transparent outline-none cursor-pointer text-sm text-black"
+            className="w-full bg-transparent outline-none cursor-pointer text-sm text-text-primary transition-colors"
             required={required}
           >
             {placeholder && (
@@ -91,12 +91,12 @@ const Select: React.FC<SelectProps> = ({
 
   return (
     <div>
-      <label className="text-[13px] text-slate-800">{label}</label>
+      <label className="text-[13px] text-text-secondary transition-colors">{label}</label>
 
       <div className="input-box relative" ref={dropdownRef}>
         <div
           onClick={() => setIsOpen(!isOpen)}
-          className="w-full bg-transparent outline-none cursor-pointer text-sm text-black flex items-center gap-2 py-1"
+          className="w-full bg-transparent outline-none cursor-pointer text-sm text-text-primary flex items-center gap-2 py-1 transition-colors"
         >
           {selectedOption?.icon && (
             <img
@@ -126,13 +126,13 @@ const Select: React.FC<SelectProps> = ({
         </div>
 
         {isOpen && (
-          <div className="absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 overflow-auto">
+          <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-md shadow-lg dark:shadow-black/20 max-h-60 overflow-auto transition-colors">
             {placeholder && (
               <div
                 onClick={() => {
                   setIsOpen(false);
                 }}
-                className="px-3 py-2 text-sm text-gray-500 hover:bg-gray-100 cursor-pointer"
+                className="px-3 py-2 text-sm text-text-secondary hover:bg-hover cursor-pointer transition-colors"
               >
                 {placeholder}
               </div>
@@ -141,8 +141,8 @@ const Select: React.FC<SelectProps> = ({
               <div
                 key={option.value}
                 onClick={() => handleSelect(option)}
-                className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-gray-100 ${
-                  option.value === value ? "bg-blue-50" : ""
+                className={`px-3 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
+                  option.value === value ? "bg-purple-50 dark:bg-purple-900/20" : ""
                 }`}
               >
                 {option.icon && (
@@ -152,7 +152,7 @@ const Select: React.FC<SelectProps> = ({
                     className="w-5 h-5 object-contain"
                   />
                 )}
-                <span>{option.label}</span>
+                <span className="text-text-primary">{option.label}</span>
               </div>
             ))}
           </div>

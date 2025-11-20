@@ -41,11 +41,11 @@ const ClosingBalanceTrends = ({
     <div className="card">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h5 className="text-lg">Closing Balance Trend</h5>
-          <p className="text-sm text-gray-500">Last 5 months + current month</p>
+          <h5 className="text-lg text-text-primary transition-colors">Closing Balance Trend</h5>
+          <p className="text-sm text-text-secondary transition-colors">Last 5 months + current month</p>
         </div>
         <div className="text-right">
-          <p className="text-xs uppercase tracking-wide text-gray-500">
+          <p className="text-xs uppercase tracking-wide text-text-secondary transition-colors">
             Current Balance
           </p>
           <p className="text-xl font-semibold text-primary">

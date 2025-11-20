@@ -41,15 +41,17 @@ const Modal: React.FC<ModalProps> = ({
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Content */}
-        <div className="relative bg-white rounded-lg shadow-sm">
+        <div className="relative bg-bg-primary rounded-lg shadow-sm transition-colors">
           {/* Modal Header */}
-          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-gray-200">
-            <h3 className="text-lg font-medium text-gray-900">{title}</h3>
+          <div className="flex items-center justify-between p-4 md:p-5 border-b rounded-t border-border transition-colors">
+            <h3 className="text-lg font-medium text-text-primary transition-colors">
+              {title}
+            </h3>
 
             {!hideCloseButton && (
               <button
                 type="button"
-                className="text-gray-400 bg-transparent hover:bg-gray-200 hover:text-gray-900 rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center cursor-pointer"
+                className="text-text-secondary bg-transparent hover:bg-hover hover:text-text-primary rounded-lg text-sm w-8 h-8 inline-flex justify-center items-center cursor-pointer transition-colors"
                 onClick={onClose}
               >
                 <svg

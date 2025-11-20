@@ -183,7 +183,7 @@ const Income = () => {
     <DashboardLayout activeMenu="Income">
       <div className="my-5 mx-auto">
         <div className="mb-4 flex items-center justify-start gap-3">
-          <MdFilterList className="text-gray-600 text-xl ml-2" />
+          <MdFilterList className="text-text-secondary text-xl ml-2 transition-colors" />
           <DateRangePicker />
         </div>
         <div className="grid grid-cols-1 gap-6">

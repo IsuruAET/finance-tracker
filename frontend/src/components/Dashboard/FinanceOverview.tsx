@@ -52,7 +52,7 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
   return (
     <div className="card">
       <div className="flex items-center justify-between">
-        <h5 className="text-lg">Finance Overview</h5>
+        <h5 className="text-lg text-text-primary transition-colors">Finance Overview</h5>
       </div>
 
       <CustomPieChart

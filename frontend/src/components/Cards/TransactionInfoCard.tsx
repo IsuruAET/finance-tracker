@@ -58,16 +58,16 @@ const TransactionInfoCard = ({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const getAmountStyles = () => {
-    if (type === "INCOME") return "bg-green-50 text-green-500";
-    if (type === "EXPENSE") return "bg-red-50 text-red-500";
-    if (type === "INITIAL_BALANCE") return "bg-orange-50 text-orange-500";
-    return "bg-blue-50 text-blue-500";
+    if (type === "INCOME") return "bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400";
+    if (type === "EXPENSE") return "bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400";
+    if (type === "INITIAL_BALANCE") return "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400";
+    return "bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400";
   };
 
   return (
     <>
-      <div className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60">
-        <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 bg-gray-100 rounded-full">
+      <div className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60 dark:hover:bg-hover transition-colors">
+        <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-bg-secondary rounded-full transition-colors">
           {icon ? (
             <img src={icon} alt={title} className="w-6 h-6" />
           ) : type === "TRANSFER" ? (
@@ -81,8 +81,8 @@ const TransactionInfoCard = ({
 
         <div className="flex-1 flex items-center justify-between">
           <div>
-            <p className="text-sm text-gray-700 font-medium">{title}</p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-sm text-gray-700 dark:text-text-primary font-medium transition-colors">{title}</p>
+            <p className="text-xs text-gray-400 dark:text-text-secondary mt-1 transition-colors">
               {date} {note ? `• ${note}` : ""}
             </p>
           </div>
@@ -90,7 +90,7 @@ const TransactionInfoCard = ({
           <div className="flex items-center gap-2">
             {!hideDeleteBtn && onDelete && (
               <button
-                className="text-gray-400 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer"
+                className="text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer"
                 onClick={() => setIsDeleteAlertOpen(true)}
                 aria-label="Delete transaction"
               >

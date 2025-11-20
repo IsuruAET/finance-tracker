@@ -134,7 +134,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
     <div>
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <label className="text-[13px] text-slate-800">Cash Wallets</label>
+          <label className="text-[13px] text-text-secondary transition-colors">Cash Wallets</label>
           <button type="button" onClick={addCashWallet} className="add-btn">
             <LuPlus className="text-lg" />
             Add Cash Wallet
@@ -144,7 +144,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
         {cashWallets.map((cash, index) => (
           <div
             key={index}
-            className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50"
+            className="mb-4 p-4 border border-border rounded-lg bg-bg-secondary transition-colors"
           >
             <div className="flex justify-between items-start mb-2">
               <div className="flex-1 mr-2">
@@ -162,7 +162,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
                 <button
                   type="button"
                   onClick={() => removeCashWallet(index)}
-                  className="mt-8 inline-flex items-center justify-center rounded-full border border-red-200 text-red-600 hover:text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-colors duration-150 p-2"
+                  className="mt-8 inline-flex items-center justify-center rounded-full border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-white dark:bg-bg-primary hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-colors duration-150 p-2"
                   aria-label="Remove cash wallet"
                   title="Remove cash wallet"
                 >
@@ -185,7 +185,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <label className="text-[13px] text-slate-800">Card Wallets</label>
+          <label className="text-[13px] text-text-secondary transition-colors">Card Wallets</label>
           <button type="button" onClick={addCard} className="add-btn">
             <LuPlus className="text-lg" />
             Add Card Wallet
@@ -195,7 +195,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
         {cards.map((card, index) => (
           <div
             key={index}
-            className="mb-4 p-4 border border-gray-200 rounded-lg bg-gray-50"
+            className="mb-4 p-4 border border-border rounded-lg bg-bg-secondary transition-colors"
           >
             <div className="flex justify-between items-start mb-2">
               <div className="flex-1 mr-2">
@@ -211,7 +211,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
                 <button
                   type="button"
                   onClick={() => removeCard(index)}
-                  className="mt-8 inline-flex items-center justify-center rounded-full border border-red-200 text-red-600 hover:text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-colors duration-150 p-2"
+                  className="mt-8 inline-flex items-center justify-center rounded-full border border-red-200 dark:border-red-800/50 text-red-600 dark:text-red-400 hover:text-red-700 dark:hover:text-red-300 bg-white dark:bg-bg-primary hover:bg-red-50 dark:hover:bg-red-900/20 focus:outline-none focus:ring-2 focus:ring-red-400 focus:ring-offset-2 transition-colors duration-150 p-2"
                   aria-label="Remove card"
                   title="Remove card"
                 >

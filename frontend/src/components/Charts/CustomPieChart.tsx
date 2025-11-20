@@ -10,6 +10,7 @@ import {
 import type { TooltipProps, LegendProps } from "recharts";
 import CustomTooltip from "./CustomTooltip";
 import CustomLegend from "./CustomLegend";
+import { useTheme } from "../../hooks/useTheme";
 
 export interface PieChartData {
   [key: string]: string | number;
@@ -34,6 +35,10 @@ const CustomPieChart = ({
   showTextAnchor = true,
   legendOrder,
 }: CustomPieChartProps) => {
+  const { theme } = useTheme();
+  const labelColor = theme === "dark" ? "#b0b3b8" : "#666"; // text-text-secondary equivalent
+  const amountColor = theme === "dark" ? "#e4e6eb" : "#333"; // text-text-primary equivalent
+
   return (
     <ResponsiveContainer width="100%" height={380}>
       <PieChart>
@@ -71,7 +76,7 @@ const CustomPieChart = ({
               y="50%"
               dy={-25}
               textAnchor="middle"
-              fill="#666"
+              fill={labelColor}
               fontSize={14}
             >
               {label}
@@ -81,7 +86,7 @@ const CustomPieChart = ({
               y="50%"
               dy={8}
               textAnchor="middle"
-              fill="#333"
+              fill={amountColor}
               fontSize={24}
               fontWeight={600}
             >

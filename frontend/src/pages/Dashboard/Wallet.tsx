@@ -263,7 +263,7 @@ const Wallet = () => {
         {canDelete && (
           <button
             onClick={() => handleDeleteWalletClick(wallet._id)}
-            className="absolute top-2 right-2 text-gray-400 hover:text-red-500 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-opacity cursor-pointer p-1 rounded bg-white shadow-sm"
+            className="absolute top-2 right-2 text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm"
             title="Delete wallet"
           >
             <LuTrash2 className="h-5 w-5" />
@@ -282,8 +282,10 @@ const Wallet = () => {
               <div>
                 <h5 className="text-lg">My Wallets</h5>
                 <div className="flex flex-col mt-2">
-                  <span className="text-sm text-gray-500">Total Balance</span>
-                  <span className="text-[22px] font-medium text-gray-800">
+                  <span className="text-sm text-text-secondary">
+                    Total Balance
+                  </span>
+                  <span className="text-[22px] font-medium text-text-primary">
                     {formatCurrency(totalBalance)}
                   </span>
                 </div>
@@ -312,8 +314,10 @@ const Wallet = () => {
             <div className="flex flex-row items-start justify-between mb-4">
               <h5 className="text-lg">Cash in Hand</h5>
               <div className="flex flex-col items-end">
-                <span className="text-sm text-gray-500">Total Balance</span>
-                <span className="text-[22px] font-medium text-gray-800">
+                <span className="text-sm text-text-secondary">
+                  Total Balance
+                </span>
+                <span className="text-[22px] font-medium text-text-primary">
                   {formatCurrency(cashBalance)}
                 </span>
               </div>
@@ -323,8 +327,8 @@ const Wallet = () => {
                 {cashWallets.map(renderWalletCard)}
               </div>
             ) : (
-              <div className="text-center py-8 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">No cash wallets found</p>
+              <div className="text-center py-8 bg-bg-secondary rounded-lg">
+                <p className="text-text-secondary">No cash wallets found</p>
               </div>
             )}
           </div>
@@ -334,8 +338,10 @@ const Wallet = () => {
             <div className="flex flex-row items-start justify-between mb-4">
               <h5 className="text-lg">Card Wallets</h5>
               <div className="flex flex-col items-end">
-                <span className="text-sm text-gray-500">Total Balance</span>
-                <span className="text-[22px] font-medium text-gray-800">
+                <span className="text-sm text-text-secondary">
+                  Total Balance
+                </span>
+                <span className="text-[22px] font-medium text-text-primary">
                   {formatCurrency(cardBalance)}
                 </span>
               </div>
@@ -345,8 +351,8 @@ const Wallet = () => {
                 {cardWallets.map(renderWalletCard)}
               </div>
             ) : (
-              <div className="text-center py-8 bg-gray-50 rounded-lg">
-                <p className="text-gray-500">No card wallets found</p>
+              <div className="text-center py-8 bg-bg-secondary rounded-lg">
+                <p className="text-text-secondary">No card wallets found</p>
               </div>
             )}
           </div>

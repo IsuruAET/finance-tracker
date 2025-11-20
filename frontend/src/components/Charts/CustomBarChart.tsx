@@ -11,6 +11,7 @@ import {
 } from "recharts";
 import type { TooltipProps } from "recharts";
 import { formatCurrency } from "../../utils/helper";
+import { useTheme } from "../../hooks/useTheme";
 
 // Define data type
 export interface ChartDataItem {
@@ -27,6 +28,8 @@ interface CustomBarChartProps {
 const MOBILE_BREAKPOINT = 640;
 
 const CustomBarChart = ({ data }: CustomBarChartProps) => {
+  const { theme } = useTheme();
+  const tickColor = theme === "dark" ? "#b0b3b8" : "#555";
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
@@ -63,12 +66,12 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
     if (active && payload && payload.length) {
       const { title, yAxisValue, desc } = payload[0].payload;
       return (
-        <div className="bg-white shadow-md rounded-lg p-2 border border-gray-300">
-          <p className="text-xs font-semibold text-purple-800 mb-1">{title}</p>
-          {desc && <p className="text-xs text-gray-500 mb-1">{desc}</p>}
-          <p className="text-sm text-gray-600">
+        <div className="bg-bg-primary dark:bg-bg-secondary shadow-md rounded-lg p-2 border border-border transition-colors">
+          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">{title}</p>
+          {desc && <p className="text-xs text-text-secondary mb-1 transition-colors">{desc}</p>}
+          <p className="text-sm text-text-secondary transition-colors">
             Amount:{" "}
-            <span className="text-sm font-medium text-gray-900">
+            <span className="text-sm font-medium text-text-primary transition-colors">
               {formatCurrency(yAxisValue)}
             </span>
           </p>
@@ -85,7 +88,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   };
 
   return (
-    <div className="bg-white mt-6">
+    <div className="bg-transparent mt-6">
       <ResponsiveContainer width="100%" height={isMobile ? 240 : 300}>
         <BarChart
           data={data}
@@ -100,7 +103,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
             height={isMobile ? 60 : undefined}
             tick={{
               fontSize: isMobile ? 10 : 12,
-              fill: "#555",
+              fill: tickColor,
             }}
             angle={isMobile ? -40 : 0}
             textAnchor={isMobile ? "end" : "middle"}
@@ -109,7 +112,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
             tickFormatter={(value) => truncateLabel(value)}
           />
           <YAxis
-            tick={{ fontSize: isMobile ? 10 : 12, fill: "#555" }}
+            tick={{ fontSize: isMobile ? 10 : 12, fill: tickColor }}
             stroke="none"
             width={isMobile ? 40 : 60}
           />

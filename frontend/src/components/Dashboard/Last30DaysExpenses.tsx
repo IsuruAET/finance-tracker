@@ -18,7 +18,7 @@ const Last30DaysExpenses = ({
   return (
     <div className="card col-span-1">
       <div className="flex items-center justify-between">
-        <h5 className="text-lg">Highest Expense Categories – Last 30 Days</h5>
+        <h5 className="text-lg text-text-primary transition-colors">Highest Expense Categories – Last 30 Days</h5>
       </div>
 
       <CustomBarChart data={chartData} />

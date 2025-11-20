@@ -28,7 +28,7 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
   };
 
   return (
-    <div className="w-64 h-full bg-white border-r border-gray-200/50 p-5 overflow-y-auto">
+    <div className="w-64 h-full bg-bg-primary border-r border-border p-5 overflow-y-auto transition-colors">
       <div className="flex flex-col items-center justify-center gap-3 mt-3 mb-7">
         {user?.profileImageUrl ? (
           <img
@@ -45,7 +45,7 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
           />
         )}
 
-        <h5 className="text-gray-950 font-medium leading-6">
+        <h5 className="text-text-primary font-medium leading-6 transition-colors">
           {user?.fullName || ""}
         </h5>
       </div>
@@ -57,13 +57,21 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
         return (
           <button
             key={`menu_${index}`}
-            className={`w-full flex items-center gap-4 text-[15px] py-3 px-6 rounded-lg mb-3 transition-colors ${
-              isActive ? "text-white bg-primary" : ""
-            } ${isLogout ? "text-red-500 border border-red-200 hover:bg-red-50" : ""}`}
+            className={`w-full flex items-center gap-4 text-[15px] py-3 px-6 rounded-lg mb-3 transition-colors cursor-pointer ${
+              isActive
+                ? "text-white bg-primary"
+                : "text-text-primary hover:bg-hover"
+            } ${
+              isLogout
+                ? "text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20"
+                : ""
+            }`}
             onClick={() => handleClick(item.path)}
           >
             <item.icon className="text-xl" />
-            <span className={isLogout ? "font-semibold" : ""}>{item.label}</span>
+            <span className={isLogout ? "font-semibold" : ""}>
+              {item.label}
+            </span>
           </button>
         );
       })}
