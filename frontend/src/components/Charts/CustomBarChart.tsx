@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   BarChart,
   Bar,
@@ -33,7 +33,8 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkViewport = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const checkViewport = () =>
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
 
     checkViewport();
     window.addEventListener("resize", checkViewport);
@@ -45,6 +46,18 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
   const getBarColor = (index: number): string => {
     return index % 2 === 0 ? "#875CF5" : "#CFBEFB";
   };
+
+  const tooltipCursorProps = useMemo(() => {
+    const fill =
+      theme === "dark" ? "rgba(58, 59, 60, 0.35)" : "rgba(243, 244, 246, 0.65)";
+    const stroke = theme === "dark" ? "#4a4b4d" : "#e4e6eb";
+    return {
+      fill,
+      stroke,
+      strokeWidth: 1,
+      radius: 12,
+    };
+  }, [theme]);
 
   // Define your data type
   interface BarData {
@@ -67,8 +80,14 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
       const { title, yAxisValue, desc } = payload[0].payload;
       return (
         <div className="bg-bg-primary dark:bg-bg-secondary shadow-md rounded-lg p-2 border border-border transition-colors">
-          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">{title}</p>
-          {desc && <p className="text-xs text-text-secondary mb-1 transition-colors">{desc}</p>}
+          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">
+            {title}
+          </p>
+          {desc && (
+            <p className="text-xs text-text-secondary mb-1 transition-colors">
+              {desc}
+            </p>
+          )}
           <p className="text-sm text-text-secondary transition-colors">
             Amount:{" "}
             <span className="text-sm font-medium text-text-primary transition-colors">
@@ -118,6 +137,7 @@ const CustomBarChart = ({ data }: CustomBarChartProps) => {
           />
 
           <Tooltip
+            cursor={tooltipCursorProps}
             content={(props: TooltipProps<number, string>) => (
               <CustomTooltip {...props} />
             )}
