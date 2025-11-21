@@ -62,6 +62,18 @@ const Home = () => {
     };
   }, [fetchDashboardData]);
 
+  // Listen for transaction added to refetch dashboard data
+  useEffect(() => {
+    const handleTransactionAdded = () => {
+      fetchDashboardData();
+    };
+
+    window.addEventListener("transactionAdded", handleTransactionAdded);
+    return () => {
+      window.removeEventListener("transactionAdded", handleTransactionAdded);
+    };
+  }, [fetchDashboardData]);
+
   return (
     <DashboardLayout activeMenu="Dashboard">
       <div className="my-5 mx-auto">

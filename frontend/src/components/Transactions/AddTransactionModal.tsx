@@ -179,6 +179,7 @@ const AddTransactionModal = ({
         } added successfully`
       );
       onSuccess?.();
+      window.dispatchEvent(new CustomEvent("transactionAdded"));
       onClose();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -231,6 +232,7 @@ const AddTransactionModal = ({
 
       toast.success("Transfer completed successfully!");
       onSuccess?.();
+      window.dispatchEvent(new CustomEvent("transactionAdded"));
       onClose();
     } catch (error: unknown) {
       const errorMessage =
