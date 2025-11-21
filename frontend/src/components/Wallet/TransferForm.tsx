@@ -6,7 +6,7 @@ import DatePicker from "../Inputs/DatePicker";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
-import { formatCurrency } from "../../utils/helper";
+import { formatCurrency, categorizeWallets } from "../../utils/helper";
 
 interface Wallet {
   _id: string;
@@ -93,19 +93,10 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
     }
   };
 
-  const fromWalletOptions = wallets.map((wallet) => ({
-    value: wallet._id,
-    label: `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
-    icon: wallet.icon,
-  }));
-
-  const toWalletOptions = wallets
-    .filter((w) => w._id !== fromWalletId)
-    .map((wallet) => ({
-      value: wallet._id,
-      label: `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
-      icon: wallet.icon,
-    }));
+  const fromWalletGroups = categorizeWallets(wallets);
+  const toWalletGroups = categorizeWallets(
+    wallets.filter((w) => w._id !== fromWalletId)
+  );
 
   const selectedFromWallet = wallets.find((w) => w._id === fromWalletId);
   const transferAmount = Number(amount) || 0;
@@ -117,7 +108,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
         onChange={(e) => setFromWalletId(e.target.value)}
         label="From Wallet"
         placeholder="Select source wallet"
-        options={fromWalletOptions}
+        groups={fromWalletGroups}
         required
       />
 
@@ -126,7 +117,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
         onChange={(e) => setToWalletId(e.target.value)}
         label="To Wallet"
         placeholder="Select destination wallet"
-        options={toWalletOptions}
+        groups={toWalletGroups}
         required
       />
 

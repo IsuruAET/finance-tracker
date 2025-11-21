@@ -7,12 +7,18 @@ interface SelectOption {
   icon?: string;
 }
 
+interface SelectGroup {
+  label: string;
+  options: SelectOption[];
+}
+
 interface SelectProps {
   value: string;
   onChange: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   placeholder?: string;
   label?: string;
   options: SelectOption[];
+  groups?: SelectGroup[];
   required?: boolean;
 }
 
@@ -21,18 +27,25 @@ const Select: React.FC<SelectProps> = ({
   onChange,
   placeholder,
   label,
-  options,
+  options = [],
+  groups,
   required = false,
 }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
+  
+  // Flatten groups to get all options for finding selected option
+  const allOptions = groups 
+    ? groups.flatMap(group => group.options)
+    : options;
+  
   const [selectedValue, setSelectedValue] = useState<string>(
-    value || options[0]?.value || ""
+    value || allOptions[0]?.value || ""
   );
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedValue(value || options[0]?.value || "");
-  }, [value, options]);
+    setSelectedValue(value || allOptions[0]?.value || "");
+  }, [value, allOptions]);
 
   useEffect(() => {
     const handleClickAway = (event: MouseEvent) => {
@@ -59,8 +72,8 @@ const Select: React.FC<SelectProps> = ({
     setIsDropdownVisible(false);
   };
 
-  const selectedOption = options.find((opt) => opt.value === selectedValue);
-  const hasIcons = options.some((opt) => opt.icon);
+  const selectedOption = allOptions.find((opt) => opt.value === selectedValue);
+  const hasIcons = allOptions.some((opt) => opt.icon);
 
   if (!hasIcons) {
     return (
@@ -99,19 +112,42 @@ const Select: React.FC<SelectProps> = ({
                   {placeholder}
                 </div>
               )}
-              {options.map((option) => (
-                <div
-                  key={option.value}
-                  onClick={() => handleSelect(option.value)}
-                  className={`px-4 py-2 text-sm text-text-primary cursor-pointer hover:bg-hover transition-colors truncate ${
-                    option.value === selectedValue
-                      ? "bg-purple-50 dark:bg-purple-900/20"
-                      : ""
-                  }`}
-                >
-                  {option.label}
-                </div>
-              ))}
+              {groups ? (
+                groups.map((group, groupIndex) => (
+                  <div key={group.label}>
+                    <div className={`px-4 py-1.5 text-[11px] font-semibold text-text-secondary/70 dark:text-text-secondary/60 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50 sticky top-0 pointer-events-none select-none ${groupIndex > 0 ? 'border-t border-border/50' : ''}`}>
+                      {group.label}
+                    </div>
+                    {group.options.map((option) => (
+                      <div
+                        key={option.value}
+                        onClick={() => handleSelect(option.value)}
+                        className={`px-4 py-2 text-sm cursor-pointer hover:bg-hover transition-colors truncate ${
+                          option.value === selectedValue
+                            ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium"
+                            : "text-text-primary"
+                        }`}
+                      >
+                        {option.label}
+                      </div>
+                    ))}
+                  </div>
+                ))
+              ) : (
+                options.map((option) => (
+                  <div
+                    key={option.value}
+                    onClick={() => handleSelect(option.value)}
+                    className={`px-4 py-2 text-sm cursor-pointer hover:bg-hover transition-colors truncate ${
+                      option.value === selectedValue
+                        ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium"
+                        : "text-text-primary"
+                    }`}
+                  >
+                    {option.label}
+                  </div>
+                ))
+              )}
             </div>
           )}
         </div>
@@ -127,11 +163,23 @@ const Select: React.FC<SelectProps> = ({
               {placeholder}
             </option>
           )}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {groups ? (
+            groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          ) : (
+            options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))
+          )}
         </select>
       </div>
     );
@@ -182,26 +230,56 @@ const Select: React.FC<SelectProps> = ({
                 {placeholder}
               </div>
             )}
-            {options.map((option) => (
-              <div
-                key={option.value}
-                onClick={() => handleSelect(option.value)}
-                className={`px-4 py-2 text-sm text-text-primary cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
-                  option.value === selectedValue
-                    ? "bg-purple-50 dark:bg-purple-900/20"
-                    : ""
-                }`}
-              >
-                {option.icon && (
-                  <img
-                    src={option.icon}
-                    alt=""
-                    className="w-5 h-5 object-contain shrink-0"
-                  />
-                )}
-                <span className="truncate">{option.label}</span>
-              </div>
-            ))}
+            {groups ? (
+              groups.map((group, groupIndex) => (
+                <div key={group.label}>
+                  <div className={`px-4 py-1.5 text-[11px] font-semibold text-text-secondary/70 dark:text-text-secondary/60 uppercase tracking-wider bg-gray-50 dark:bg-gray-800/50 sticky top-0 pointer-events-none select-none ${groupIndex > 0 ? 'border-t border-border/50' : ''}`}>
+                    {group.label}
+                  </div>
+                  {group.options.map((option) => (
+                    <div
+                      key={option.value}
+                      onClick={() => handleSelect(option.value)}
+                      className={`px-4 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
+                        option.value === selectedValue
+                          ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium"
+                          : "text-text-primary"
+                      }`}
+                    >
+                      {option.icon && (
+                        <img
+                          src={option.icon}
+                          alt=""
+                          className="w-5 h-5 object-contain shrink-0"
+                        />
+                      )}
+                      <span className="truncate">{option.label}</span>
+                    </div>
+                  ))}
+                </div>
+              ))
+            ) : (
+              options.map((option) => (
+                <div
+                  key={option.value}
+                  onClick={() => handleSelect(option.value)}
+                  className={`px-4 py-2 text-sm cursor-pointer flex items-center gap-2 hover:bg-hover transition-colors ${
+                    option.value === selectedValue
+                      ? "bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-300 font-medium"
+                      : "text-text-primary"
+                  }`}
+                >
+                  {option.icon && (
+                    <img
+                      src={option.icon}
+                      alt=""
+                      className="w-5 h-5 object-contain shrink-0"
+                    />
+                  )}
+                  <span className="truncate">{option.label}</span>
+                </div>
+              ))
+            )}
           </div>
         )}
 
@@ -216,11 +294,23 @@ const Select: React.FC<SelectProps> = ({
               {placeholder}
             </option>
           )}
-          {options.map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
+          {groups ? (
+            groups.map((group) => (
+              <optgroup key={group.label} label={group.label}>
+                {group.options.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </optgroup>
+            ))
+          ) : (
+            options.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))
+          )}
         </select>
       </div>
     </div>

@@ -316,3 +316,60 @@ export const formatDateHeader = (dateString: string): string => {
     return dt.toFormat("MMM d, yyyy"); // "Jan 15, 2024"
   }
 };
+
+interface Wallet {
+  _id: string;
+  name: string;
+  type: "CASH" | "BANK" | "CARD" | "OTHER";
+  balance: number;
+  icon?: string;
+}
+
+interface SelectOption {
+  value: string;
+  label: string;
+  icon?: string;
+}
+
+interface SelectGroup {
+  label: string;
+  options: SelectOption[];
+}
+
+// Categorize wallets into Cash and Card groups
+export const categorizeWallets = (
+  wallets: Wallet[],
+  formatLabel?: (wallet: Wallet) => string
+): SelectGroup[] => {
+  const cashWallets: SelectOption[] = [];
+  const cardWallets: SelectOption[] = [];
+
+  wallets.forEach((wallet) => {
+    const option: SelectOption = {
+      value: wallet._id,
+      label: formatLabel
+        ? formatLabel(wallet)
+        : `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
+      icon: wallet.icon,
+    };
+
+    if (wallet.type === "CASH") {
+      cashWallets.push(option);
+    } else {
+      // CARD, BANK, OTHER all go into Card category
+      cardWallets.push(option);
+    }
+  });
+
+  const groups: SelectGroup[] = [];
+
+  if (cashWallets.length > 0) {
+    groups.push({ label: "Cash", options: cashWallets });
+  }
+
+  if (cardWallets.length > 0) {
+    groups.push({ label: "Card", options: cardWallets });
+  }
+
+  return groups;
+};

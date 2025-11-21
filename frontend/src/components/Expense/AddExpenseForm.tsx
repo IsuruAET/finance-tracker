@@ -7,7 +7,7 @@ import DatePicker from "../Inputs/DatePicker";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import { formatCurrency } from "../../utils/helper";
+import { formatCurrency, categorizeWallets } from "../../utils/helper";
 
 export interface ExpenseData {
   categoryId: string;
@@ -144,11 +144,7 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
         onChange={(e) => handleChange("walletId", e.target.value)}
         label="Pay from Wallet"
         placeholder="Select a wallet"
-        options={wallets.map((wallet) => ({
-          value: wallet._id,
-          label: `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
-          icon: wallet.icon,
-        }))}
+        groups={categorizeWallets(wallets)}
         required
       />
 

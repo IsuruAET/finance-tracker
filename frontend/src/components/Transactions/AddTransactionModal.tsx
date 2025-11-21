@@ -7,7 +7,7 @@ import DatePicker from "../Inputs/DatePicker";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import { formatCurrency } from "../../utils/helper";
+import { formatCurrency, categorizeWallets } from "../../utils/helper";
 import toast from "react-hot-toast";
 import axios from "axios";
 import { LuWalletMinimal, LuHandCoins } from "react-icons/lu";
@@ -263,19 +263,10 @@ const AddTransactionModal = ({
     return "Continue";
   };
 
-  const walletOptions = wallets.map((wallet) => ({
-    value: wallet._id,
-    label: `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
-    icon: wallet.icon,
-  }));
-
-  const toWalletOptions = wallets
-    .filter((w) => w._id !== fromWalletId)
-    .map((wallet) => ({
-      value: wallet._id,
-      label: `${wallet.name} (Balance: ${formatCurrency(wallet.balance)})`,
-      icon: wallet.icon,
-    }));
+  const walletGroups = categorizeWallets(wallets);
+  const toWalletGroups = categorizeWallets(
+    wallets.filter((w) => w._id !== fromWalletId)
+  );
 
   const categoryOptions = categories.map((category) => ({
     value: category._id,
@@ -407,7 +398,7 @@ const AddTransactionModal = ({
                   onChange={(e) => setFromWalletId(e.target.value)}
                   label="From Wallet"
                   placeholder="Select source wallet"
-                  options={walletOptions}
+                  groups={walletGroups}
                   required
                 />
 
@@ -416,7 +407,7 @@ const AddTransactionModal = ({
                   onChange={(e) => setToWalletId(e.target.value)}
                   label="To Wallet"
                   placeholder="Select destination wallet"
-                  options={toWalletOptions}
+                  groups={toWalletGroups}
                   required
                 />
 
@@ -488,7 +479,7 @@ const AddTransactionModal = ({
                       : "Pay from Wallet"
                   }
                   placeholder="Select a wallet"
-                  options={walletOptions}
+                  groups={walletGroups}
                   required
                 />
 
