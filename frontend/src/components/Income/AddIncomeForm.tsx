@@ -7,7 +7,7 @@ import DatePicker from "../Inputs/DatePicker";
 import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
-import { formatCurrency, categorizeWallets } from "../../utils/helper";
+import { categorizeWallets } from "../../utils/helper";
 
 export interface IncomeData {
   categoryId: string;
