@@ -34,7 +34,19 @@ app.use(cors(corsOptions));
 
 app.use(express.json());
 
-connectDB();
+// Health check endpoint (for monitoring and keep-alive)
+app.get("/health", (req, res) => {
+  res.status(200).json({
+    status: "ok",
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+  });
+});
+
+// Connect to database - non-blocking
+connectDB().catch((err) => {
+  console.error("Failed to connect to database:", err);
+});
 
 app.use("/api/v1/auth", authRoutes);
 app.use("/api/v1/transactions", transactionRoutes);
