@@ -9,6 +9,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 import { UserContext } from "../../context/UserContext";
 import axios from "axios";
 import uploadImage from "../../utils/uploadImage";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState<File | null>(null);
@@ -22,6 +23,7 @@ const SignUp = () => {
 
   // This will never undefined
   const { updateUser } = useContext(UserContext)!;
+  const { refreshConfig } = useClientConfig();
 
   // Handle Sign Up Form Submit
   const handleSignUp = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -65,6 +67,8 @@ const SignUp = () => {
       if (token) {
         localStorage.setItem("token", token);
         updateUser(user);
+        // Fetch client configuration after successful signup
+        await refreshConfig();
         navigate("/dashboard");
       }
     } catch (error) {

@@ -1,9 +1,10 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useContext, useCallback } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
 import toast from "react-hot-toast";
 import { ClientConfigContext } from "./ClientConfigContext";
 import type { ClientConfig } from "./ClientConfigContext";
+import { UserContext } from "./UserContext";
 
 export const ClientConfigProvider = ({
   children,
@@ -12,8 +13,15 @@ export const ClientConfigProvider = ({
 }) => {
   const [config, setConfig] = useState<ClientConfig | null>(null);
   const [loading, setLoading] = useState(true);
+  const { user } = useContext(UserContext)!;
 
-  const fetchConfig = async () => {
+  const fetchConfig = useCallback(async () => {
+    const token = localStorage.getItem("token");
+    if (!token) {
+      setLoading(false);
+      return;
+    }
+
     try {
       setLoading(true);
       const response = await axiosInstance.get<ClientConfig>(
@@ -32,7 +40,7 @@ export const ClientConfigProvider = ({
     } finally {
       setLoading(false);
     }
-  };
+  }, []);
 
   const updateConfig = async (defaultWalletId: string | null) => {
     try {
@@ -52,8 +60,13 @@ export const ClientConfigProvider = ({
   };
 
   useEffect(() => {
-    fetchConfig();
-  }, []);
+    const token = localStorage.getItem("token");
+    if (token && user) {
+      fetchConfig();
+    } else {
+      setLoading(false);
+    }
+  }, [user, fetchConfig]);
 
   return (
     <ClientConfigContext.Provider

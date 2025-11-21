@@ -7,6 +7,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import axios from "axios";
 import { UserContext } from "../../context/UserContext";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 const Login = () => {
   const [email, setEmail] = useState("");
@@ -18,6 +19,7 @@ const Login = () => {
 
   // This will never undefined
   const { updateUser } = useContext(UserContext)!;
+  const { refreshConfig } = useClientConfig();
 
   // Handle Login Form Submit
   const handleLogin = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -46,6 +48,8 @@ const Login = () => {
       if (token) {
         localStorage.setItem("token", token);
         updateUser(user);
+        // Fetch client configuration after successful login
+        await refreshConfig();
         navigate("/dashboard");
       }
     } catch (error) {
