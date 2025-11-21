@@ -1,9 +1,10 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
-import { MdLightMode, MdDarkMode } from "react-icons/md";
+import { MdLightMode, MdDarkMode, MdAdd } from "react-icons/md";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../../hooks/useTheme";
+import AddTransactionModal from "../Transactions/AddTransactionModal";
 
 interface NavbarProps {
   activeMenu: string;
@@ -11,6 +12,7 @@ interface NavbarProps {
 
 const Navbar = ({ activeMenu }: NavbarProps) => {
   const [openSideMenu, setOpenSideMenu] = useState(false);
+  const [openAddTransactionModal, setOpenAddTransactionModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -50,17 +52,27 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
           </h2>
         </div>
 
-        <button
-          onClick={toggleTheme}
-          className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
-          aria-label="Toggle theme"
-        >
-          {theme === "dark" ? (
-            <MdLightMode className="text-xl" />
-          ) : (
-            <MdDarkMode className="text-xl" />
-          )}
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={() => setOpenAddTransactionModal(true)}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
+            aria-label="Add transaction"
+          >
+            <MdAdd className="text-xl" />
+          </button>
+
+          <button
+            onClick={toggleTheme}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === "dark" ? (
+              <MdLightMode className="text-xl" />
+            ) : (
+              <MdDarkMode className="text-xl" />
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Backdrop */}
@@ -85,6 +97,11 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
           onClose={() => setOpenSideMenu(false)}
         />
       </div>
+
+      <AddTransactionModal
+        isOpen={openAddTransactionModal}
+        onClose={() => setOpenAddTransactionModal(false)}
+      />
     </>
   );
 };
