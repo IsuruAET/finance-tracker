@@ -27,6 +27,9 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
     navigate("/login");
   };
 
+  const regularMenuItems = SIDE_MENU_DATA.filter((item) => item.path !== "logout");
+  const logoutItem = SIDE_MENU_DATA.find((item) => item.path === "logout");
+
   return (
     <div className="w-64 h-full bg-bg-primary border-r border-border p-5 overflow-y-auto transition-colors">
       <div className="flex flex-col items-center justify-center gap-3 mt-3 mb-7">
@@ -50,9 +53,8 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
         </h5>
       </div>
 
-      {SIDE_MENU_DATA.map((item, index) => {
-        const isLogout = item.path === "logout";
-        const isActive = activeMenu === item.label && !isLogout;
+      {regularMenuItems.map((item, index) => {
+        const isActive = activeMenu === item.label;
 
         return (
           <button
@@ -61,20 +63,26 @@ const SideMenu = ({ activeMenu, onClose }: SideMenuProps) => {
               isActive
                 ? "text-white bg-primary"
                 : "text-text-primary hover:bg-hover"
-            } ${
-              isLogout
-                ? "text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20"
-                : ""
             }`}
             onClick={() => handleClick(item.path)}
           >
             <item.icon className="text-xl" />
-            <span className={isLogout ? "font-semibold" : ""}>
-              {item.label}
-            </span>
+            <span>{item.label}</span>
           </button>
         );
       })}
+
+      <div className="border-t border-border my-4"></div>
+
+      {logoutItem && (
+        <button
+          className="w-full flex items-center gap-4 text-[15px] py-3 px-6 rounded-lg transition-colors cursor-pointer text-red-500 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20"
+          onClick={() => handleClick(logoutItem.path)}
+        >
+          <logoutItem.icon className="text-xl" />
+          <span className="font-semibold">{logoutItem.label}</span>
+        </button>
+      )}
     </div>
   );
 };
