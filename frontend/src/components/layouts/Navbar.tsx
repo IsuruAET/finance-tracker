@@ -5,6 +5,7 @@ import { MdLightMode, MdDarkMode, MdAdd } from "react-icons/md";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../../hooks/useTheme";
 import AddTransactionModal from "../Transactions/AddTransactionModal";
+import logo from "../../assets/images/logo.svg";
 
 interface NavbarProps {
   activeMenu: string;
@@ -32,10 +33,11 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
       <div className="flex items-center justify-between gap-2 sm:gap-5 bg-bg-primary border border-b border-border backdrop-blur-[2px] py-4 px-2 sm:px-7 sticky top-0 z-30 transition-colors">
         <div className="flex items-center gap-2 sm:gap-5 min-w-0 shrink">
           <button
-            className="block lg:hidden text-text-primary shrink-0 transition-colors"
+            className="block lg:hidden text-text-primary shrink-0 transition-colors p-1 -ml-1"
             onClick={() => {
               setOpenSideMenu(!openSideMenu);
             }}
+            aria-label="Toggle menu"
           >
             {openSideMenu ? (
               <HiOutlineX className="text-2xl" />
@@ -44,15 +46,23 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
             )}
           </button>
 
-          <h2
+          <button
             onClick={() => navigate("/dashboard")}
-            className="text-lg font-medium text-text-primary transition-colors cursor-pointer hover:opacity-80"
+            className="flex items-center gap-2 transition-opacity hover:opacity-80 focus:outline-none focus:ring-2 focus:ring-primary rounded"
+            aria-label="Finance Tracker - Go to dashboard"
           >
-            Finance Tracker
-          </h2>
+            <img
+              src={logo}
+              alt="Finance Tracker"
+              className="h-6 sm:h-7 w-auto"
+            />
+            <span className="text-base sm:text-lg font-medium text-text-primary transition-colors">
+              Finance Tracker
+            </span>
+          </button>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 -mr-1">
           <button
             onClick={() => setOpenAddTransactionModal(true)}
             className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
