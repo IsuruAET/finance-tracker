@@ -7,6 +7,8 @@ interface InputProps {
   placeholder?: string;
   label?: string;
   type?: string;
+  required?: boolean;
+  disabled?: boolean;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -15,6 +17,8 @@ const Input: React.FC<InputProps> = ({
   placeholder,
   label,
   type = "text",
+  required = false,
+  disabled = false,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
@@ -68,7 +72,9 @@ const Input: React.FC<InputProps> = ({
         </label>
       )}
 
-      <div className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 mb-4 mt-3 flex items-center gap-2 text-sm text-text-primary transition-colors hover:border-purple-500/50">
+      <div className={`w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 mb-4 mt-3 flex items-center gap-2 text-sm text-text-primary transition-colors ${
+        disabled ? "opacity-50 cursor-not-allowed" : "hover:border-purple-500/50"
+      }`}>
         <input
           ref={inputRef}
           type={isPassword ? (showPassword ? "text" : "password") : type}
@@ -82,6 +88,8 @@ const Input: React.FC<InputProps> = ({
           onChange={(e) => onChange(e)}
           onWheel={isNumber ? handleWheel : undefined}
           onKeyDown={isNumber ? handleNumberKeyDown : undefined}
+          disabled={disabled}
+          required={required}
         />
 
         {isPassword && (

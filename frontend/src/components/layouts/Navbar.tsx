@@ -1,10 +1,11 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
-import { MdLightMode, MdDarkMode, MdAdd } from "react-icons/md";
+import { MdLightMode, MdDarkMode, MdAdd, MdSettings } from "react-icons/md";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../../hooks/useTheme";
 import AddTransactionModal from "../Transactions/AddTransactionModal";
+import ClientConfigModal from "../ClientConfig/ClientConfigModal";
 import logo from "../../assets/images/logo.svg";
 
 interface NavbarProps {
@@ -14,6 +15,7 @@ interface NavbarProps {
 const Navbar = ({ activeMenu }: NavbarProps) => {
   const [openSideMenu, setOpenSideMenu] = useState(false);
   const [openAddTransactionModal, setOpenAddTransactionModal] = useState(false);
+  const [openClientConfigModal, setOpenClientConfigModal] = useState(false);
   const { theme, toggleTheme } = useTheme();
   const navigate = useNavigate();
 
@@ -72,6 +74,14 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
           </button>
 
           <button
+            onClick={() => setOpenClientConfigModal(true)}
+            className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
+            aria-label="Client configuration"
+          >
+            <MdSettings className="text-xl" />
+          </button>
+
+          <button
             onClick={toggleTheme}
             className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
             aria-label="Toggle theme"
@@ -111,6 +121,11 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
       <AddTransactionModal
         isOpen={openAddTransactionModal}
         onClose={() => setOpenAddTransactionModal(false)}
+      />
+
+      <ClientConfigModal
+        isOpen={openClientConfigModal}
+        onClose={() => setOpenClientConfigModal(false)}
       />
     </>
   );

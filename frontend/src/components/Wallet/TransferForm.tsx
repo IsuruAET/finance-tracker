@@ -7,6 +7,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { formatCurrency, categorizeWallets } from "../../utils/helper";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 interface Wallet {
   _id: string;
@@ -23,6 +24,7 @@ interface TransferFormProps {
 }
 
 const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
+  const { config } = useClientConfig();
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [fromWalletId, setFromWalletId] = useState("");
   const [toWalletId, setToWalletId] = useState("");
@@ -141,6 +143,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
         onChange={setDate}
         label="Date"
         placeholder="Select a date"
+        minDate={config?.earliestWalletDate || undefined}
       />
 
       <Input

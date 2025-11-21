@@ -1,6 +1,7 @@
 import { Response } from "express";
 import Wallet from "../models/Wallet";
 import Transaction from "../models/Transaction";
+import ClientConfig from "../models/ClientConfig";
 import { AuthenticatedRequest } from "../types/express";
 
 // Initialize wallets (cash in hand + cards)
@@ -107,6 +108,28 @@ export const initializeWallets = async (
           wallets.push(cardWallet);
         }
       }
+    }
+
+    // Update client config to mark wallets as initialized
+    if (wallets.length > 0) {
+      let config = await ClientConfig.findOne({ userId });
+      const initializationDate = new Date();
+      
+      if (!config) {
+        config = new ClientConfig({
+          userId,
+          defaultWalletId: null,
+          hasInitializedWallets: true,
+          walletInitializationDate: initializationDate,
+        });
+      } else {
+        // Only update if not already initialized (first time initialization)
+        if (!config.hasInitializedWallets) {
+          config.hasInitializedWallets = true;
+          config.walletInitializationDate = initializationDate;
+        }
+      }
+      await config.save();
     }
 
     return res.status(201).json({ wallets });

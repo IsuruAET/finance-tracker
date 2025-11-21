@@ -9,6 +9,7 @@ interface DatePickerProps {
   label?: string;
   placeholder?: string;
   required?: boolean;
+  minDate?: string; // ISO date string
 }
 
 const DatePicker: React.FC<DatePickerProps> = ({
@@ -17,6 +18,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   label,
   placeholder = "Select a date",
   required = false,
+  minDate,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [currentMonth, setCurrentMonth] = useState(DateTime.now());
@@ -103,6 +105,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
   const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
   const selectedDate = value ? DateTime.fromISO(value) : null;
   const today = DateTime.now();
+  const minDateTime = minDate ? DateTime.fromISO(minDate) : null;
 
   return (
     <div>
@@ -178,7 +181,9 @@ const DatePicker: React.FC<DatePickerProps> = ({
               <div className="grid grid-cols-7 gap-1">
                 {days.map((date, idx) => {
                   if (!date) {
-                    return <div key={`empty-${idx}`} className="aspect-square" />;
+                    return (
+                      <div key={`empty-${idx}`} className="aspect-square" />
+                    );
                   }
 
                   const dateTime = DateTime.fromJSDate(date);
@@ -186,16 +191,24 @@ const DatePicker: React.FC<DatePickerProps> = ({
                     selectedDate &&
                     dateTime.toISODate() === selectedDate.toISODate();
                   const isToday = dateTime.toISODate() === today.toISODate();
+                  const isDisabled = minDateTime
+                    ? dateTime < minDateTime.startOf("day")
+                    : false;
 
                   return (
                     <button
                       key={date.toISOString()}
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleDateClick(date);
+                        if (!isDisabled) {
+                          handleDateClick(date);
+                        }
                       }}
+                      disabled={isDisabled}
                       className={`aspect-square text-sm sm:text-xs rounded-md transition-colors flex items-center justify-center ${
-                        isSelected
+                        isDisabled
+                          ? "text-text-secondary opacity-40 cursor-not-allowed"
+                          : isSelected
                           ? "bg-primary text-white font-semibold"
                           : isToday
                           ? "bg-bg-secondary dark:bg-hover text-text-primary font-medium"

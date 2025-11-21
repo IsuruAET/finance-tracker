@@ -33,4 +33,8 @@ export const API_PATHS = {
     DELETE_WALLET: (walletId: string | number): string =>
       `/api/v1/wallet/${walletId}`,
   },
+  CLIENT_CONFIG: {
+    GET: "/api/v1/client-config/get",
+    UPDATE: "/api/v1/client-config/update",
+  },
 };

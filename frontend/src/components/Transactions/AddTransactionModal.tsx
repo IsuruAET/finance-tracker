@@ -12,6 +12,7 @@ import toast from "react-hot-toast";
 import axios from "axios";
 import { LuWalletMinimal, LuHandCoins } from "react-icons/lu";
 import { BiTransfer } from "react-icons/bi";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 type TransactionType = "INCOME" | "EXPENSE" | "TRANSFER" | "";
 
@@ -44,6 +45,7 @@ const AddTransactionModal = ({
   onClose,
   onSuccess,
 }: AddTransactionModalProps) => {
+  const { config } = useClientConfig();
   const [transactionType, setTransactionType] = useState<TransactionType>("");
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
@@ -75,8 +77,11 @@ const AddTransactionModal = ({
           );
           setWallets(response.data);
           if (response.data.length > 0) {
-            setWalletId(response.data[0]._id);
-            setFromWalletId(response.data[0]._id);
+            // Use main wallet if configured, otherwise use first wallet
+            const defaultWallet =
+              config?.defaultWalletId || response.data[0]._id;
+            setWalletId(defaultWallet);
+            setFromWalletId(defaultWallet);
           }
         } catch (error) {
           console.error("Error fetching wallets", error);
@@ -85,7 +90,7 @@ const AddTransactionModal = ({
       };
       fetchWallets();
     }
-  }, [isOpen]);
+  }, [isOpen, config]);
 
   // Fetch categories when transaction type changes
   useEffect(() => {
@@ -131,6 +136,19 @@ const AddTransactionModal = ({
       setNote("");
     }
   }, [isOpen]);
+
+  // Update wallet when transaction type changes
+  useEffect(() => {
+    if (
+      (transactionType === "INCOME" || transactionType === "EXPENSE") &&
+      wallets.length > 0 &&
+      config
+    ) {
+      // Use main wallet if configured, otherwise use first wallet
+      const defaultWalletId = config.defaultWalletId || wallets[0]._id;
+      setWalletId(defaultWalletId);
+    }
+  }, [transactionType, wallets, config]);
 
   // Update icon when category changes
   useEffect(() => {
@@ -434,6 +452,7 @@ const AddTransactionModal = ({
                   onChange={setTransferDate}
                   label="Date"
                   placeholder="Select a date"
+                  minDate={config?.earliestWalletDate || undefined}
                 />
 
                 <Input
@@ -490,6 +509,7 @@ const AddTransactionModal = ({
                   onChange={setDate}
                   label="Date"
                   placeholder="Select a date"
+                  minDate={config?.earliestWalletDate || undefined}
                 />
 
                 <Input

@@ -9,6 +9,7 @@ import categoryRoutes from "./routes/categoryRoutes";
 import goalRoutes from "./routes/goalRoutes";
 import dashboardRoutes from "./routes/dashboardRoutes";
 import walletRoutes from "./routes/walletRoutes";
+import clientConfigRoutes from "./routes/clientConfigRoutes";
 
 dotenv.config();
 
@@ -54,6 +55,7 @@ app.use("/api/v1/categories", categoryRoutes);
 app.use("/api/v1/goals", goalRoutes);
 app.use("/api/v1/dashboard", dashboardRoutes);
 app.use("/api/v1/wallet", walletRoutes);
+app.use("/api/v1/client-config", clientConfigRoutes);
 
 const PORT: number = Number(process.env.PORT) || 5000;
 

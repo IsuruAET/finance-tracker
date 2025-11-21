@@ -6,6 +6,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { LuMinus, LuPlus, LuLogOut } from "react-icons/lu";
 import { useUserContext } from "../../context/UserContext";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 interface CashWallet {
   name: string;
@@ -24,6 +25,7 @@ interface InitializeWalletsProps {
 
 const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   const { clearUser } = useUserContext();
+  const { refreshConfig } = useClientConfig();
   const navigate = useNavigate();
   const [cashWallets, setCashWallets] = useState<CashWallet[]>([
     { name: "", balance: 0 },
@@ -130,6 +132,8 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
       });
 
       toast.success("Wallets initialized successfully!");
+      // Refresh client config to get updated hasInitializedWallets flag
+      await refreshConfig();
       onComplete();
     } catch (error: unknown) {
       const errorMessage =

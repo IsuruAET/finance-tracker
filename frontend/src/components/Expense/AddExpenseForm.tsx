@@ -8,6 +8,7 @@ import EmojiPickerPopup from "../Inputs/EmojiPickerPopup";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { categorizeWallets } from "../../utils/helper";
+import { useClientConfig } from "../../context/ClientConfigContext";
 
 export interface ExpenseData {
   categoryId: string;
@@ -41,6 +42,7 @@ interface AddExpenseFormProps {
 }
 
 const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
+  const { config } = useClientConfig();
   const [expense, setExpense] = useState<ExpenseData>({
     categoryId: "",
     amount: 0,
@@ -62,7 +64,10 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
         if (response.data.length > 0) {
           setExpense((prev) => {
             if (!prev.walletId) {
-              return { ...prev, walletId: response.data[0]._id };
+              // Use main wallet if configured, otherwise use first wallet
+              const defaultWalletId =
+                config?.defaultWalletId || response.data[0]._id;
+              return { ...prev, walletId: defaultWalletId };
             }
             return prev;
           });
@@ -72,7 +77,7 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
       }
     };
     fetchWallets();
-  }, []);
+  }, [config]);
 
   useEffect(() => {
     const fetchCategories = async () => {
@@ -153,6 +158,7 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
         onChange={(value) => handleChange("date", value)}
         label="Date"
         placeholder="Select a date"
+        minDate={config?.earliestWalletDate || undefined}
       />
 
       <Input

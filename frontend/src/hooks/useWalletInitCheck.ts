@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import { API_PATHS } from "../utils/apiPaths";
+import { useClientConfig } from "../context/ClientConfigContext";
 
 type UseWalletInitCheckParams = {
   isLoading: boolean;
@@ -15,6 +16,7 @@ export function useWalletInitCheck({
   token,
   pathname,
 }: UseWalletInitCheckParams) {
+  const { config, loading: configLoading } = useClientConfig();
   const [checkingWallets, setCheckingWallets] = useState(true);
   const [walletsInitialized, setWalletsInitialized] = useState(false);
   const [showInitModal, setShowInitModal] = useState(false);
@@ -26,6 +28,20 @@ export function useWalletInitCheck({
         return;
       }
 
+      // Wait for config to load
+      if (configLoading) {
+        return;
+      }
+
+      // If config indicates wallets are initialized, skip API call
+      if (config?.hasInitializedWallets) {
+        setWalletsInitialized(true);
+        setCheckingWallets(false);
+        return;
+      }
+
+      // Only call API if config says wallets haven't been initialized
+      // This handles edge cases where config might be out of sync
       try {
         const response = await axiosInstance.get(API_PATHS.WALLET.GET_ALL);
         if (response.data && response.data.length > 0) {
@@ -50,7 +66,7 @@ export function useWalletInitCheck({
     } else if (!isLoading) {
       setCheckingWallets(false);
     }
-  }, [isLoading, user, token, pathname]);
+  }, [isLoading, user, token, pathname, config, configLoading]);
 
   const handleInitComplete = () => {
     setShowInitModal(false);
