@@ -32,11 +32,19 @@ const DatePicker: React.FC<DatePickerProps> = ({
       }
     };
 
-    document.addEventListener("mousedown", handleClickAway);
+    if (isOpen) {
+      document.addEventListener("mousedown", handleClickAway);
+      // Prevent body scroll on mobile when modal is open
+      if (window.innerWidth < 640) {
+        document.body.style.overflow = "hidden";
+      }
+    }
+
     return () => {
       document.removeEventListener("mousedown", handleClickAway);
+      document.body.style.overflow = "";
     };
-  }, []);
+  }, [isOpen]);
 
   // Initialize current month from value if provided
   useEffect(() => {
@@ -120,78 +128,87 @@ const DatePicker: React.FC<DatePickerProps> = ({
         </div>
 
         {isOpen && (
-          <div className="absolute top-full left-0 mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50 z-50 p-3 w-full sm:w-[280px] transition-colors">
-            {/* Month Navigation */}
-            <div className="flex items-center justify-between mb-3">
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateMonth("prev");
-                }}
-                className="p-1 hover:bg-hover rounded transition-colors"
-              >
-                <IoChevronBack className="text-text-secondary text-sm transition-colors" />
-              </button>
-              <h4 className="text-xs sm:text-sm font-semibold text-text-primary transition-colors">
-                {currentMonth.toFormat("MMMM yyyy")}
-              </h4>
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  navigateMonth("next");
-                }}
-                className="p-1 hover:bg-hover rounded transition-colors"
-              >
-                <IoChevronForward className="text-text-secondary text-sm transition-colors" />
-              </button>
-            </div>
+          <>
+            {/* Backdrop for mobile */}
+            <div
+              className="fixed inset-0 bg-black/50 z-40 sm:hidden"
+              onClick={() => setIsOpen(false)}
+            />
 
-            {/* Week Days Header */}
-            <div className="grid grid-cols-7 gap-1 mb-2">
-              {weekDays.map((day, idx) => (
-                <div
-                  key={idx}
-                  className="text-center text-[10px] sm:text-xs font-medium text-text-secondary py-1 transition-colors"
+            {/* Calendar - Modal on mobile, dropdown on desktop */}
+            <div className="fixed inset-x-4 top-1/2 -translate-y-1/2 sm:absolute sm:inset-x-0 sm:top-full sm:translate-y-0 sm:left-0 sm:mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50 z-50 p-4 sm:p-3 w-auto sm:w-[280px] max-w-sm sm:max-w-none mx-auto transition-colors">
+              {/* Month Navigation */}
+              <div className="flex items-center justify-between mb-3">
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateMonth("prev");
+                  }}
+                  className="p-1 hover:bg-hover rounded transition-colors"
                 >
-                  {day}
-                </div>
-              ))}
-            </div>
+                  <IoChevronBack className="text-text-secondary text-sm transition-colors" />
+                </button>
+                <h4 className="text-sm sm:text-sm font-semibold text-text-primary transition-colors">
+                  {currentMonth.toFormat("MMMM yyyy")}
+                </h4>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    navigateMonth("next");
+                  }}
+                  className="p-1 hover:bg-hover rounded transition-colors"
+                >
+                  <IoChevronForward className="text-text-secondary text-sm transition-colors" />
+                </button>
+              </div>
 
-            {/* Calendar Days */}
-            <div className="grid grid-cols-7 gap-1">
-              {days.map((date, idx) => {
-                if (!date) {
-                  return <div key={`empty-${idx}`} className="aspect-square" />;
-                }
-
-                const dateTime = DateTime.fromJSDate(date);
-                const isSelected =
-                  selectedDate &&
-                  dateTime.toISODate() === selectedDate.toISODate();
-                const isToday = dateTime.toISODate() === today.toISODate();
-
-                return (
-                  <button
-                    key={date.toISOString()}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleDateClick(date);
-                    }}
-                    className={`aspect-square text-xs rounded-md transition-colors flex items-center justify-center ${
-                      isSelected
-                        ? "bg-primary text-white font-semibold"
-                        : isToday
-                        ? "bg-bg-secondary dark:bg-hover text-text-primary font-medium"
-                        : "text-text-primary hover:bg-hover"
-                    }`}
+              {/* Week Days Header */}
+              <div className="grid grid-cols-7 gap-1 mb-2">
+                {weekDays.map((day, idx) => (
+                  <div
+                    key={idx}
+                    className="text-center text-xs font-medium text-text-secondary py-1 transition-colors"
                   >
-                    {dateTime.day}
-                  </button>
-                );
-              })}
+                    {day}
+                  </div>
+                ))}
+              </div>
+
+              {/* Calendar Days */}
+              <div className="grid grid-cols-7 gap-1">
+                {days.map((date, idx) => {
+                  if (!date) {
+                    return <div key={`empty-${idx}`} className="aspect-square" />;
+                  }
+
+                  const dateTime = DateTime.fromJSDate(date);
+                  const isSelected =
+                    selectedDate &&
+                    dateTime.toISODate() === selectedDate.toISODate();
+                  const isToday = dateTime.toISODate() === today.toISODate();
+
+                  return (
+                    <button
+                      key={date.toISOString()}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        handleDateClick(date);
+                      }}
+                      className={`aspect-square text-sm sm:text-xs rounded-md transition-colors flex items-center justify-center ${
+                        isSelected
+                          ? "bg-primary text-white font-semibold"
+                          : isToday
+                          ? "bg-bg-secondary dark:bg-hover text-text-primary font-medium"
+                          : "text-text-primary hover:bg-hover"
+                      }`}
+                    >
+                      {dateTime.day}
+                    </button>
+                  );
+                })}
+              </div>
             </div>
-          </div>
+          </>
         )}
 
         {/* Hidden input for form validation */}

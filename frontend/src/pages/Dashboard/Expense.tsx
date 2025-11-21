@@ -11,11 +11,12 @@ import AddExpenseForm, {
   type ExpenseData,
 } from "../../components/Expense/AddExpenseForm";
 import ExpenseList from "../../components/Expense/ExpenseList";
-import DateRangePicker from "../../components/DateRangePicker/DateRangePicker";
+import DateRangePicker, { type DateRangePickerRef } from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 import type { TransactionApiResponse } from "../../types/dashboard";
 
 const Expense = () => {
+  const dateRangePickerRef = useRef<DateRangePickerRef>(null);
   const { dateRange } = useDateRange();
   const [expenseData, setExpenseData] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
@@ -183,8 +184,13 @@ const Expense = () => {
     <DashboardLayout activeMenu="Expense">
       <div className="my-5 mx-auto">
         <div className="mb-4 flex items-center justify-start gap-3">
-          <MdFilterList className="text-text-secondary text-xl ml-2 transition-colors" />
-          <DateRangePicker />
+          <button
+            onClick={() => dateRangePickerRef.current?.open()}
+            className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+          >
+            <MdFilterList className="text-xl ml-2" />
+          </button>
+          <DateRangePicker ref={dateRangePickerRef} />
         </div>
         <div className="grid grid-cols-1 gap-6">
           <div>

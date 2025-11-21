@@ -12,11 +12,12 @@ import toast from "react-hot-toast";
 import IncomeList from "../../components/Income/IncomeList";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
-import DateRangePicker from "../../components/DateRangePicker/DateRangePicker";
+import DateRangePicker, { type DateRangePickerRef } from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 
 const Income = () => {
   const { dateRange } = useDateRange();
+  const dateRangePickerRef = useRef<DateRangePickerRef>(null);
   const [incomeData, setIncomeData] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
   const [openAddIncomeModal, setOpenAddIncomeModal] = useState(false);
@@ -183,8 +184,13 @@ const Income = () => {
     <DashboardLayout activeMenu="Income">
       <div className="my-5 mx-auto">
         <div className="mb-4 flex items-center justify-start gap-3">
-          <MdFilterList className="text-text-secondary text-xl ml-2 transition-colors" />
-          <DateRangePicker />
+          <button
+            onClick={() => dateRangePickerRef.current?.open()}
+            className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+          >
+            <MdFilterList className="text-xl ml-2" />
+          </button>
+          <DateRangePicker ref={dateRangePickerRef} />
         </div>
         <div className="grid grid-cols-1 gap-6">
           <div>

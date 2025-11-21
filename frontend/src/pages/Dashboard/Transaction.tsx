@@ -7,11 +7,12 @@ import { useDateRange } from "../../context/DateRangeContext";
 import toast from "react-hot-toast";
 import TransactionList from "../../components/Transactions/TransactionList";
 import type { TransactionApiResponse } from "../../types/dashboard";
-import DateRangePicker from "../../components/DateRangePicker/DateRangePicker";
+import DateRangePicker, { type DateRangePickerRef } from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 import axios from "axios";
 
 const Transaction = () => {
+  const dateRangePickerRef = useRef<DateRangePickerRef>(null);
   const { dateRange } = useDateRange();
   const [transactions, setTransactions] = useState<TransactionApiResponse[]>(
     []
@@ -93,8 +94,13 @@ const Transaction = () => {
     <DashboardLayout activeMenu="Transaction">
       <div className="my-5 mx-auto">
         <div className="mb-4 flex items-center justify-start gap-3">
-          <MdFilterList className="text-text-secondary text-xl ml-2 transition-colors" />
-          <DateRangePicker />
+          <button
+            onClick={() => dateRangePickerRef.current?.open()}
+            className="text-text-secondary hover:text-text-primary transition-colors cursor-pointer"
+          >
+            <MdFilterList className="text-xl ml-2" />
+          </button>
+          <DateRangePicker ref={dateRangePickerRef} />
         </div>
 
         <div className="grid grid-cols-1 gap-6">

@@ -1,4 +1,10 @@
-import { useState, useRef, useEffect } from "react";
+import {
+  useState,
+  useRef,
+  useEffect,
+  forwardRef,
+  useImperativeHandle,
+} from "react";
 import { DateTime } from "luxon";
 import { useDateRange, type DateRange } from "../../context/DateRangeContext";
 import { HiCalendar } from "react-icons/hi";
@@ -9,7 +15,11 @@ type PredefinedRange = {
   getRange: () => DateRange;
 };
 
-const DateRangePicker = () => {
+export type DateRangePickerRef = {
+  open: () => void;
+};
+
+const DateRangePicker = forwardRef<DateRangePickerRef>((_props, ref) => {
   const { dateRange, setDateRange } = useDateRange();
   const [isOpen, setIsOpen] = useState(false);
   const [showCustomPicker, setShowCustomPicker] = useState(false);
@@ -285,6 +295,13 @@ const DateRangePicker = () => {
     setShowCustomPicker(true);
   };
 
+  // Expose open method via ref
+  useImperativeHandle(ref, () => ({
+    open: () => {
+      setIsOpen(true);
+    },
+  }));
+
   const days1 = generateCalendarDays(currentMonth);
   const days2 = generateCalendarDays(currentMonth.plus({ months: 1 }));
   const weekDays = ["M", "T", "W", "T", "F", "S", "S"];
@@ -308,7 +325,7 @@ const DateRangePicker = () => {
 
       {/* Dropdown */}
       {isOpen && (
-        <div className="absolute top-full right-0 sm:right-0 mt-2 bg-bg-primary border border-border rounded-lg shadow-lg dark:shadow-black/20 z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto max-h-[85vh] overflow-y-auto transition-colors">
+        <div className="absolute top-full left-1/2 -translate-x-1/2 sm:left-auto sm:right-0 sm:translate-x-0 mt-2 bg-bg-primary border border-border rounded-lg shadow-lg dark:shadow-black/20 z-50 w-[calc(100vw-2rem)] max-w-[700px] sm:w-auto max-h-[85vh] overflow-y-auto transition-colors">
           {!showCustomPicker ? (
             // Predefined Ranges
             <div className="p-4">
@@ -483,6 +500,8 @@ const DateRangePicker = () => {
       )}
     </div>
   );
-};
+});
+
+DateRangePicker.displayName = "DateRangePicker";
 
 export default DateRangePicker;
