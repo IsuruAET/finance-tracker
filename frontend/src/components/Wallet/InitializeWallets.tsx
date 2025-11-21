@@ -1,9 +1,11 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Input from "../Inputs/Input";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
-import { LuMinus, LuPlus } from "react-icons/lu";
+import { LuMinus, LuPlus, LuLogOut } from "react-icons/lu";
+import { useUserContext } from "../../context/UserContext";
 
 interface CashWallet {
   name: string;
@@ -21,12 +23,20 @@ interface InitializeWalletsProps {
 }
 
 const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
+  const { clearUser } = useUserContext();
+  const navigate = useNavigate();
   const [cashWallets, setCashWallets] = useState<CashWallet[]>([
     { name: "", balance: 0 },
   ]);
   const [cards, setCards] = useState<Card[]>([
     { name: "", balance: 0, icon: "💳" },
   ]);
+
+  const handleLogout = () => {
+    localStorage.clear();
+    clearUser();
+    navigate("/login");
+  };
 
   const addCashWallet = () => {
     setCashWallets([...cashWallets, { name: "", balance: 0 }]);
@@ -132,9 +142,19 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
 
   return (
     <div>
+      <div className="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800/50 rounded-lg">
+        <p className="text-sm text-blue-800 dark:text-blue-300">
+          <strong>Welcome!</strong> To get started, you need to initialize at
+          least one wallet with a balance greater than 0. If you don't want to
+          add a wallet right now, you can logout and return later.
+        </p>
+      </div>
+
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <label className="text-[13px] text-text-secondary transition-colors">Cash Wallets</label>
+          <label className="text-[13px] text-text-secondary transition-colors">
+            Cash Wallets
+          </label>
           <button type="button" onClick={addCashWallet} className="add-btn">
             <LuPlus className="text-lg" />
             Add Cash Wallet
@@ -185,7 +205,9 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
 
       <div className="mb-6">
         <div className="flex justify-between items-center mb-3">
-          <label className="text-[13px] text-text-secondary transition-colors">Card Wallets</label>
+          <label className="text-[13px] text-text-secondary transition-colors">
+            Card Wallets
+          </label>
           <button type="button" onClick={addCard} className="add-btn">
             <LuPlus className="text-lg" />
             Add Card Wallet
@@ -230,7 +252,15 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
         ))}
       </div>
 
-      <div className="flex justify-end mt-6">
+      <div className="flex justify-between items-center mt-6">
+        <button
+          type="button"
+          onClick={handleLogout}
+          className="flex items-center gap-2 text-sm font-medium text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800/50 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg px-4 py-2 transition-colors cursor-pointer"
+        >
+          <LuLogOut className="text-lg" />
+          Logout
+        </button>
         <button
           type="button"
           className="add-btn add-btn-fill"

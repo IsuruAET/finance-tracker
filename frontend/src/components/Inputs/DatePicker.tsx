@@ -115,7 +115,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             readOnly
             value={formatDisplayDate(value)}
             placeholder={placeholder}
-            className="w-full bg-transparent outline-none cursor-pointer text-text-primary placeholder:text-text-secondary transition-colors"
+            className="w-full bg-transparent outline-none cursor-pointer text-base text-text-primary placeholder:text-text-secondary transition-colors"
           />
         </div>
 
@@ -162,9 +162,7 @@ const DatePicker: React.FC<DatePickerProps> = ({
             <div className="grid grid-cols-7 gap-1">
               {days.map((date, idx) => {
                 if (!date) {
-                  return (
-                    <div key={`empty-${idx}`} className="aspect-square" />
-                  );
+                  return <div key={`empty-${idx}`} className="aspect-square" />;
                 }
 
                 const dateTime = DateTime.fromJSDate(date);
@@ -210,4 +208,3 @@ const DatePicker: React.FC<DatePickerProps> = ({
 };
 
 export default DatePicker;
-

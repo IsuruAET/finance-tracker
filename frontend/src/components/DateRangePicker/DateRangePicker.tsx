@@ -301,7 +301,7 @@ const DateRangePicker = () => {
           type="text"
           readOnly
           value={formatDateRange(dateRange)}
-          className="outline-none cursor-pointer text-xs sm:text-sm font-medium text-text-primary bg-transparent w-full min-w-[140px] sm:min-w-[200px] transition-colors"
+          className="outline-none cursor-pointer text-base sm:text-sm font-medium text-text-primary bg-transparent w-full min-w-[140px] sm:min-w-[200px] transition-colors"
           placeholder="Select date range"
         />
       </div>

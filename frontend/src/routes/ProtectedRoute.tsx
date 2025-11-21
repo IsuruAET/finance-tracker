@@ -35,7 +35,7 @@ const ProtectedRoute = () => {
         <Modal
           isOpen={showInitModal}
           onClose={() => {}}
-          title="Initialize Your Wallets"
+          title="Initialize Your Wallets - Required"
           hideCloseButton={true}
         >
           <InitializeWallets onComplete={handleInitComplete} />

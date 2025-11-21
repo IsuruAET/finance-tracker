@@ -65,7 +65,7 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
 
       {/* Backdrop */}
       <div
-        className={`fixed inset-0 bg-black/50 z-40 transition-opacity duration-300 ${
+        className={`fixed inset-0 bg-black/50 dark:bg-black/75 z-40 transition-opacity duration-300 ${
           openSideMenu
             ? "opacity-100 pointer-events-auto"
             : "opacity-0 pointer-events-none"

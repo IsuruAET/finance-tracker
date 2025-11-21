@@ -73,7 +73,7 @@ const Input: React.FC<InputProps> = ({
           ref={inputRef}
           type={isPassword ? (showPassword ? "text" : "password") : type}
           placeholder={placeholder}
-          className={`w-full bg-transparent outline-none text-text-primary placeholder:text-text-secondary transition-colors ${
+          className={`w-full bg-transparent outline-none text-base text-text-primary placeholder:text-text-secondary transition-colors ${
             isNumber
               ? "[appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
               : ""

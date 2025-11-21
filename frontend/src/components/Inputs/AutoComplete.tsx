@@ -126,7 +126,7 @@ const AutoComplete: React.FC<AutoCompleteProps> = ({
             onChange={handleInputChange}
             onFocus={handleInputFocus}
             placeholder={placeholder || "Type to search..."}
-            className="w-full bg-transparent outline-none flex-1 text-text-primary placeholder:text-text-secondary transition-colors"
+            className="w-full bg-transparent outline-none flex-1 text-base text-text-primary placeholder:text-text-secondary transition-colors"
             required={required}
           />
           <IoIosArrowDown
