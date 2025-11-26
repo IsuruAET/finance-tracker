@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import {
   XAxis,
   YAxis,
@@ -22,9 +23,21 @@ interface CustomLineChartProps {
   data: ChartDataItem[];
 }
 
+const MOBILE_BREAKPOINT = 640;
+
 const CustomLineChart = ({ data }: CustomLineChartProps) => {
   const { theme } = useTheme();
   const tickColor = theme === "dark" ? "#b0b3b8" : "#555";
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkViewport = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+
+    checkViewport();
+    window.addEventListener("resize", checkViewport);
+
+    return () => window.removeEventListener("resize", checkViewport);
+  }, []);
   
   // Define your data type
   interface LineData {
@@ -59,10 +72,18 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
     return null;
   };
 
+  const truncateLabel = (label: string, maxLength: number = 12): string => {
+    if (label.length <= maxLength) return label;
+    return label.substring(0, maxLength) + "...";
+  };
+
   return (
     <div className="bg-transparent mt-6">
-      <ResponsiveContainer width="100%" height={300}>
-        <AreaChart data={data}>
+      <ResponsiveContainer width="100%" height={isMobile ? 240 : 300}>
+        <AreaChart
+          data={data}
+          margin={{ top: 10, right: 6, left: 0, bottom: isMobile ? 36 : 10 }}
+        >
           <defs>
             <linearGradient id="expenseGradient" x1="0" y1="0" x2="0" y2="1">
               <stop offset="5%" stopColor="#875CF5" stopOpacity={0.4} />
@@ -74,10 +95,22 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
 
           <XAxis
             dataKey="xAxisValue"
-            tick={{ fontSize: 12, fill: tickColor }}
+            interval={0}
+            height={isMobile ? 60 : undefined}
+            tick={{
+              fontSize: isMobile ? 10 : 12,
+              fill: tickColor,
+            }}
+            angle={isMobile ? -40 : 0}
+            textAnchor={isMobile ? "end" : "middle"}
+            tickMargin={isMobile ? 8 : 16}
+            stroke="none"
+            tickFormatter={(value) => truncateLabel(value)}
+          />
+          <YAxis
+            tick={{ fontSize: isMobile ? 10 : 12, fill: tickColor }}
             stroke="none"
           />
-          <YAxis tick={{ fontSize: 12, fill: tickColor }} stroke="none" />
 
           <Tooltip
             content={(props: TooltipProps<number, string>) => (

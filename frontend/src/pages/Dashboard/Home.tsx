@@ -6,7 +6,7 @@ import { API_PATHS } from "../../utils/apiPaths";
 
 import { LuHandCoins, LuWalletMinimal, LuWallet } from "react-icons/lu";
 import { IoMdCard } from "react-icons/io";
-import { getCurrentMonthYear } from "../../utils/helper";
+import { getCurrentMonthYear, getCurrentDate } from "../../utils/helper";
 import InfoCard from "../../components/Cards/InfoCard";
 import RecentTransactions from "../../components/Dashboard/RecentTransactions";
 import FinanceOverview from "../../components/Dashboard/FinanceOverview";
@@ -114,9 +114,9 @@ const Home = () => {
 
           <InfoCard
             icon={<LuWallet />}
-            label="Closing Balance"
+            label="Total Balance"
             value={dashboardData?.thisMonthTotalBalance || 0}
-            desc={getCurrentMonthYear()}
+            desc={getCurrentDate()}
             color="bg-primary"
           />
         </div>

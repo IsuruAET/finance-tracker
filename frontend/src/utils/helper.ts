@@ -114,15 +114,13 @@ export const prepareTransactionBarChartData = (
     if (!isoDate) return;
 
     const label = DateTime.fromISO(item.date).toFormat("d MMM");
-    const entry =
-      totalsMap.get(isoDate) ??
-      {
-        label,
-        income: 0,
-        expense: 0,
-        transfer: 0,
-        initial: 0,
-      };
+    const entry = totalsMap.get(isoDate) ?? {
+      label,
+      income: 0,
+      expense: 0,
+      transfer: 0,
+      initial: 0,
+    };
 
     switch (item.type) {
       case "INCOME":
@@ -150,7 +148,8 @@ export const prepareTransactionBarChartData = (
       const net = entry.income + entry.initial - entry.expense;
       const descParts: string[] = [];
 
-      if (entry.income) descParts.push(`Income ${formatCurrency(entry.income)}`);
+      if (entry.income)
+        descParts.push(`Income ${formatCurrency(entry.income)}`);
       if (entry.expense)
         descParts.push(`Expense ${formatCurrency(entry.expense)}`);
       if (entry.initial)
@@ -180,10 +179,7 @@ export const filterTransactionsByDateRange = (
   return transactions.filter((transaction) => {
     const transactionDate = DateTime.fromISO(transaction.date);
     if (!transactionDate.isValid) return false;
-    return (
-      transactionDate >= start &&
-      transactionDate <= end
-    );
+    return transactionDate >= start && transactionDate <= end;
   });
 };
 
@@ -269,7 +265,11 @@ export const findOrCreateCategory = async (
 };
 
 export const getCurrentMonthYear = () => {
-  return DateTime.now().toFormat("MMMM yyyy");
+  return DateTime.now().toFormat("MMM yyyy");
+};
+
+export const getCurrentDate = () => {
+  return DateTime.now().toFormat("MMM d, yyyy");
 };
 
 // Group transactions by date
