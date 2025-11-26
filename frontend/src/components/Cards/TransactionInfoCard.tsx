@@ -69,10 +69,10 @@ const TransactionInfoCard = ({
 
   return (
     <>
-      <div className="group relative mt-3 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-bg-secondary shadow-sm hover:shadow-md transition-all">
+      <div className="group relative mt-3 p-4 pr-6 sm:pr-10 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-bg-secondary shadow-sm transition-all duration-200 hover:shadow-md hover:border-gray-200 dark:hover:border-gray-700 hover:-translate-y-0.5">
         {!hideDeleteBtn && onDelete && (
           <button
-            className="absolute top-3 right-3 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer z-10"
+            className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer z-10"
             onClick={() => setIsDeleteAlertOpen(true)}
             aria-label="Delete transaction"
           >
@@ -104,7 +104,7 @@ const TransactionInfoCard = ({
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-none">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-none sm:ml-auto">
             <div
               className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
             >
