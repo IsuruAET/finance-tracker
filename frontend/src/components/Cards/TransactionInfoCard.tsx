@@ -58,15 +58,28 @@ const TransactionInfoCard = ({
   const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
 
   const getAmountStyles = () => {
-    if (type === "INCOME") return "bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400";
-    if (type === "EXPENSE") return "bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400";
-    if (type === "INITIAL_BALANCE") return "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400";
+    if (type === "INCOME")
+      return "bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400";
+    if (type === "EXPENSE")
+      return "bg-red-50 dark:bg-red-900/30 text-red-500 dark:text-red-400";
+    if (type === "INITIAL_BALANCE")
+      return "bg-orange-50 dark:bg-orange-900/30 text-orange-500 dark:text-orange-400";
     return "bg-blue-50 dark:bg-blue-900/30 text-blue-500 dark:text-blue-400";
   };
 
   return (
     <>
       <div className="group relative mt-3 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-bg-secondary shadow-sm hover:shadow-md transition-all">
+        {!hideDeleteBtn && onDelete && (
+          <button
+            className="absolute top-3 right-3 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer z-10"
+            onClick={() => setIsDeleteAlertOpen(true)}
+            aria-label="Delete transaction"
+          >
+            <LuTrash2 size={18} />
+          </button>
+        )}
+
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 flex items-center justify-center text-lg text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
@@ -82,28 +95,20 @@ const TransactionInfoCard = ({
             </div>
 
             <div className="flex-1">
-              <p className="text-sm text-gray-900 dark:text-text-primary font-semibold transition-colors">{title}</p>
-              <p className="text-xs text-gray-500 dark:text-text-secondary mt-1 transition-colors break-words">
+              <p className="text-sm text-gray-900 dark:text-text-primary font-semibold transition-colors">
+                {title}
+              </p>
+              <p className="text-xs text-gray-500 dark:text-text-secondary mt-1 transition-colors wrap-break-word">
                 {date} {note ? `• ${note}` : ""}
               </p>
             </div>
           </div>
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-none">
-            {!hideDeleteBtn && onDelete && (
-              <button
-                className="order-2 sm:order-1 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer"
-                onClick={() => setIsDeleteAlertOpen(true)}
-                aria-label="Delete transaction"
-              >
-                <LuTrash2 size={18} />
-              </button>
-            )}
-
             <div
-              className={`order-1 sm:order-2 flex items-center justify-between gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
+              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
             >
-              <h6 className="text-sm font-semibold tracking-tight text-right flex-1">
+              <h6 className="text-sm font-semibold tracking-tight text-center">
                 {type === "INCOME" || type === "INITIAL_BALANCE"
                   ? "+"
                   : type === "EXPENSE"
