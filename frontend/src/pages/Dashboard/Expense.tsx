@@ -11,7 +11,9 @@ import AddExpenseForm, {
   type ExpenseData,
 } from "../../components/Expense/AddExpenseForm";
 import ExpenseList from "../../components/Expense/ExpenseList";
-import DateRangePicker, { type DateRangePickerRef } from "../../components/DateRangePicker/DateRangePicker";
+import DateRangePicker, {
+  type DateRangePickerRef,
+} from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 import type { TransactionApiResponse } from "../../types/dashboard";
 
@@ -57,13 +59,14 @@ const Expense = () => {
   // Handle Add Expense
   const handleAddExpense = async (expense: ExpenseData) => {
     const { categoryId, amount, date, walletId, desc } = expense;
+    const numericAmount = Number(amount);
 
     if (!categoryId) {
       toast.error("Category is required.");
       return;
     }
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) {
       toast.error("Amount should be a valid number greater than 0");
       return;
     }
@@ -81,7 +84,7 @@ const Expense = () => {
     try {
       await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
         type: "EXPENSE",
-        amount: Number(amount),
+        amount: numericAmount,
         date,
         walletId,
         categoryId,

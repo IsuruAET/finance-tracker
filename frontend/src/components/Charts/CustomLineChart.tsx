@@ -31,17 +31,19 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
   const [isMobile, setIsMobile] = useState(false);
 
   useEffect(() => {
-    const checkViewport = () => setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
+    const checkViewport = () =>
+      setIsMobile(window.innerWidth < MOBILE_BREAKPOINT);
 
     checkViewport();
     window.addEventListener("resize", checkViewport);
 
     return () => window.removeEventListener("resize", checkViewport);
   }, []);
-  
+
   // Define your data type
   interface LineData {
     title: string;
+    xAxisValue: string;
     yAxisValue: number;
   }
 
@@ -56,10 +58,12 @@ const CustomLineChart = ({ data }: CustomLineChartProps) => {
 
   const CustomTooltip = ({ active, payload }: CustomTooltipProps) => {
     if (active && payload && payload.length) {
-      const { title, yAxisValue } = payload[0].payload;
+      const { xAxisValue, yAxisValue } = payload[0].payload;
       return (
         <div className="bg-bg-primary dark:bg-bg-secondary shadow-md rounded-lg p-2 border border-border transition-colors">
-          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">{title}</p>
+          <p className="text-xs font-semibold text-purple-800 dark:text-purple-400 mb-1 transition-colors">
+            {xAxisValue}
+          </p>
           <p className="text-sm text-text-secondary transition-colors">
             Amount:{" "}
             <span className="text-sm font-medium text-text-primary transition-colors">

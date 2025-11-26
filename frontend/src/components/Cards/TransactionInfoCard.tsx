@@ -66,31 +66,33 @@ const TransactionInfoCard = ({
 
   return (
     <>
-      <div className="group relative flex items-center gap-4 mt-2 p-3 rounded-lg hover:bg-gray-100/60 dark:hover:bg-hover transition-colors">
-        <div className="w-12 h-12 flex items-center justify-center text-xl text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-bg-secondary rounded-full transition-colors">
-          {icon ? (
-            <img src={icon} alt={title} className="w-6 h-6" />
-          ) : type === "TRANSFER" ? (
-            <BiTransfer className="w-6 h-6" />
-          ) : type === "INITIAL_BALANCE" ? (
-            <LuWallet className="w-6 h-6" />
-          ) : (
-            <LuUtensils />
-          )}
-        </div>
+      <div className="group relative mt-3 p-4 rounded-2xl border border-gray-100 dark:border-gray-800 bg-white dark:bg-bg-secondary shadow-sm hover:shadow-md transition-all">
+        <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 flex items-center justify-center text-lg text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
+              {icon ? (
+                <img src={icon} alt={title} className="w-6 h-6" />
+              ) : type === "TRANSFER" ? (
+                <BiTransfer className="w-6 h-6" />
+              ) : type === "INITIAL_BALANCE" ? (
+                <LuWallet className="w-6 h-6" />
+              ) : (
+                <LuUtensils />
+              )}
+            </div>
 
-        <div className="flex-1 flex items-center justify-between">
-          <div>
-            <p className="text-sm text-gray-700 dark:text-text-primary font-medium transition-colors">{title}</p>
-            <p className="text-xs text-gray-400 dark:text-text-secondary mt-1 transition-colors">
-              {date} {note ? `• ${note}` : ""}
-            </p>
+            <div className="flex-1">
+              <p className="text-sm text-gray-900 dark:text-text-primary font-semibold transition-colors">{title}</p>
+              <p className="text-xs text-gray-500 dark:text-text-secondary mt-1 transition-colors break-words">
+                {date} {note ? `• ${note}` : ""}
+              </p>
+            </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-none">
             {!hideDeleteBtn && onDelete && (
               <button
-                className="text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer"
+                className="order-2 sm:order-1 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer"
                 onClick={() => setIsDeleteAlertOpen(true)}
                 aria-label="Delete transaction"
               >
@@ -99,9 +101,9 @@ const TransactionInfoCard = ({
             )}
 
             <div
-              className={`flex items-center justify-between gap-2 px-3 py-1.5 rounded-md w-28 min-w-28 shrink-0 ${getAmountStyles()}`}
+              className={`order-1 sm:order-2 flex items-center justify-between gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
             >
-              <h6 className="text-xs font-semibold tracking-tight text-right flex-1">
+              <h6 className="text-sm font-semibold tracking-tight text-right flex-1">
                 {type === "INCOME" || type === "INITIAL_BALANCE"
                   ? "+"
                   : type === "EXPENSE"

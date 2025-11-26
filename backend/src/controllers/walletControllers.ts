@@ -25,7 +25,11 @@ export const initializeWallets = async (
     const wallets = [];
 
     // Support legacy cashInHand for backward compatibility
-    if (cashInHand !== undefined && cashInHand >= 0 && (!cashWallets || cashWallets.length === 0)) {
+    if (
+      cashInHand !== undefined &&
+      cashInHand >= 0 &&
+      (!cashWallets || cashWallets.length === 0)
+    ) {
       const cashWallet = new Wallet({
         userId,
         name: "Cash In Hand",
@@ -114,7 +118,7 @@ export const initializeWallets = async (
     if (wallets.length > 0) {
       let config = await ClientConfig.findOne({ userId });
       const initializationDate = new Date();
-      
+
       if (!config) {
         config = new ClientConfig({
           userId,
@@ -310,7 +314,7 @@ export const getTransfers = async (
     })
       .populate("fromWalletId", "name type")
       .populate("toWalletId", "name type")
-      .sort({ date: -1 });
+      .sort({ date: -1, createdAt: -1 });
 
     return res.status(200).json(transfers);
   } catch (error: unknown) {
@@ -349,19 +353,15 @@ export const deleteWallet = async (
 
     // Check for associated transactions
     const transactions = await Transaction.find({
-      $or: [
-        { walletId },
-        { fromWalletId: walletId },
-        { toWalletId: walletId },
-      ],
+      $or: [{ walletId }, { fromWalletId: walletId }, { toWalletId: walletId }],
     });
 
     const hasTransactions = transactions.length > 0;
 
     // Check if all transactions are INITIAL_BALANCE type
-    const allInitialBalance = hasTransactions && transactions.every(
-      (tx) => tx.type === "INITIAL_BALANCE"
-    );
+    const allInitialBalance =
+      hasTransactions &&
+      transactions.every((tx) => tx.type === "INITIAL_BALANCE");
 
     // Allow deletion if:
     // 1. No associated transactions, OR

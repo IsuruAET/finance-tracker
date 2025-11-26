@@ -102,6 +102,7 @@ const Home = () => {
             value={dashboardData?.thisMonthTotalIncome || 0}
             desc={getCurrentMonthYear()}
             color="bg-green-500"
+            onNavigate={() => navigate("/income")}
           />
 
           <InfoCard
@@ -110,6 +111,7 @@ const Home = () => {
             value={dashboardData?.thisMonthTotalExpenses || 0}
             desc={getCurrentMonthYear()}
             color="bg-red-500"
+            onNavigate={() => navigate("/expense")}
           />
 
           <InfoCard
@@ -118,6 +120,7 @@ const Home = () => {
             value={dashboardData?.thisMonthTotalBalance || 0}
             desc={getCurrentDate()}
             color="bg-primary"
+            onNavigate={() => navigate("/wallet")}
           />
         </div>
 

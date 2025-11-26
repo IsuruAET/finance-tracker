@@ -12,7 +12,9 @@ import toast from "react-hot-toast";
 import IncomeList from "../../components/Income/IncomeList";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
-import DateRangePicker, { type DateRangePickerRef } from "../../components/DateRangePicker/DateRangePicker";
+import DateRangePicker, {
+  type DateRangePickerRef,
+} from "../../components/DateRangePicker/DateRangePicker";
 import { MdFilterList } from "react-icons/md";
 
 const Income = () => {
@@ -57,13 +59,14 @@ const Income = () => {
   // Handle Add Income
   const handleAddIncome = async (income: IncomeData) => {
     const { categoryId, amount, date, walletId, desc } = income;
+    const numericAmount = Number(amount);
 
     if (!categoryId) {
       toast.error("Category is required.");
       return;
     }
 
-    if (!amount || isNaN(amount) || Number(amount) <= 0) {
+    if (!amount || Number.isNaN(numericAmount) || numericAmount <= 0) {
       toast.error("Amount should be a valid number greater than 0");
       return;
     }
@@ -81,7 +84,7 @@ const Income = () => {
     try {
       await axiosInstance.post(API_PATHS.TRANSACTIONS.ADD, {
         type: "INCOME",
-        amount: Number(amount),
+        amount: numericAmount,
         date,
         walletId,
         categoryId,
@@ -214,7 +217,6 @@ const Income = () => {
         >
           <AddIncomeForm onAddIncome={handleAddIncome} />
         </Modal>
-
       </div>
     </DashboardLayout>
   );

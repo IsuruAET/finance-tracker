@@ -15,12 +15,12 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
   const [type, setType] = useState<"CASH" | "BANK" | "CARD" | "OTHER">(
     walletType
   );
-  const [balance, setBalance] = useState<string>("0");
+  const [balance, setBalance] = useState<string>("");
 
   useEffect(() => {
     setType(walletType);
     setName("");
-    setBalance("0");
+    setBalance("");
   }, [walletType]);
 
   const handleSubmit = async () => {
@@ -50,7 +50,7 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
 
       toast.success("Wallet added successfully!");
       setName("");
-      setBalance("0");
+      setBalance("");
       onAddComplete();
     } catch (error: unknown) {
       const errorMessage =
@@ -107,7 +107,7 @@ const AddWalletForm = ({ walletType, onAddComplete }: AddWalletFormProps) => {
         value={balance}
         onChange={(e) => setBalance(e.target.value)}
         label="Initial Balance"
-        placeholder="0"
+        placeholder="Enter starting balance"
         type="number"
       />
 

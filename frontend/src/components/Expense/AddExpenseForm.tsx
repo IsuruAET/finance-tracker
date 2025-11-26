@@ -12,7 +12,7 @@ import { useClientConfig } from "../../context/ClientConfigContext";
 
 export interface ExpenseData {
   categoryId: string;
-  amount: number;
+  amount: string;
   date: string;
   icon: string;
   walletId: string;
@@ -45,7 +45,7 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
   const { config } = useClientConfig();
   const [expense, setExpense] = useState<ExpenseData>({
     categoryId: "",
-    amount: 0,
+    amount: "",
     date: DateTime.now().toISODate() || "",
     icon: "",
     walletId: "",
@@ -135,12 +135,12 @@ const AddExpenseForm = ({ onAddExpense }: AddExpenseFormProps) => {
       />
 
       <Input
-        value={String(expense.amount)}
+        value={expense.amount}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           handleChange("amount", e.target.value)
         }
         label="Amount"
-        placeholder=""
+        placeholder="Enter expense amount"
         type="number"
       />
 

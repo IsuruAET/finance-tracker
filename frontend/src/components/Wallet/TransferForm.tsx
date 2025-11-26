@@ -28,7 +28,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
   const [wallets, setWallets] = useState<Wallet[]>([]);
   const [fromWalletId, setFromWalletId] = useState("");
   const [toWalletId, setToWalletId] = useState("");
-  const [amount, setAmount] = useState<string>("0");
+  const [amount, setAmount] = useState<string>("");
   const [date, setDate] = useState(DateTime.now().toISODate() || "");
   const [note, setNote] = useState("");
 
@@ -85,6 +85,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
       });
 
       toast.success("Transfer completed successfully!");
+      setAmount("");
       onTransferComplete();
     } catch (error: unknown) {
       const errorMessage =
@@ -127,7 +128,7 @@ const TransferForm = ({ onTransferComplete }: TransferFormProps) => {
         value={amount}
         onChange={(e) => setAmount(e.target.value)}
         label="Amount"
-        placeholder="0"
+        placeholder="Enter transfer amount"
         type="number"
       />
 

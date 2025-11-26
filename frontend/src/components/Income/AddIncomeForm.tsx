@@ -12,7 +12,7 @@ import { useClientConfig } from "../../context/ClientConfigContext";
 
 export interface IncomeData {
   categoryId: string;
-  amount: number;
+  amount: string;
   date: string;
   icon: string;
   walletId: string;
@@ -45,7 +45,7 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
   const { config } = useClientConfig();
   const [income, setIncome] = useState<IncomeData>({
     categoryId: "",
-    amount: 0,
+    amount: "",
     date: DateTime.now().toISODate() || "",
     icon: "",
     walletId: "",
@@ -135,12 +135,12 @@ const AddIncomeForm = ({ onAddIncome }: AddIncomeFormProps) => {
       />
 
       <Input
-        value={String(income.amount)}
+        value={income.amount}
         onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
           handleChange("amount", e.target.value)
         }
         label="Amount"
-        placeholder=""
+        placeholder="Enter income amount"
         type="number"
       />
 

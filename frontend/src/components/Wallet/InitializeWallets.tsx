@@ -10,12 +10,12 @@ import { useClientConfig } from "../../context/ClientConfigContext";
 
 interface CashWallet {
   name: string;
-  balance: number;
+  balance: string;
 }
 
 interface Card {
   name: string;
-  balance: number;
+  balance: string;
   icon: string;
 }
 
@@ -28,10 +28,10 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   const { refreshConfig } = useClientConfig();
   const navigate = useNavigate();
   const [cashWallets, setCashWallets] = useState<CashWallet[]>([
-    { name: "", balance: 0 },
+    { name: "", balance: "" },
   ]);
   const [cards, setCards] = useState<Card[]>([
-    { name: "", balance: 0, icon: "💳" },
+    { name: "", balance: "", icon: "💳" },
   ]);
 
   const handleLogout = () => {
@@ -41,7 +41,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   };
 
   const addCashWallet = () => {
-    setCashWallets([...cashWallets, { name: "", balance: 0 }]);
+    setCashWallets([...cashWallets, { name: "", balance: "" }]);
   };
 
   const updateCashWallet = (
@@ -61,7 +61,7 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
   };
 
   const addCard = () => {
-    setCards([...cards, { name: "", balance: 0, icon: "💳" }]);
+    setCards([...cards, { name: "", balance: "", icon: "💳" }]);
   };
 
   const updateCard = (
@@ -195,12 +195,12 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
               )}
             </div>
             <Input
-              value={String(cash.balance)}
+              value={cash.balance}
               onChange={(e) =>
                 updateCashWallet(index, "balance", e.target.value)
               }
               label="Initial Balance"
-              placeholder="0"
+              placeholder="Enter initial balance"
               type="number"
             />
           </div>
@@ -246,10 +246,10 @@ const InitializeWallets = ({ onComplete }: InitializeWalletsProps) => {
               )}
             </div>
             <Input
-              value={String(card.balance)}
+              value={card.balance}
               onChange={(e) => updateCard(index, "balance", e.target.value)}
               label="Initial Balance"
-              placeholder="0"
+              placeholder="Enter initial balance"
               type="number"
             />
           </div>

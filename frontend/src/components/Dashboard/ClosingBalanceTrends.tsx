@@ -25,7 +25,7 @@ const ClosingBalanceTrends = ({
     }
 
     const formatted: ChartDataItem[] = closingBalanceHistory.map((item) => ({
-      title: `${item.monthLabel} Closing Balance`,
+      title: item.monthLabel,
       xAxisValue: item.monthLabel,
       yAxisValue: item.balance,
     }));
@@ -41,8 +41,12 @@ const ClosingBalanceTrends = ({
     <div className="card">
       <div className="flex items-center justify-between gap-4 flex-wrap">
         <div>
-          <h5 className="text-lg text-text-primary transition-colors">Closing Balance Trend</h5>
-          <p className="text-sm text-text-secondary transition-colors">Last 5 months + current month</p>
+          <h5 className="text-lg text-text-primary transition-colors">
+            Closing Balance Trend
+          </h5>
+          <p className="text-sm text-text-secondary transition-colors">
+            Last 5 months + current month
+          </p>
         </div>
         <div className="text-right">
           <p className="text-xs uppercase tracking-wide text-text-secondary transition-colors">
