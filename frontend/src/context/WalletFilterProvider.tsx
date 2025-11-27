@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { WalletFilterContext } from "./WalletFilterContext";
 
 const STORAGE_KEY = "finance-tracker-wallet-filter";
@@ -32,12 +32,20 @@ const getAllWallets = (): string => {
   return ""; // Default to all wallets
 };
 
+// Routes where search params should be applied
+const DASHBOARD_ROUTES = ["/income", "/expense", "/transaction"];
+
+const shouldApplySearchParams = (pathname: string): boolean => {
+  return DASHBOARD_ROUTES.some((route) => pathname.startsWith(route));
+};
+
 export const WalletFilterProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   // Initialize from URL params or storage, default to "" (all wallets)
   const getInitialWalletId = useCallback((): string => {
@@ -59,9 +67,12 @@ export const WalletFilterProvider = ({
     getInitialWalletId()
   );
 
-  // Update URL params when wallet changes
+  // Update URL params when wallet changes (only on dashboard routes)
   const applyWalletToUrl = useCallback(
     (walletId: string) => {
+      if (!shouldApplySearchParams(location.pathname)) {
+        return; // Don't update URL params on non-dashboard routes
+      }
       const params = new URLSearchParams(searchParams);
       if (walletId && walletId !== "") {
         params.set("walletId", walletId);
@@ -70,7 +81,7 @@ export const WalletFilterProvider = ({
       }
       setSearchParams(params, { replace: true });
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams, location.pathname]
   );
 
   const setSelectedWalletId = useCallback(
@@ -89,24 +100,32 @@ export const WalletFilterProvider = ({
     if (walletParam !== null && walletParam !== selectedWalletId) {
       setSelectedWalletIdState(walletParam);
       persistWalletId(walletParam);
-    } else if (walletParam === null && selectedWalletId !== "") {
-      // URL doesn't have walletId, but state does - sync to URL
+    } else if (
+      walletParam === null &&
+      selectedWalletId !== "" &&
+      shouldApplySearchParams(location.pathname)
+    ) {
+      // URL doesn't have walletId, but state does - sync to URL (only on dashboard routes)
       applyWalletToUrl(selectedWalletId);
     } else if (walletParam === null && selectedWalletId === "") {
       // Both are empty, ensure storage is cleared
       persistWalletId("");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.toString()]);
+  }, [searchParams.toString(), location.pathname]);
 
-  // Initial sync: if we have a stored value but no URL param, add it to URL
+  // Initial sync: if we have a stored value but no URL param, add it to URL (only on dashboard routes)
   useEffect(() => {
     const walletParam = searchParams.get("walletId");
-    if (walletParam === null && selectedWalletId !== "") {
+    if (
+      walletParam === null &&
+      selectedWalletId !== "" &&
+      shouldApplySearchParams(location.pathname)
+    ) {
       applyWalletToUrl(selectedWalletId);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [location.pathname]);
 
   return (
     <WalletFilterContext.Provider
@@ -120,4 +139,3 @@ export const WalletFilterProvider = ({
     </WalletFilterContext.Provider>
   );
 };
-

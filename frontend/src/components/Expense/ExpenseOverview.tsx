@@ -38,7 +38,15 @@ const ExpenseOverview = ({
       </div>
 
       <div className="mt-10">
-        <CustomLineChart data={chartData} />
+        {chartData.length === 0 ? (
+          <div className="text-center py-12 bg-bg-secondary rounded-lg transition-colors">
+            <p className="text-text-secondary transition-colors">
+              No expense transactions found
+            </p>
+          </div>
+        ) : (
+          <CustomLineChart data={chartData} />
+        )}
       </div>
     </div>
   );

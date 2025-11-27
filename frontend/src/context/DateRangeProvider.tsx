@@ -1,5 +1,5 @@
 import { useState, useCallback, useEffect } from "react";
-import { useSearchParams } from "react-router-dom";
+import { useSearchParams, useLocation } from "react-router-dom";
 import { DateTime } from "luxon";
 import { DateRangeContext, type DateRange } from "./DateRangeContext";
 
@@ -63,12 +63,20 @@ const areRangesEqual = (a: DateRange, b: DateRange) => {
   return aStart === bStart && aEnd === bEnd;
 };
 
+// Routes where search params should be applied
+const DASHBOARD_ROUTES = ["/income", "/expense", "/transaction"];
+
+const shouldApplySearchParams = (pathname: string): boolean => {
+  return DASHBOARD_ROUTES.some((route) => pathname.startsWith(route));
+};
+
 export const DateRangeProvider = ({
   children,
 }: {
   children: React.ReactNode;
 }) => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const location = useLocation();
 
   const getCurrentMonthRange = useCallback(() => {
     const now = DateTime.now();
@@ -111,15 +119,18 @@ export const DateRangeProvider = ({
     getInitialDateRange()
   );
 
-  // Update URL params when date range changes
+  // Update URL params when date range changes (only on dashboard routes)
   const applyRangeToUrl = useCallback(
     (range: DateRange) => {
+      if (!shouldApplySearchParams(location.pathname)) {
+        return; // Don't update URL params on non-dashboard routes
+      }
       const params = new URLSearchParams(searchParams);
       params.set("startDate", serializeDate(range.startDate));
       params.set("endDate", serializeDate(range.endDate));
       setSearchParams(params, { replace: true });
     },
-    [searchParams, setSearchParams]
+    [searchParams, setSearchParams, location.pathname]
   );
 
   const setDateRange = useCallback(
@@ -159,11 +170,11 @@ export const DateRangeProvider = ({
 
     if (!areRangesEqual(dateRange, storedOrDefault)) {
       setDateRange(storedOrDefault);
-    } else if (!startParam || !endParam) {
+    } else if ((!startParam || !endParam) && shouldApplySearchParams(location.pathname)) {
       applyRangeToUrl(storedOrDefault);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.toString()]);
+  }, [searchParams.toString(), location.pathname]);
 
   return (
     <DateRangeContext.Provider

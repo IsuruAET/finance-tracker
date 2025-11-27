@@ -37,7 +37,15 @@ const IncomeOverview: React.FC<IncomeOverviewProps> = ({
       </div>
 
       <div className="mt-10">
-        <CustomBarChart data={chartData} />
+        {chartData.length === 0 ? (
+          <div className="text-center py-12 bg-bg-secondary rounded-lg transition-colors">
+            <p className="text-text-secondary transition-colors">
+              No income transactions found
+            </p>
+          </div>
+        ) : (
+          <CustomBarChart data={chartData} />
+        )}
       </div>
     </div>
   );

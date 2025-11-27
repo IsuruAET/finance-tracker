@@ -23,7 +23,7 @@ const ExpenseTransactions: React.FC<ExpenseTransactionsProps> = ({
       </div>
 
       <div className="mt-6">
-        {transactions?.slice(0, 4)?.map((item) => (
+        {transactions?.slice(0, 5)?.map((item) => (
           <TransactionInfoCard
             key={item._id}
             transaction={item}
