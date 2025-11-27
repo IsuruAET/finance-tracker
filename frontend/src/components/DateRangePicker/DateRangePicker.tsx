@@ -309,8 +309,9 @@ const DateRangePicker = forwardRef<DateRangePickerRef>((_props, ref) => {
   return (
     <div className="relative" ref={containerRef}>
       {/* Date Range Input */}
-      <div
-        className="flex items-center gap-2 px-2 sm:px-3 py-2 border border-border rounded-lg cursor-pointer hover:border-primary/50 transition-colors bg-bg-primary"
+      <button
+        type="button"
+        className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 flex items-center gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50 min-w-0"
         onClick={() => setIsOpen(!isOpen)}
       >
         <HiCalendar className="text-text-secondary text-base sm:text-lg shrink-0 transition-colors" />
@@ -318,10 +319,10 @@ const DateRangePicker = forwardRef<DateRangePickerRef>((_props, ref) => {
           type="text"
           readOnly
           value={formatDateRange(dateRange)}
-          className="outline-none cursor-pointer text-base sm:text-sm font-medium text-text-primary bg-transparent w-full min-w-[140px] sm:min-w-[200px] transition-colors"
+          className="outline-none cursor-pointer text-sm font-medium text-text-primary bg-transparent w-full min-w-[140px] sm:min-w-[200px] transition-colors"
           placeholder="Select date range"
         />
-      </div>
+      </button>
 
       {/* Dropdown */}
       {isOpen && (

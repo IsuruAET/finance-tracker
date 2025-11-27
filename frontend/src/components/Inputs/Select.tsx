@@ -20,6 +20,7 @@ interface SelectProps {
   options?: SelectOption[];
   groups?: SelectGroup[];
   required?: boolean;
+  compact?: boolean;
 }
 
 const Select: React.FC<SelectProps> = ({
@@ -30,6 +31,7 @@ const Select: React.FC<SelectProps> = ({
   options = [],
   groups,
   required = false,
+  compact = false,
 }) => {
   const [isDropdownVisible, setIsDropdownVisible] = useState(false);
 
@@ -38,14 +40,12 @@ const Select: React.FC<SelectProps> = ({
     ? groups.flatMap((group) => group.options)
     : options;
 
-  const [selectedValue, setSelectedValue] = useState<string>(
-    value || allOptions[0]?.value || ""
-  );
+  const [selectedValue, setSelectedValue] = useState<string>(value);
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setSelectedValue(value || allOptions[0]?.value || "");
-  }, [value, allOptions]);
+    setSelectedValue(value);
+  }, [value]);
 
   useEffect(() => {
     const handleClickAway = (event: MouseEvent) => {
@@ -88,7 +88,9 @@ const Select: React.FC<SelectProps> = ({
           <button
             type="button"
             onClick={() => setIsDropdownVisible(!isDropdownVisible)}
-            className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 mb-4 mt-3 flex items-center justify-between gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50 min-w-0"
+            className={`w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 flex items-center justify-between gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50 min-w-0 ${
+              compact ? "" : "mb-4 mt-3"
+            }`}
           >
             <span className="flex-1 text-left truncate min-w-0">
               {selectedOption?.label || placeholder || "Select..."}
@@ -104,9 +106,7 @@ const Select: React.FC<SelectProps> = ({
             <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50 overflow-hidden">
               {placeholder && (
                 <div
-                  onClick={() => {
-                    setIsDropdownVisible(false);
-                  }}
+                  onClick={() => handleSelect("")}
                   className="px-4 py-2 text-sm text-text-secondary hover:bg-hover cursor-pointer transition-colors"
                 >
                   {placeholder}
@@ -197,7 +197,9 @@ const Select: React.FC<SelectProps> = ({
         <button
           type="button"
           onClick={() => setIsDropdownVisible(!isDropdownVisible)}
-          className="w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 mb-4 mt-3 flex items-center justify-between gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50 min-w-0"
+          className={`w-full bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg px-4 py-3 flex items-center justify-between gap-2 text-sm text-text-primary cursor-pointer transition-colors hover:border-purple-500/50 min-w-0 ${
+            compact ? "" : "mb-4 mt-3"
+          }`}
         >
           <div className="flex items-center gap-2 flex-1 min-w-0">
             {selectedOption?.icon && (
@@ -222,9 +224,7 @@ const Select: React.FC<SelectProps> = ({
           <div className="absolute z-50 w-full mt-1 bg-bg-primary dark:bg-bg-secondary border border-border rounded-lg shadow-lg dark:shadow-black/50 max-h-60 overflow-auto">
             {placeholder && (
               <div
-                onClick={() => {
-                  setIsDropdownVisible(false);
-                }}
+                onClick={() => handleSelect("")}
                 className="px-4 py-2 text-sm text-text-secondary hover:bg-hover cursor-pointer transition-colors"
               >
                 {placeholder}

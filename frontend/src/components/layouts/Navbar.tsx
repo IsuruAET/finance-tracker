@@ -1,7 +1,12 @@
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { HiOutlineMenu, HiOutlineX } from "react-icons/hi";
-import { MdLightMode, MdDarkMode, MdSettings } from "react-icons/md";
+import {
+  MdLightMode,
+  MdDarkMode,
+  MdSettings,
+  MdFilterList,
+} from "react-icons/md";
 import SideMenu from "./SideMenu";
 import { useTheme } from "../../hooks/useTheme";
 import ClientConfigModal from "../ClientConfig/ClientConfigModal";
@@ -63,6 +68,18 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
         </div>
 
         <div className="flex items-center gap-2 -mr-1">
+          {["Transaction", "Income", "Expense"].includes(activeMenu) && (
+            <button
+              onClick={() => {
+                window.dispatchEvent(new Event("toggle-filters"));
+              }}
+              className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors md:hidden"
+              aria-label="Toggle filters"
+            >
+              <MdFilterList className="text-xl" />
+            </button>
+          )}
+
           <button
             onClick={() => setOpenClientConfigModal(true)}
             className="flex items-center justify-center w-10 h-10 rounded-full hover:bg-hover text-text-primary transition-colors"
