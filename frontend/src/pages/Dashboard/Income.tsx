@@ -1,10 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { useSearchParams } from "react-router-dom";
 import DashboardLayout from "../../components/layouts/DashboardLayout";
 import IncomeOverview from "../../components/Income/IncomeOverview";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import { useDateRange } from "../../context/DateRangeContext";
+import { useWalletFilter } from "../../context/WalletFilterContext";
 import Modal from "../../components/Modal";
 import AddIncomeForm, {
   type IncomeData,
@@ -14,8 +14,6 @@ import IncomeList from "../../components/Income/IncomeList";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
 import FilterSection from "../../components/FilterSection/FilterSection";
-
-const STORAGE_KEY = "finance-tracker-wallet-filter";
 
 type Wallet = {
   _id: string;
@@ -27,99 +25,11 @@ type Wallet = {
 
 const Income = () => {
   const { dateRange } = useDateRange();
-  const [searchParams, setSearchParams] = useSearchParams();
+  const { selectedWalletId, setSelectedWalletId } = useWalletFilter();
   const [incomeData, setIncomeData] = useState<TransactionApiResponse[]>([]);
   const loadingRef = useRef(false);
   const [openAddIncomeModal, setOpenAddIncomeModal] = useState(false);
   const [wallets, setWallets] = useState<Wallet[]>([]);
-
-  // Initialize wallet filter from URL or storage, default to "" (all wallets)
-  const getInitialWalletId = useCallback((): string => {
-    const walletParam = searchParams.get("walletId");
-    if (walletParam !== null) {
-      // Persist to storage
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, walletParam);
-      } catch {
-        // Ignore storage errors
-      }
-      return walletParam;
-    }
-
-    // Try to get from storage
-    try {
-      const stored = window.sessionStorage.getItem(STORAGE_KEY);
-      if (stored !== null) {
-        return stored;
-      }
-    } catch {
-      // Ignore storage errors
-    }
-
-    return ""; // Default to all wallets
-  }, [searchParams]);
-
-  const [selectedWalletId, setSelectedWalletIdState] = useState<string>(
-    getInitialWalletId()
-  );
-
-  // Update URL params when wallet changes
-  const updateWalletInUrl = useCallback(
-    (walletId: string) => {
-      const params = new URLSearchParams(searchParams);
-      if (walletId && walletId !== "") {
-        params.set("walletId", walletId);
-        try {
-          window.sessionStorage.setItem(STORAGE_KEY, walletId);
-        } catch {
-          // Ignore storage errors
-        }
-      } else {
-        params.delete("walletId");
-        try {
-          window.sessionStorage.removeItem(STORAGE_KEY);
-        } catch {
-          // Ignore storage errors
-        }
-      }
-      setSearchParams(params, { replace: true });
-    },
-    [searchParams, setSearchParams]
-  );
-
-  const setSelectedWalletId = useCallback(
-    (walletId: string) => {
-      setSelectedWalletIdState(walletId);
-      updateWalletInUrl(walletId);
-    },
-    [updateWalletInUrl]
-  );
-
-  // Initial sync: if we have a stored value but no URL param, add it to URL
-  useEffect(() => {
-    const walletParam = searchParams.get("walletId");
-    if (walletParam === null && selectedWalletId !== "") {
-      updateWalletInUrl(selectedWalletId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  // Sync state when URL params change
-  useEffect(() => {
-    const walletParam = searchParams.get("walletId");
-    if (walletParam !== null && walletParam !== selectedWalletId) {
-      setSelectedWalletIdState(walletParam);
-      try {
-        window.sessionStorage.setItem(STORAGE_KEY, walletParam);
-      } catch {
-        // Ignore storage errors
-      }
-    } else if (walletParam === null && selectedWalletId !== "") {
-      // URL doesn't have walletId, but state does - sync to URL
-      updateWalletInUrl(selectedWalletId);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchParams.toString()]);
 
   // Get All Income Details
   const fetchIncomeDetails = useCallback(async () => {

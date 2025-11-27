@@ -3,6 +3,7 @@ import AppRoutes from "./routes/AppRoutes";
 import ToastContainer from "./components/ToastContainer";
 import UserProvider from "./context/UserProvider";
 import { DateRangeProvider } from "./context/DateRangeProvider";
+import { WalletFilterProvider } from "./context/WalletFilterProvider";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { ClientConfigProvider } from "./context/ClientConfigProvider";
 
@@ -13,8 +14,10 @@ function App() {
         <ClientConfigProvider>
           <Router>
             <DateRangeProvider>
-              <AppRoutes />
-              <ToastContainer />
+              <WalletFilterProvider>
+                <AppRoutes />
+                <ToastContainer />
+              </WalletFilterProvider>
             </DateRangeProvider>
           </Router>
         </ClientConfigProvider>
