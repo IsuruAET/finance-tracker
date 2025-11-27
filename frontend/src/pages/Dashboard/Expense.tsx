@@ -6,6 +6,7 @@ import { useWalletFilter } from "../../context/WalletFilterContext";
 import toast from "react-hot-toast";
 import axiosInstance from "../../utils/axiosInstance";
 import axios from "axios";
+import { formatLocalDate } from "../../utils/helper";
 import ExpenseOverview from "../../components/Expense/ExpenseOverview";
 import Modal from "../../components/Modal";
 import AddExpenseForm, {
@@ -39,8 +40,8 @@ const Expense = () => {
 
     try {
       // Format dates as YYYY-MM-DD for API
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get<TransactionApiResponse[]>(
         `${API_PATHS.TRANSACTIONS.GET_ALL}`,
@@ -162,8 +163,8 @@ const Expense = () => {
   const handleDownloadExpenseDetails = async () => {
     try {
       // Format dates as YYYY-MM-DD for API
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get(
         API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,

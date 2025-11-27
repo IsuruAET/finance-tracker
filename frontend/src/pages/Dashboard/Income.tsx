@@ -14,6 +14,7 @@ import IncomeList from "../../components/Income/IncomeList";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
 import FilterSection from "../../components/FilterSection/FilterSection";
+import { formatLocalDate } from "../../utils/helper";
 
 type Wallet = {
   _id: string;
@@ -39,8 +40,8 @@ const Income = () => {
 
     try {
       // Format dates as YYYY-MM-DD for API
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get<TransactionApiResponse[]>(
         `${API_PATHS.TRANSACTIONS.GET_ALL}`,
@@ -162,8 +163,8 @@ const Income = () => {
   const handleDownloadIncomeDetails = async () => {
     try {
       // Format dates as YYYY-MM-DD for API
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get(
         API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,

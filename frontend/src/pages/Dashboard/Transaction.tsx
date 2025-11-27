@@ -10,6 +10,7 @@ import TransactionList from "../../components/Transactions/TransactionList";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import axios from "axios";
 import FilterSection from "../../components/FilterSection/FilterSection";
+import { formatLocalDate } from "../../utils/helper";
 
 type Wallet = {
   _id: string;
@@ -34,8 +35,8 @@ const Transaction = () => {
     loadingRef.current = true;
 
     try {
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get<TransactionApiResponse[]>(
         `${API_PATHS.TRANSACTIONS.GET_ALL}`,
@@ -74,8 +75,8 @@ const Transaction = () => {
 
   const handleDownloadTransactions = async () => {
     try {
-      const startDate = dateRange.startDate.toISOString().split("T")[0];
-      const endDate = dateRange.endDate.toISOString().split("T")[0];
+      const startDate = formatLocalDate(dateRange.startDate);
+      const endDate = formatLocalDate(dateRange.endDate);
 
       const response = await axiosInstance.get(
         API_PATHS.TRANSACTIONS.DOWNLOAD_EXCEL,
