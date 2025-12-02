@@ -106,9 +106,9 @@ const TransactionInfoCard = ({
 
           <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end sm:flex-none sm:ml-auto">
             <div
-              className={`flex items-center justify-center gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
+              className={`flex items-center justify-center sm:justify-end gap-2 px-3 py-2 rounded-lg w-full sm:w-32 ${getAmountStyles()}`}
             >
-              <h6 className="text-sm font-semibold tracking-tight text-center">
+              <h6 className="text-sm font-semibold tracking-tight text-center sm:text-right">
                 {type === "INCOME" || type === "INITIAL_BALANCE"
                   ? "+"
                   : type === "EXPENSE"

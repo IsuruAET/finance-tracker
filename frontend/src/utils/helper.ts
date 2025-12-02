@@ -296,6 +296,63 @@ export const groupTransactionsByDate = (
   return grouped;
 };
 
+// Group transactions by category (across all dates)
+export interface CategoryGroup {
+  categoryId: string;
+  categoryName: string;
+  categoryIcon?: string;
+  transactions: TransactionApiResponse[];
+  total: number;
+  count: number;
+}
+
+export const groupTransactionsByCategory = (
+  transactions: TransactionApiResponse[]
+): CategoryGroup[] => {
+  // Group all transactions by category (regardless of date)
+  const categoryMap = new Map<string, TransactionApiResponse[]>();
+
+  transactions.forEach((transaction) => {
+    const categoryId =
+      transaction.categoryId?._id || "uncategorized";
+
+    if (!categoryMap.has(categoryId)) {
+      categoryMap.set(categoryId, []);
+    }
+    categoryMap.get(categoryId)?.push(transaction);
+  });
+
+  // Convert to CategoryGroup array
+  const categories: CategoryGroup[] = Array.from(categoryMap.entries()).map(
+    ([categoryId, categoryTransactions]) => {
+      const firstTransaction = categoryTransactions[0];
+      const total = categoryTransactions.reduce(
+        (sum, t) => sum + t.amount,
+        0
+      );
+
+      return {
+        categoryId,
+        categoryName:
+          firstTransaction.categoryId?.name ||
+          firstTransaction.desc ||
+          "Uncategorized",
+        categoryIcon: firstTransaction.categoryId?.icon,
+        transactions: categoryTransactions.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        ),
+        total,
+        count: categoryTransactions.length,
+      };
+    }
+  );
+
+  // Sort categories by total descending
+  categories.sort((a, b) => b.total - a.total);
+
+  return categories;
+};
+
 // Format date header with relative labels
 export const formatDateHeader = (dateString: string): string => {
   const dt = DateTime.fromISO(dateString);
