@@ -32,7 +32,7 @@ export const formatCurrency = (number: number): string => {
     maximumFractionDigits: 2,
   });
 
-  return `AU$${formatted}`;
+  return `$ ${formatted}`;
 };
 
 export const prepareExpenseBarChartData = (

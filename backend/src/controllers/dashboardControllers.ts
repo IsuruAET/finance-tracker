@@ -20,10 +20,27 @@ export const getDashboardData = async (
     // Build match conditions
     const baseMatch = { userId: userObjectId };
 
-    // Get current date and calculate month boundaries
-    const now = new Date();
-    const currentYear = now.getFullYear();
-    const currentMonth = now.getMonth();
+    // Get reference month/year (from query or fallback to current month)
+    const { month: monthQuery, year: yearQuery } = req.query;
+
+    let referenceDate = new Date();
+
+    if (monthQuery && yearQuery) {
+      const parsedMonth = Number(monthQuery);
+      const parsedYear = Number(yearQuery);
+
+      if (
+        Number.isFinite(parsedMonth) &&
+        Number.isFinite(parsedYear) &&
+        parsedMonth >= 1 &&
+        parsedMonth <= 12
+      ) {
+        referenceDate = new Date(parsedYear, parsedMonth - 1, 1);
+      }
+    }
+
+    const currentYear = referenceDate.getFullYear();
+    const currentMonth = referenceDate.getMonth();
 
     // First day of current month
     const firstDayOfCurrentMonth = new Date(currentYear, currentMonth, 1);
@@ -130,8 +147,8 @@ export const getDashboardData = async (
       thisMonthIncome -
       thisMonthExpenses;
 
-    // Closing balance history (last 5 full months + current month)
-    const monthsToInclude = 6;
+    // Closing balance history (last 5 months up to selected month)
+    const monthsToInclude = 5;
     const targetMonths: { year: number; monthIndex: number }[] = [];
     for (let i = monthsToInclude - 1; i >= 0; i -= 1) {
       const targetDate = new Date(currentYear, currentMonth - i, 1);
@@ -256,48 +273,43 @@ export const getDashboardData = async (
       });
     }
 
-    // Get income transactions for last 60 days (excluding INITIAL_BALANCE)
-    const incomeDateFilter = {
-      $gte: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000),
-    };
-
-    const last60DaysIncomeTransactions = await Transaction.find({
+    // Get income transactions for selected month only
+    const thisMonthIncomeTransactions = await Transaction.find({
       userId: userObjectId,
       type: "INCOME",
-      date: incomeDateFilter,
+      date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
     })
       .populate("walletId", "name type")
       .populate("categoryId", "name type icon")
       .sort({ date: -1, createdAt: -1 });
 
-    // Get total income for filtered period
-    const incomeLast60Days = last60DaysIncomeTransactions.reduce(
+    // Get total income for selected month
+    const incomeThisMonth = thisMonthIncomeTransactions.reduce(
       (sum, transaction) => sum + transaction.amount,
       0
     );
 
-    // Get expense transactions for last 30 days
-    const expenseDateFilter = {
-      $gte: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000),
-    };
-
-    const last30DaysExpenseTransactions = await Transaction.find({
+    // Get expense transactions for selected month only
+    const thisMonthExpenseTransactions = await Transaction.find({
       userId: userObjectId,
       type: "EXPENSE",
-      date: expenseDateFilter,
+      date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
     })
       .populate("walletId", "name type")
       .populate("categoryId", "name type icon")
       .sort({ date: -1, createdAt: -1 });
 
-    // Get total expenses for filtered period
-    const expensesLast30Days = last30DaysExpenseTransactions.reduce(
+    // Get total expenses for selected month
+    const expensesThisMonth = thisMonthExpenseTransactions.reduce(
       (sum, transaction) => sum + transaction.amount,
       0
     );
 
-    // Fetch last 5 transactions (all types)
-    const lastTransactions = await Transaction.find(baseMatch)
+    // Fetch recent transactions for selected month only (all types)
+    const lastTransactions = await Transaction.find({
+      ...baseMatch,
+      date: { $gte: firstDayOfCurrentMonth, $lt: firstDayOfNextMonth },
+    })
       .populate("walletId", "name type")
       .populate("fromWalletId", "name type")
       .populate("toWalletId", "name type")
@@ -317,12 +329,12 @@ export const getDashboardData = async (
       thisMonthTotalBalance,
       wallets,
       last30DaysExpenses: {
-        total: expensesLast30Days,
-        transactions: last30DaysExpenseTransactions,
+        total: expensesThisMonth,
+        transactions: thisMonthExpenseTransactions,
       },
       last60DaysIncome: {
-        total: incomeLast60Days,
-        transactions: last60DaysIncomeTransactions,
+        total: incomeThisMonth,
+        transactions: thisMonthIncomeTransactions,
       },
       recentTransactions: lastTransactions,
       closingBalanceHistory,

@@ -49,20 +49,37 @@ const FinanceOverview: React.FC<FinanceOverviewProps> = ({
     COLORS[4], // Total Balance
   ];
 
+  const hasData =
+    broadForwardBalance !== 0 ||
+    savings !== 0 ||
+    income !== 0 ||
+    expenses !== 0 ||
+    totalBalance !== 0;
+
   return (
     <div className="card">
       <div className="flex items-center justify-between">
         <h5 className="text-lg text-text-primary transition-colors">Finance Overview</h5>
       </div>
 
-      <CustomPieChart
-        data={balanceData}
-        label="Total Balance"
-        totalAmount={formatCurrency(totalBalance)}
-        colors={colors}
-        showTextAnchor
-        legendOrder={legendOrder}
-      />
+      <div className="mt-8">
+        {hasData ? (
+          <CustomPieChart
+            data={balanceData}
+            label="Total Balance"
+            totalAmount={formatCurrency(totalBalance)}
+            colors={colors}
+            showTextAnchor
+            legendOrder={legendOrder}
+          />
+        ) : (
+          <div className="text-center py-12 bg-bg-secondary rounded-lg transition-colors">
+            <p className="text-text-secondary transition-colors">
+              No financial data available for this period
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

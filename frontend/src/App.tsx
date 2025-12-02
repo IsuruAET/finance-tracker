@@ -4,6 +4,7 @@ import ToastContainer from "./components/ToastContainer";
 import UserProvider from "./context/UserProvider";
 import { DateRangeProvider } from "./context/DateRangeProvider";
 import { WalletFilterProvider } from "./context/WalletFilterProvider";
+import { MonthYearFilterProvider } from "./context/MonthYearFilterProvider";
 import { ThemeProvider } from "./context/ThemeProvider";
 import { ClientConfigProvider } from "./context/ClientConfigProvider";
 
@@ -15,8 +16,10 @@ function App() {
           <Router>
             <DateRangeProvider>
               <WalletFilterProvider>
-                <AppRoutes />
-                <ToastContainer />
+                <MonthYearFilterProvider>
+                  <AppRoutes />
+                  <ToastContainer />
+                </MonthYearFilterProvider>
               </WalletFilterProvider>
             </DateRangeProvider>
           </Router>

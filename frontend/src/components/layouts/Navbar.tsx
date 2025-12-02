@@ -68,7 +68,7 @@ const Navbar = ({ activeMenu }: NavbarProps) => {
         </div>
 
         <div className="flex items-center gap-2 -mr-1">
-          {["Transaction", "Income", "Expense"].includes(activeMenu) && (
+          {["Transaction", "Income", "Expense", "Dashboard"].includes(activeMenu) && (
             <button
               onClick={() => {
                 window.dispatchEvent(new Event("toggle-filters"));

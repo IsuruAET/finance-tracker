@@ -22,13 +22,21 @@ const RecentTransactions = ({
       </div>
 
       <div className="mt-6">
-        {transactions?.slice(0, 5).map((item) => (
-          <TransactionInfoCard
-            key={item._id}
-            transaction={item}
-            hideDeleteBtn
-          />
-        ))}
+        {transactions && transactions.length > 0 ? (
+          transactions.slice(0, 5).map((item) => (
+            <TransactionInfoCard
+              key={item._id}
+              transaction={item}
+              hideDeleteBtn
+            />
+          ))
+        ) : (
+          <div className="text-center py-8 bg-bg-secondary rounded-lg transition-colors">
+            <p className="text-text-secondary transition-colors">
+              No transactions found for this period
+            </p>
+          </div>
+        )}
       </div>
     </div>
   );

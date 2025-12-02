@@ -57,7 +57,17 @@ const ClosingBalanceTrends = ({
           </p>
         </div>
       </div>
-      <CustomLineChart data={chartData} />
+      <div className="mt-6">
+        {chartData.length === 0 ? (
+          <div className="text-center py-12 bg-bg-secondary rounded-lg transition-colors">
+            <p className="text-text-secondary transition-colors">
+              No balance history available for this period
+            </p>
+          </div>
+        ) : (
+          <CustomLineChart data={chartData} />
+        )}
+      </div>
     </div>
   );
 };
