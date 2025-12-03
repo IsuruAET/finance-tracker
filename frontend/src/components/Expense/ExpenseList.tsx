@@ -66,12 +66,27 @@ const ExpenseList = ({
         {sortedDates.map((dateKey) => {
           const dateTransactions = groupedTransactions.get(dateKey) || [];
           const dateHeader = formatDateHeader(dateKey);
-          const fullDate = DateTime.fromISO(dateKey).toFormat("MMM d, yyyy");
+          const dt = DateTime.fromISO(dateKey);
+          const fullDate = dt.toFormat("MMM d, yyyy");
+          const dayOfWeek = dt.toFormat("EEEE"); // e.g., "Wednesday"
           const isExpanded = expandedDates.has(dateKey);
           const totalAmount = dateTransactions.reduce(
             (sum, transaction) => sum + transaction.amount,
             0
           );
+
+          // Determine what to show as secondary text
+          let secondaryText = "";
+          if (dateHeader === "Today" || dateHeader === "Yesterday") {
+            // Don't show anything for Today/Yesterday
+            secondaryText = "";
+          } else if (dateHeader === dayOfWeek) {
+            // If dateHeader is already the day name (within last 7 days), show full date
+            secondaryText = fullDate;
+          } else {
+            // If dateHeader is "MMM d" format, show day of week instead of full date
+            secondaryText = dayOfWeek;
+          }
 
           return (
             <div key={dateKey} className="space-y-3">
@@ -83,9 +98,9 @@ const ExpenseList = ({
                   <h6 className="text-sm font-semibold text-text-primary transition-colors">
                     {dateHeader}
                   </h6>
-                  {dateHeader !== fullDate && (
+                  {secondaryText && (
                     <span className="text-xs text-text-secondary transition-colors">
-                      {fullDate}
+                      {secondaryText}
                     </span>
                   )}
                 </div>

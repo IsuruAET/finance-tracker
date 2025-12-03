@@ -82,7 +82,7 @@ const TransactionInfoCard = ({
 
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:gap-4">
           <div className="flex items-center gap-3">
-            <div className="w-11 h-11 flex items-center justify-center text-lg text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
+            <div className="w-11 h-11 flex items-center justify-center text-lg text-gray-800 dark:text-text-primary bg-gray-100 dark:bg-gray-700/60 dark:border dark:border-gray-600/50 rounded-full transition-colors shrink-0">
               {icon ? (
                 <img src={icon} alt={title} className="w-6 h-6" />
               ) : type === "TRANSFER" ? (
