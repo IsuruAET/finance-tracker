@@ -10,6 +10,8 @@ import {
   formatCurrency,
 } from "../../utils/helper";
 import { DateTime } from "luxon";
+import Modal from "../Modal";
+import DeleteAlert from "../DeleteAlert";
 
 interface ExpenseListProps {
   transactions: TransactionApiResponse[];
@@ -25,6 +27,13 @@ const ExpenseList = ({
   onDownload,
 }: ExpenseListProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>("date");
+  const [openDeleteAlert, setOpenDeleteAlert] = useState<{
+    show: boolean;
+    id: string | null;
+  }>({
+    show: false,
+    id: null,
+  });
   const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
     new Set()
   );
@@ -48,6 +57,17 @@ const ExpenseList = ({
       }
       return newSet;
     });
+  };
+
+  const handleDeleteClick = (id: string) => {
+    setOpenDeleteAlert({ show: true, id });
+  };
+
+  const handleConfirmDelete = () => {
+    if (openDeleteAlert.id) {
+      onDelete(openDeleteAlert.id);
+    }
+    setOpenDeleteAlert({ show: false, id: null });
   };
 
   const renderDateView = () => {
@@ -141,7 +161,7 @@ const ExpenseList = ({
                     <TransactionInfoCard
                       key={item._id}
                       transaction={item}
-                      onDelete={() => onDelete(item._id)}
+                      onDelete={() => handleDeleteClick(item._id)}
                     />
                   ))}
                 </div>
@@ -248,7 +268,7 @@ const ExpenseList = ({
                     <TransactionInfoCard
                       key={item._id}
                       transaction={item}
-                      onDelete={() => onDelete(item._id)}
+                      onDelete={() => handleDeleteClick(item._id)}
                     />
                   ))}
                 </div>
@@ -303,6 +323,17 @@ const ExpenseList = ({
       </div>
 
       {viewMode === "date" ? renderDateView() : renderCategoryView()}
+
+      <Modal
+        isOpen={openDeleteAlert.show}
+        onClose={() => setOpenDeleteAlert({ show: false, id: null })}
+        title="Delete Transaction"
+      >
+        <DeleteAlert
+          content="Are you sure you want to delete this transaction?"
+          onDelete={handleConfirmDelete}
+        />
+      </Modal>
     </div>
   );
 };

@@ -1,4 +1,3 @@
-import { useState } from "react";
 import {
   LuUtensils,
   LuTrendingUp,
@@ -9,8 +8,6 @@ import {
 import { BiTransfer } from "react-icons/bi";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import { formatDate, formatCurrency } from "../../utils/helper";
-import Modal from "../Modal";
-import DeleteAlert from "../DeleteAlert";
 
 interface TransactionInfoCardProps {
   transaction: TransactionApiResponse;
@@ -55,8 +52,6 @@ const TransactionInfoCard = ({
   const amount = transaction.amount;
   const type = transaction.type;
 
-  const [isDeleteAlertOpen, setIsDeleteAlertOpen] = useState(false);
-
   const getAmountStyles = () => {
     if (type === "INCOME")
       return "bg-green-50 dark:bg-green-900/30 text-green-500 dark:text-green-400";
@@ -73,7 +68,7 @@ const TransactionInfoCard = ({
         {!hideDeleteBtn && onDelete && (
           <button
             className="absolute top-2.5 right-2.5 sm:top-3 sm:right-3 text-gray-400 dark:text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer z-10"
-            onClick={() => setIsDeleteAlertOpen(true)}
+            onClick={onDelete}
             aria-label="Delete transaction"
           >
             <LuTrash2 size={18} />
@@ -129,22 +124,6 @@ const TransactionInfoCard = ({
           </div>
         </div>
       </div>
-
-      {!hideDeleteBtn && onDelete && (
-        <Modal
-          isOpen={isDeleteAlertOpen}
-          onClose={() => setIsDeleteAlertOpen(false)}
-          title="Delete Transaction"
-        >
-          <DeleteAlert
-            content="Are you sure you want to delete this transaction?"
-            onDelete={() => {
-              onDelete();
-              setIsDeleteAlertOpen(false);
-            }}
-          />
-        </Modal>
-      )}
     </>
   );
 };
