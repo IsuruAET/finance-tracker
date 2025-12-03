@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { LuDownload } from "react-icons/lu";
+import { LuDownload, LuChevronDown } from "react-icons/lu";
 import { HiViewList, HiViewGrid } from "react-icons/hi";
 import TransactionInfoCard from "../Cards/TransactionInfoCard";
 import type { TransactionApiResponse } from "../../types/dashboard";
@@ -25,6 +25,10 @@ const IncomeList = ({
   onDownload,
 }: IncomeListProps) => {
   const [viewMode, setViewMode] = useState<ViewMode>("date");
+  const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
+    new Set()
+  );
+  const [expandedDates, setExpandedDates] = useState<Set<string>>(new Set());
 
   const groupedTransactions = groupTransactionsByDate(transactions);
   const categoryGroupedTransactions = groupTransactionsByCategory(transactions);
@@ -33,6 +37,18 @@ const IncomeList = ({
   const sortedDates = Array.from(groupedTransactions.keys()).sort(
     (a, b) => new Date(b).getTime() - new Date(a).getTime()
   );
+
+  const toggleDate = (dateKey: string) => {
+    setExpandedDates((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(dateKey)) {
+        newSet.delete(dateKey);
+      } else {
+        newSet.add(dateKey);
+      }
+      return newSet;
+    });
+  };
 
   const renderDateView = () => {
     if (sortedDates.length === 0) {
@@ -51,40 +67,87 @@ const IncomeList = ({
           const dateTransactions = groupedTransactions.get(dateKey) || [];
           const dateHeader = formatDateHeader(dateKey);
           const fullDate = DateTime.fromISO(dateKey).toFormat("MMM d, yyyy");
+          const isExpanded = expandedDates.has(dateKey);
+          const totalAmount = dateTransactions.reduce(
+            (sum, transaction) => sum + transaction.amount,
+            0
+          );
 
           return (
             <div key={dateKey} className="space-y-3">
-              <div className="flex items-center gap-3 pb-2 border-b border-border transition-colors">
-                <h6 className="text-sm font-semibold text-text-primary transition-colors">
-                  {dateHeader}
-                </h6>
-                {dateHeader !== fullDate && (
-                  <span className="text-xs text-text-secondary transition-colors">
-                    {fullDate}
-                  </span>
-                )}
-                <span className="text-xs text-text-secondary ml-auto transition-colors">
-                  {dateTransactions.length}{" "}
-                  {dateTransactions.length === 1
-                    ? "transaction"
-                    : "transactions"}
-                </span>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {dateTransactions.map((item) => (
-                  <TransactionInfoCard
-                    key={item._id}
-                    transaction={item}
-                    onDelete={() => onDelete(item._id)}
+              <button
+                onClick={() => toggleDate(dateKey)}
+                className="w-full flex items-center gap-3 pb-2 border-b border-border transition-colors hover:opacity-80 cursor-pointer"
+              >
+                <div className="flex items-center gap-3 flex-1">
+                  <h6 className="text-sm font-semibold text-text-primary transition-colors">
+                    {dateHeader}
+                  </h6>
+                  {dateHeader !== fullDate && (
+                    <span className="text-xs text-text-secondary transition-colors">
+                      {fullDate}
+                    </span>
+                  )}
+                </div>
+                <div className="ml-auto flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-text-primary transition-colors">
+                      {formatCurrency(totalAmount)}
+                    </p>
+                    <span className="text-xs text-text-secondary transition-colors">
+                      {dateTransactions.length}{" "}
+                      {dateTransactions.length === 1
+                        ? "transaction"
+                        : "transactions"}
+                    </span>
+                  </div>
+                  <LuChevronDown
+                    className={`text-text-secondary transition-transform duration-300 ease-in-out ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                    size={20}
                   />
-                ))}
+                </div>
+              </button>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isExpanded ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-2 gap-3 transition-all duration-300 ease-in-out ${
+                    isExpanded
+                      ? "translate-y-0 opacity-100"
+                      : "-translate-y-4 opacity-0"
+                  }`}
+                >
+                  {dateTransactions.map((item) => (
+                    <TransactionInfoCard
+                      key={item._id}
+                      transaction={item}
+                      onDelete={() => onDelete(item._id)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           );
         })}
       </div>
     );
+  };
+
+  const toggleCategory = (categoryId: string) => {
+    setExpandedCategories((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(categoryId)) {
+        newSet.delete(categoryId);
+      } else {
+        newSet.add(categoryId);
+      }
+      return newSet;
+    });
   };
 
   const renderCategoryView = () => {
@@ -106,11 +169,15 @@ const IncomeList = ({
           const latestDate = latestTransaction
             ? DateTime.fromISO(latestTransaction.date).toFormat("MMM d, yyyy")
             : "";
+          const isExpanded = expandedCategories.has(category.categoryId);
 
           return (
             <div key={category.categoryId} className="space-y-3">
-              <div className="flex items-center gap-3 pb-2 border-b border-border transition-colors">
-                <div className="flex items-center gap-3">
+              <button
+                onClick={() => toggleCategory(category.categoryId)}
+                className="w-full flex items-center gap-3 pb-2 border-b border-border transition-colors hover:opacity-80 cursor-pointer"
+              >
+                <div className="flex items-center gap-3 flex-1">
                   {category.categoryIcon && (
                     <div className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
                       <img
@@ -120,7 +187,7 @@ const IncomeList = ({
                       />
                     </div>
                   )}
-                  <div>
+                  <div className="text-left">
                     <h6 className="text-sm font-semibold text-text-primary transition-colors">
                       {category.categoryName}
                     </h6>
@@ -131,25 +198,45 @@ const IncomeList = ({
                     )}
                   </div>
                 </div>
-                <div className="ml-auto text-right">
-                  <p className="text-sm font-semibold text-text-primary transition-colors">
-                    {formatCurrency(category.total)}
-                  </p>
-                  <span className="text-xs text-text-secondary transition-colors">
-                    {category.count}{" "}
-                    {category.count === 1 ? "transaction" : "transactions"}
-                  </span>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                {category.transactions.map((item) => (
-                  <TransactionInfoCard
-                    key={item._id}
-                    transaction={item}
-                    onDelete={() => onDelete(item._id)}
+                <div className="ml-auto flex items-center gap-3">
+                  <div className="text-right">
+                    <p className="text-sm font-semibold text-text-primary transition-colors">
+                      {formatCurrency(category.total)}
+                    </p>
+                    <span className="text-xs text-text-secondary transition-colors">
+                      {category.count}{" "}
+                      {category.count === 1 ? "transaction" : "transactions"}
+                    </span>
+                  </div>
+                  <LuChevronDown
+                    className={`text-text-secondary transition-transform duration-300 ease-in-out ${
+                      isExpanded ? "rotate-180" : ""
+                    }`}
+                    size={20}
                   />
-                ))}
+                </div>
+              </button>
+
+              <div
+                className={`overflow-hidden transition-all duration-300 ease-in-out ${
+                  isExpanded ? "max-h-[5000px] opacity-100" : "max-h-0 opacity-0"
+                }`}
+              >
+                <div
+                  className={`grid grid-cols-1 md:grid-cols-2 gap-3 transition-all duration-300 ease-in-out ${
+                    isExpanded
+                      ? "translate-y-0 opacity-100"
+                      : "-translate-y-4 opacity-0"
+                  }`}
+                >
+                  {category.transactions.map((item) => (
+                    <TransactionInfoCard
+                      key={item._id}
+                      transaction={item}
+                      onDelete={() => onDelete(item._id)}
+                    />
+                  ))}
+                </div>
               </div>
             </div>
           );
