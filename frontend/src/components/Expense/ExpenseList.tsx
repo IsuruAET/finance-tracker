@@ -99,48 +99,61 @@ const ExpenseList = ({
     }
 
     return (
-      <div className="space-y-4">
-        {categoryGroupedTransactions.map((category) => (
-          <div key={category.categoryId} className="space-y-2">
-            <div className="flex items-center justify-between p-3 bg-bg-secondary rounded-lg transition-colors">
-              <div className="flex items-center gap-3">
-                {category.categoryIcon && (
-                  <div className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
-                    <img
-                      src={category.categoryIcon}
-                      alt={category.categoryName}
-                      className="w-6 h-6"
-                    />
+      <div className="space-y-6">
+        {categoryGroupedTransactions.map((category) => {
+          // Get the latest transaction date for this category
+          const latestTransaction = category.transactions[0]; // Already sorted by date desc
+          const latestDate = latestTransaction
+            ? DateTime.fromISO(latestTransaction.date).toFormat("MMM d, yyyy")
+            : "";
+
+          return (
+            <div key={category.categoryId} className="space-y-3">
+              <div className="flex items-center gap-3 pb-2 border-b border-border transition-colors">
+                <div className="flex items-center gap-3">
+                  {category.categoryIcon && (
+                    <div className="w-10 h-10 flex items-center justify-center bg-gray-100 dark:bg-bg-tertiary rounded-full transition-colors shrink-0">
+                      <img
+                        src={category.categoryIcon}
+                        alt={category.categoryName}
+                        className="w-6 h-6"
+                      />
+                    </div>
+                  )}
+                  <div>
+                    <h6 className="text-sm font-semibold text-text-primary transition-colors">
+                      {category.categoryName}
+                    </h6>
+                    {latestDate && (
+                      <span className="text-xs text-text-secondary transition-colors">
+                        {latestDate}
+                      </span>
+                    )}
                   </div>
-                )}
-                <div>
-                  <h6 className="text-sm font-semibold text-text-primary transition-colors">
-                    {category.categoryName}
-                  </h6>
-                  <p className="text-xs text-text-secondary transition-colors">
+                </div>
+                <div className="ml-auto text-right">
+                  <p className="text-sm font-semibold text-text-primary transition-colors">
+                    {formatCurrency(category.total)}
+                  </p>
+                  <span className="text-xs text-text-secondary transition-colors">
                     {category.count}{" "}
                     {category.count === 1 ? "transaction" : "transactions"}
-                  </p>
+                  </span>
                 </div>
               </div>
-              <div className="text-right">
-                <p className="text-sm font-semibold text-text-primary transition-colors">
-                  {formatCurrency(category.total)}
-                </p>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                {category.transactions.map((item) => (
+                  <TransactionInfoCard
+                    key={item._id}
+                    transaction={item}
+                    onDelete={() => onDelete(item._id)}
+                  />
+                ))}
               </div>
             </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-3 ml-4">
-              {category.transactions.map((item) => (
-                <TransactionInfoCard
-                  key={item._id}
-                  transaction={item}
-                  onDelete={() => onDelete(item._id)}
-                />
-              ))}
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     );
   };
