@@ -16,6 +16,8 @@ import TransferList from "../../components/Wallet/TransferList";
 import axios from "axios";
 import InfoCard from "../../components/Cards/InfoCard";
 import type { TransactionApiResponse } from "../../types/dashboard";
+import cashIcon from "../../assets/images/cash.png";
+import cardIcon from "../../assets/images/card.png";
 
 interface Wallet {
   _id: string;
@@ -241,13 +243,18 @@ const Wallet = () => {
   );
 
   const renderWalletIcon = (wallet: Wallet) => {
-    const icon = wallet.icon || "💳";
-    const isUrl = icon.startsWith("http://") || icon.startsWith("https://");
-
-    if (isUrl) {
-      return <img src={icon} alt={wallet.name} className="w-6 h-6" />;
+    // If wallet has a custom icon (URL or emoji), use it
+    if (wallet.icon) {
+      const isUrl = wallet.icon.startsWith("http://") || wallet.icon.startsWith("https://");
+      if (isUrl) {
+        return <img src={wallet.icon} alt={wallet.name} className="w-6 h-6" />;
+      }
+      return <span className="text-2xl leading-none">{wallet.icon}</span>;
     }
-    return <span className="text-2xl leading-none">{icon}</span>;
+    
+    // Use default images based on wallet type
+    const defaultIcon = wallet.type === "CASH" ? cashIcon : cardIcon;
+    return <img src={defaultIcon} alt={wallet.name} className="w-6 h-6" />;
   };
 
   const renderWalletCard = (wallet: Wallet) => {
@@ -256,14 +263,14 @@ const Wallet = () => {
     const getWalletColor = (type: Wallet["type"]) => {
       switch (type) {
         case "CASH":
-          return "bg-green-50";
+          return "bg-green-50 dark:bg-green-900/30";
         case "CARD":
         case "BANK":
-          return "bg-blue-50";
+          return "bg-blue-50 dark:bg-blue-900/30";
         case "OTHER":
-          return "bg-purple-50";
+          return "bg-purple-50 dark:bg-purple-900/30";
         default:
-          return "bg-gray-50";
+          return "bg-gray-50 dark:bg-gray-800/30";
       }
     };
     const color = getWalletColor(wallet.type);
