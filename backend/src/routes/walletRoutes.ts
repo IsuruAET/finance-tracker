@@ -6,6 +6,7 @@ import {
   transferBetweenWallets,
   getTransfers,
   deleteWallet,
+  updateWallet,
 } from "../controllers/walletControllers";
 import { protect } from "../middleware/authMiddleware";
 
@@ -16,6 +17,7 @@ router.get("/get", protect, getAllWallets);
 router.post("/add", protect, addWallet);
 router.post("/transfer", protect, transferBetweenWallets);
 router.get("/transfers", protect, getTransfers);
+router.put("/:id", protect, updateWallet);
 router.delete("/:id", protect, deleteWallet);
 
 export default router;

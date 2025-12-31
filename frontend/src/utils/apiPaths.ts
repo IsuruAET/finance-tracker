@@ -30,6 +30,8 @@ export const API_PATHS = {
     ADD: "/api/v1/wallet/add",
     TRANSFER: "/api/v1/wallet/transfer",
     GET_TRANSFERS: "/api/v1/wallet/transfers",
+    UPDATE_WALLET: (walletId: string | number): string =>
+      `/api/v1/wallet/${walletId}`,
     DELETE_WALLET: (walletId: string | number): string =>
       `/api/v1/wallet/${walletId}`,
   },

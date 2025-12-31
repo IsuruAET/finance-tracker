@@ -398,3 +398,39 @@ export const deleteWallet = async (
     return res.status(500).json({ message: "Unknown error occurred" });
   }
 };
+
+// Update wallet name
+export const updateWallet = async (
+  req: AuthenticatedRequest,
+  res: Response
+): Promise<Response> => {
+  const userId = req.user?._id;
+
+  try {
+    const walletId = req.params.id;
+    const { name } = req.body || {};
+
+    if (!name || typeof name !== "string" || name.trim().length === 0) {
+      return res.status(400).json({ message: "Wallet name is required" });
+    }
+
+    // Find wallet and verify it belongs to user
+    const wallet = await Wallet.findOne({ _id: walletId, userId });
+    if (!wallet) {
+      return res.status(404).json({ message: "Wallet not found" });
+    }
+
+    // Update wallet name
+    wallet.name = name.trim();
+    await wallet.save();
+
+    return res.status(200).json(wallet);
+  } catch (error: unknown) {
+    if (error instanceof Error) {
+      return res
+        .status(500)
+        .json({ message: "Error updating wallet", error: error.message });
+    }
+    return res.status(500).json({ message: "Unknown error occurred" });
+  }
+};

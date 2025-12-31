@@ -3,6 +3,7 @@ import DashboardLayout from "../../components/layouts/DashboardLayout";
 import Modal from "../../components/Modal";
 import TransferForm from "../../components/Wallet/TransferForm";
 import AddWalletForm from "../../components/Wallet/AddWalletForm";
+import EditWalletForm from "../../components/Wallet/EditWalletForm";
 import DeleteAlert, {
   type DeleteAlertState,
 } from "../../components/DeleteAlert";
@@ -10,7 +11,7 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { formatCurrency, formatDate } from "../../utils/helper";
-import { LuPlus, LuTrash2 } from "react-icons/lu";
+import { LuPlus, LuTrash2, LuPencil } from "react-icons/lu";
 import TransferList from "../../components/Wallet/TransferList";
 import axios from "axios";
 import InfoCard from "../../components/Cards/InfoCard";
@@ -55,6 +56,13 @@ const Wallet = () => {
   const transfersLoadingRef = useRef(false);
   const [openTransferModal, setOpenTransferModal] = useState(false);
   const [openAddWalletModal, setOpenAddWalletModal] = useState(false);
+  const [openEditModal, setOpenEditModal] = useState<{
+    show: boolean;
+    wallet: Wallet | null;
+  }>({
+    show: false,
+    wallet: null,
+  });
   const [openDeleteAlert, setOpenDeleteAlert] = useState<DeleteAlertState>({
     show: false,
     data: null,
@@ -143,6 +151,15 @@ const Wallet = () => {
 
   const handleAddWalletComplete = () => {
     setOpenAddWalletModal(false);
+    fetchWallets();
+  };
+
+  const handleEditWalletClick = (wallet: Wallet) => {
+    setOpenEditModal({ show: true, wallet });
+  };
+
+  const handleEditWalletComplete = () => {
+    setOpenEditModal({ show: false, wallet: null });
     fetchWallets();
   };
 
@@ -260,15 +277,24 @@ const Wallet = () => {
           color={color}
           desc={formatDate(wallet?.initializedAt || "")}
         />
-        {canDelete && (
+        <div className="absolute top-2 right-2 flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all">
           <button
-            onClick={() => handleDeleteWalletClick(wallet._id)}
-            className="absolute top-2 right-2 text-text-secondary hover:text-red-500 dark:hover:text-red-400 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm"
-            title="Delete wallet"
+            onClick={() => handleEditWalletClick(wallet)}
+            className="text-text-secondary hover:text-primary dark:hover:text-primary opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm"
+            title="Edit wallet name"
           >
-            <LuTrash2 className="h-5 w-5" />
+            <LuPencil className="h-5 w-5" />
           </button>
-        )}
+          {canDelete && (
+            <button
+              onClick={() => handleDeleteWalletClick(wallet._id)}
+              className="text-red-500 dark:text-red-400 lg:text-text-secondary lg:hover:text-red-500 lg:dark:hover:text-red-400 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm"
+              title="Delete wallet"
+            >
+              <LuTrash2 className="h-5 w-5" />
+            </button>
+          )}
+        </div>
       </div>
     );
   };
@@ -391,6 +417,20 @@ const Wallet = () => {
             content="Are you sure you want to delete this wallet? This action cannot be undone."
             onDelete={() => deleteWallet(openDeleteAlert.data!)}
           />
+        </Modal>
+
+        <Modal
+          isOpen={openEditModal.show}
+          onClose={() => setOpenEditModal({ show: false, wallet: null })}
+          title="Edit Wallet Name"
+        >
+          {openEditModal.wallet && (
+            <EditWalletForm
+              walletId={openEditModal.wallet._id}
+              currentName={openEditModal.wallet.name}
+              onUpdateComplete={handleEditWalletComplete}
+            />
+          )}
         </Modal>
       </div>
     </DashboardLayout>
