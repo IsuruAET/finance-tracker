@@ -2,6 +2,8 @@ import { useEffect, useState, useCallback, useRef } from "react";
 import { formatCurrency } from "../../utils/helper";
 import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
+import { LuList } from "react-icons/lu";
+import Modal from "../Modal";
 
 interface WalletMetricsResponse {
   openingBalance: number;
@@ -10,6 +12,21 @@ interface WalletMetricsResponse {
   expenses: number;
   transferIn: number;
   transferOut: number;
+  currentBalance: number;
+}
+
+interface Target {
+  _id?: string;
+  amount: number;
+  description?: string;
+}
+
+interface MonthlyGoal {
+  _id: string;
+  walletId: string;
+  targets: Target[];
+  cumulativeTarget: number;
+  averageTarget: number;
   currentBalance: number;
 }
 
@@ -24,7 +41,6 @@ interface TargetMeterProps {
 const TargetMeter = ({
   walletId,
   walletName,
-  averageTarget,
   cumulativeTarget,
   selectedMonth,
 }: TargetMeterProps) => {
@@ -32,6 +48,9 @@ const TargetMeter = ({
   const [expenses, setExpenses] = useState(0);
   const [loading, setLoading] = useState(true);
   const [shouldAnimate, setShouldAnimate] = useState(false);
+  const [showTargetsModal, setShowTargetsModal] = useState(false);
+  const [targets, setTargets] = useState<Target[]>([]);
+  const [fetchingTargets, setFetchingTargets] = useState(false);
   const loadingRef = useRef(false);
 
   // Fetch wallet metrics from backend
@@ -77,24 +96,57 @@ const TargetMeter = ({
     fetchWalletMetrics();
   }, [fetchWalletMetrics]);
 
+  // Fetch monthly targets when modal opens
+  const fetchMonthlyTargets = useCallback(async () => {
+    if (!showTargetsModal) return;
+    
+    setFetchingTargets(true);
+    try {
+      const response = await axiosInstance.get<MonthlyGoal | null>(
+        API_PATHS.GOALS.MONTHLY.GET_BY_WALLET,
+        {
+          params: { walletId },
+        }
+      );
+
+      if (response.data && response.data.targets) {
+        setTargets(response.data.targets);
+      } else {
+        setTargets([]);
+      }
+    } catch (error) {
+      console.error("Error fetching monthly targets", error);
+      setTargets([]);
+    } finally {
+      setFetchingTargets(false);
+    }
+  }, [walletId, showTargetsModal]);
+
+  useEffect(() => {
+    fetchMonthlyTargets();
+  }, [fetchMonthlyTargets]);
+
   // Calculate total (current balance + expenses)
   const totalValue = currentBalance + expenses;
   
-  // Calculate the position of total value relative to average
-  // Average is at 50% (middle), so we need to scale accordingly
-  const maxDisplay = Math.max(averageTarget * 2, totalValue, cumulativeTarget, 1); // Minimum 1 to avoid division by zero
+  // Calculate the position of total value relative to cumulative target
+  // Cumulative target must be at 50% (middle), so maxDisplay = cumulativeTarget * 2
+  // This ensures the cumulative target is visually centered
   const minDisplay = 0;
+  const maxDisplay = cumulativeTarget > 0 
+    ? Math.max(cumulativeTarget * 2, totalValue, 1) // Minimum 1 to avoid division by zero
+    : Math.max(totalValue, 1);
 
   // Calculate percentage positions
-  const averagePosition = 50; // Always at middle (50%)
+  // Cumulative target is always at 50% (middle)
+  const cumulativeTargetPosition = 50; // Always at middle (50%)
   const range = maxDisplay - minDisplay;
   const totalPosition = range > 0 ? ((totalValue - minDisplay) / range) * 100 : 0;
   const balancePosition = range > 0 && totalValue > 0 ? ((currentBalance / totalValue) * totalPosition) : 0;
   const expensesPosition = range > 0 && totalValue > 0 ? ((expenses / totalValue) * totalPosition) : 0;
-  const cumulativePosition = range > 0 ? ((cumulativeTarget - minDisplay) / range) * 100 : 0;
 
-  // Determine color based on total (balance + expenses) vs target (average target)
-  const isOnTrack = totalValue >= averageTarget;
+  // Determine color based on total (balance + expenses) vs cumulative target
+  const isOnTrack = cumulativeTarget > 0 ? totalValue >= cumulativeTarget : false;
   const balanceColor = isOnTrack ? "text-green-600" : "text-red-600";
   const expensesColor = isOnTrack ? "text-green-400" : "text-red-400";
   
@@ -102,10 +154,22 @@ const TargetMeter = ({
   const balanceMeterColor = isOnTrack ? "bg-green-600" : "bg-red-600";
   const expensesMeterColor = isOnTrack ? "bg-green-400" : "bg-red-400";
 
+  const cumulativeTargetFromList = targets.reduce((sum, target) => sum + (target.amount || 0), 0);
+
   return (
-    <div className="card">
-      <div className="mb-4">
-        <h5 className="text-lg font-medium text-text-primary mb-1">{walletName}</h5>
+    <>
+      <div className="card">
+        <div className="mb-4">
+          <div className="flex items-center justify-between mb-1">
+            <h5 className="text-lg font-medium text-text-primary">{walletName}</h5>
+            <button
+              onClick={() => setShowTargetsModal(true)}
+              className="p-1.5 text-text-secondary hover:text-primary rounded transition-colors"
+              title="View Monthly Targets"
+            >
+              <LuList className="h-5 w-5 cursor-pointer" />
+            </button>
+          </div>
         <div className="space-y-1">
           <div className="flex items-center justify-between">
             <span className="text-sm text-text-secondary">Current Balance</span>
@@ -132,21 +196,15 @@ const TargetMeter = ({
       <div className="relative">
         {/* Background bar */}
         <div className="h-8 bg-bg-secondary rounded-lg overflow-hidden relative">
-          {/* Average target marker (middle) */}
-          <div
-            className="absolute top-0 bottom-0 w-0.5 bg-primary z-10"
-            style={{ left: `${averagePosition}%` }}
-          />
-
-          {/* Cumulative target marker */}
+          {/* Cumulative target marker (middle) */}
           {cumulativeTarget > 0 && (
             <div
-              className="absolute top-0 bottom-0 w-0.5 bg-blue-500 z-10"
-              style={{ left: `${Math.min(100, cumulativePosition)}%` }}
+              className="absolute top-0 bottom-0 w-0.5 bg-primary z-10"
+              style={{ left: `${cumulativeTargetPosition}%` }}
             >
               <div className="absolute -top-6 left-1/2 transform -translate-x-1/2 whitespace-nowrap">
-                <span className="text-xs font-medium text-blue-500">
-                  Total: {formatCurrency(cumulativeTarget)}
+                <span className="text-xs font-medium text-primary">
+                  Target: {formatCurrency(cumulativeTarget)}
                 </span>
               </div>
             </div>
@@ -201,9 +259,11 @@ const TargetMeter = ({
         <div className="relative mt-8 text-xs text-text-secondary">
           <div className="flex justify-between">
             <span>{formatCurrency(minDisplay)}</span>
-            <span className="absolute left-1/2 transform -translate-x-1/2 text-primary font-medium">
-              {formatCurrency(averageTarget)}
-            </span>
+            {cumulativeTarget > 0 && (
+              <span className="absolute left-1/2 transform -translate-x-1/2 text-primary font-medium">
+                {formatCurrency(cumulativeTarget)}
+              </span>
+            )}
             <span>{formatCurrency(maxDisplay)}</span>
           </div>
         </div>
@@ -226,7 +286,96 @@ const TargetMeter = ({
       {loading && (
         <div className="mt-2 text-xs text-text-secondary text-center">Calculating...</div>
       )}
-    </div>
+      </div>
+
+      {/* Monthly Targets View Modal */}
+      <Modal 
+        isOpen={showTargetsModal} 
+        onClose={() => setShowTargetsModal(false)}
+        title={`Monthly Targets - ${walletName}`}
+      >
+        <div>
+          <p className="text-sm text-text-secondary mb-4">
+            View all monthly targets for this wallet
+          </p>
+
+          {fetchingTargets ? (
+            <div className="text-center py-8">
+              <p className="text-text-secondary">Loading targets...</p>
+            </div>
+          ) : targets.length === 0 ? (
+            <div className="text-center py-8 bg-bg-secondary rounded-lg">
+              <p className="text-text-secondary">No monthly targets set for this wallet</p>
+            </div>
+          ) : (
+            <>
+              <div className="space-y-2 max-h-[400px] overflow-y-auto mb-4">
+                {targets.map((target, index) => (
+                  <div
+                    key={target._id || index}
+                    className="p-4 bg-bg-secondary rounded-lg border border-border"
+                  >
+                    <div className="flex items-center justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2">
+                          <span className="text-lg font-semibold text-text-primary">
+                            {formatCurrency(target.amount)}
+                          </span>
+                        </div>
+                        {target.description && (
+                          <p className="text-sm text-text-secondary mt-1">
+                            {target.description}
+                          </p>
+                        )}
+                        {!target.description && (
+                          <p className="text-xs text-text-secondary mt-1 italic">
+                            No description
+                          </p>
+                        )}
+                      </div>
+                      <div className="text-xs text-text-secondary bg-primary/10 dark:bg-primary/20 px-2 py-1 rounded">
+                        #{index + 1}
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {cumulativeTargetFromList > 0 && (
+                <div className="mb-4 p-4 bg-primary/10 dark:bg-primary/20 rounded-lg border border-primary/20">
+                  <div className="flex items-center justify-between">
+                    <span className="text-sm font-medium text-text-primary">
+                      Cumulative Target:
+                    </span>
+                    <span className="text-xl font-semibold text-primary">
+                      {formatCurrency(cumulativeTargetFromList)}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between mt-2">
+                    <span className="text-sm font-medium text-text-primary">
+                      Average Target:
+                    </span>
+                    <span className="text-lg font-semibold text-primary">
+                      {formatCurrency(cumulativeTargetFromList / targets.length)}
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              <div className="flex justify-end">
+                <button
+                  type="button"
+                  className="add-btn add-btn-fill"
+                  onClick={() => setShowTargetsModal(false)}
+                >
+                  Close
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </Modal>
+    </>
   );
 };
 
