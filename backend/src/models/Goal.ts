@@ -1,15 +1,25 @@
 import mongoose, { Document, Schema } from "mongoose";
 
-export type GoalStatus = "SUCCESS" | "FAIL" | "IN_PROGRESS";
+export interface ITarget {
+  amount: number;
+  description?: string;
+}
 
 export interface IGoal extends Document {
   walletId: mongoose.Schema.Types.ObjectId;
-  targetAmount: number;
-  targetDate: Date;
-  status: GoalStatus;
+  targetAmount: number; // Cumulative target (sum of all targets)
+  targets: ITarget[];
   createdAt: Date;
   updatedAt: Date;
 }
+
+const TargetSchema = new Schema<ITarget>(
+  {
+    amount: { type: Number, required: true, min: 0 },
+    description: { type: String, trim: true },
+  },
+  { _id: true }
+);
 
 const GoalSchema = new Schema<IGoal>(
   {
@@ -19,19 +29,12 @@ const GoalSchema = new Schema<IGoal>(
       required: true,
     },
     targetAmount: { type: Number, required: true, min: 0 },
-    targetDate: { type: Date, required: true },
-    status: {
-      type: String,
-      enum: ["SUCCESS", "FAIL", "IN_PROGRESS"],
-      default: "IN_PROGRESS",
-      required: true,
-    },
+    targets: { type: [TargetSchema], required: true },
   },
   { timestamps: true }
 );
 
-GoalSchema.index({ walletId: 1, status: 1 });
-GoalSchema.index({ walletId: 1, targetDate: -1 });
+GoalSchema.index({ walletId: 1 }, { unique: true });
 
 const Goal = mongoose.model<IGoal>("Goal", GoalSchema);
 export default Goal;

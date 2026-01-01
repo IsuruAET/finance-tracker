@@ -39,4 +39,13 @@ export const API_PATHS = {
     GET: "/api/v1/client-config/get",
     UPDATE: "/api/v1/client-config/update",
   },
+  GOALS: {
+    MONTHLY: {
+      GET_BY_WALLET: "/api/v1/goals/monthly/wallet",
+      GET_ALL: "/api/v1/goals/monthly/all",
+      UPSERT: "/api/v1/goals/monthly/upsert",
+      DELETE: "/api/v1/goals/monthly/delete",
+    },
+    WALLET_METRICS: "/api/v1/goals/wallet/metrics",
+  },
 };

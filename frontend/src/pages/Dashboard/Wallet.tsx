@@ -11,13 +11,25 @@ import axiosInstance from "../../utils/axiosInstance";
 import { API_PATHS } from "../../utils/apiPaths";
 import toast from "react-hot-toast";
 import { formatCurrency, formatDate } from "../../utils/helper";
-import { LuPlus, LuTrash2, LuPencil } from "react-icons/lu";
+import { LuPlus, LuTrash2, LuPencil, LuTarget } from "react-icons/lu";
 import TransferList from "../../components/Wallet/TransferList";
 import axios from "axios";
 import InfoCard from "../../components/Cards/InfoCard";
 import type { TransactionApiResponse } from "../../types/dashboard";
 import cashIcon from "../../assets/images/cash.png";
 import cardIcon from "../../assets/images/card.png";
+import MonthlyGoalModal from "../../components/Wallet/MonthlyGoalModal";
+
+interface MonthlyGoalStatus {
+  walletId:
+    | string
+    | {
+        _id: string;
+        name?: string;
+        type?: string;
+        balance?: number;
+      };
+}
 
 interface Wallet {
   _id: string;
@@ -69,6 +81,16 @@ const Wallet = () => {
     show: false,
     data: null,
   });
+  const [openMonthlyGoalModal, setOpenMonthlyGoalModal] = useState<{
+    show: boolean;
+    wallet: Wallet | null;
+  }>({
+    show: false,
+    wallet: null,
+  });
+  const [walletsWithMonthlyGoals, setWalletsWithMonthlyGoals] = useState<Set<string>>(
+    new Set()
+  );
 
   const fetchWallets = useCallback(async () => {
     if (loadingRef.current) return;
@@ -165,6 +187,15 @@ const Wallet = () => {
     fetchWallets();
   };
 
+  const handleMonthlyGoalClick = (wallet: Wallet) => {
+    setOpenMonthlyGoalModal({ show: true, wallet });
+  };
+
+  const handleMonthlyGoalComplete = () => {
+    setOpenMonthlyGoalModal({ show: false, wallet: null });
+    fetchMonthlyGoalsStatus();
+  };
+
   const handleDeleteWalletClick = (walletId: string) => {
     // Prevent deletion if there's only one wallet
     if (wallets.length === 1) {
@@ -223,10 +254,32 @@ const Wallet = () => {
     }
   };
 
+  const fetchMonthlyGoalsStatus = useCallback(async () => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.GOALS.MONTHLY.GET_ALL
+      );
+      if (response.data && Array.isArray(response.data)) {
+        const walletIds = new Set(
+          (response.data as MonthlyGoalStatus[]).map(
+            (goal) =>
+              (typeof goal.walletId === "object"
+                ? goal.walletId._id
+                : goal.walletId) || ""
+          )
+        );
+        setWalletsWithMonthlyGoals(walletIds);
+      }
+    } catch (error) {
+      console.error("Error fetching monthly goals status", error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchWallets();
     fetchTransfers();
-  }, [fetchWallets, fetchTransfers]);
+    fetchMonthlyGoalsStatus();
+  }, [fetchWallets, fetchTransfers, fetchMonthlyGoalsStatus]);
 
   const totalBalance = wallets.reduce((sum, wallet) => sum + wallet.balance, 0);
   const cashWallets = wallets.filter((wallet) => wallet.type === "CASH");
@@ -285,6 +338,17 @@ const Wallet = () => {
           desc={formatDate(wallet?.initializedAt || "")}
         />
         <div className="absolute top-2 right-2 flex gap-1 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all">
+          <button
+            onClick={() => handleMonthlyGoalClick(wallet)}
+            className={`${
+              walletsWithMonthlyGoals.has(wallet._id)
+                ? "text-primary bg-primary/10 border-primary/50"
+                : "text-text-secondary hover:text-primary dark:hover:text-primary"
+            } opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm`}
+            title="Set monthly goal"
+          >
+            <LuTarget className="h-5 w-5" />
+          </button>
           <button
             onClick={() => handleEditWalletClick(wallet)}
             className="text-text-secondary hover:text-primary dark:hover:text-primary opacity-100 lg:opacity-0 lg:group-hover:opacity-100 focus-visible:opacity-100 transition-all cursor-pointer p-1 rounded bg-bg-primary dark:bg-bg-secondary border border-border shadow-sm"
@@ -436,6 +500,21 @@ const Wallet = () => {
               walletId={openEditModal.wallet._id}
               currentName={openEditModal.wallet.name}
               onUpdateComplete={handleEditWalletComplete}
+            />
+          )}
+        </Modal>
+
+        <Modal
+          isOpen={openMonthlyGoalModal.show}
+          onClose={() => setOpenMonthlyGoalModal({ show: false, wallet: null })}
+          title="Monthly Goal"
+        >
+          {openMonthlyGoalModal.wallet && (
+            <MonthlyGoalModal
+              walletId={openMonthlyGoalModal.wallet._id}
+              walletName={openMonthlyGoalModal.wallet.name}
+              onClose={() => setOpenMonthlyGoalModal({ show: false, wallet: null })}
+              onSaveComplete={handleMonthlyGoalComplete}
             />
           )}
         </Modal>

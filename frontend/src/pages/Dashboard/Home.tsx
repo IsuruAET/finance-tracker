@@ -20,6 +20,24 @@ import MonthYearPicker from "../../components/Inputs/MonthYearPicker";
 import { useClientConfig } from "../../context/ClientConfigContext";
 import { useMonthYearFilter } from "../../context/MonthYearFilterContext";
 import { MdFilterList } from "react-icons/md";
+import TargetMeter from "../../components/Dashboard/TargetMeter";
+
+interface MonthlyGoalResponse {
+  _id: string;
+  walletId:
+    | string
+    | {
+        _id: string;
+        name: string;
+        type: string;
+        balance: number;
+      };
+  targetAmount: number;
+  targets: Array<{ amount: number; description?: string }>;
+  cumulativeTarget: number;
+  averageTarget: number;
+  currentBalance: number;
+}
 
 const Home = () => {
   const navigate = useNavigate();
@@ -35,6 +53,7 @@ const Home = () => {
     useState<DashboardDataResponse | null>(null);
   const loadingRef = useRef(false);
   const [mobileFiltersOpen, setMobileFiltersOpen] = useState(false);
+  const [monthlyGoals, setMonthlyGoals] = useState<MonthlyGoalResponse[]>([]);
 
   const accountStartMinDate = (() => {
     const iso =
@@ -73,9 +92,23 @@ const Home = () => {
     }
   }, [selectedMonth]);
 
+  const fetchMonthlyGoals = useCallback(async () => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATHS.GOALS.MONTHLY.GET_ALL
+      );
+      if (response.data && Array.isArray(response.data)) {
+        setMonthlyGoals(response.data);
+      }
+    } catch (error) {
+      console.error("Error fetching monthly goals", error);
+    }
+  }, []);
+
   useEffect(() => {
     fetchDashboardData();
-  }, [fetchDashboardData]);
+    fetchMonthlyGoals();
+  }, [fetchDashboardData, fetchMonthlyGoals]);
 
   // Listen for wallet initialization to refetch dashboard data
   useEffect(() => {
@@ -184,6 +217,34 @@ const Home = () => {
             onNavigate={() => navigate("/wallet")}
           />
         </div>
+
+        {/* Target Meters Section */}
+        {monthlyGoals.length > 0 && (
+          <div className="mt-6">
+            <h5 className="text-lg font-medium text-text-primary mb-4">Target Meters</h5>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {monthlyGoals.map((goal) => {
+                const wallet = goal.walletId;
+                if (!wallet) return null;
+
+                const walletId = typeof wallet === "object" ? wallet._id : wallet;
+                const walletName =
+                  typeof wallet === "object" ? wallet.name : "Unknown Wallet";
+
+                return (
+                  <TargetMeter
+                    key={goal._id}
+                    walletId={walletId}
+                    walletName={walletName}
+                    averageTarget={goal.averageTarget || 0}
+                    cumulativeTarget={goal.cumulativeTarget || goal.targetAmount || 0}
+                    selectedMonth={selectedMonth}
+                  />
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <RecentTransactions
